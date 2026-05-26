@@ -1,0 +1,427 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Betty Jeng — Coming Soon</title>
+<link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;600;700&family=Poppins:ital,wght@0,300;0,400;0,600;1,300;1,400&display=swap" rel="stylesheet">
+<style>
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+  :root {
+    --ink: #1a1a1a;
+    --ink-light: #4a4a4a;
+    --ink-lighter: #888;
+    --accent: #FC4C02;
+    --accent-hover: #e04000;
+    --bg: #FFFFFF;
+    --border: #e8e5e0;
+    --display: 'Montserrat', sans-serif;
+    --body: 'Poppins', sans-serif;
+  }
+
+  html { scroll-behavior: smooth; }
+
+  body {
+    background: var(--bg);
+    color: var(--ink);
+    font-family: var(--body);
+    font-weight: 300;
+    line-height: 1.7;
+    min-height: 100vh;
+    display: flex;
+    flex-direction: column;
+    -webkit-font-smoothing: antialiased;
+  }
+
+  /* ── HEADER ── */
+  header {
+    padding: 2rem 2.5rem;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    opacity: 0;
+    animation: fadeUp 0.6s ease forwards 0.1s;
+  }
+  .logo {
+    font-family: var(--display);
+    font-weight: 700;
+    font-size: 1.1rem;
+    letter-spacing: 0.04em;
+    text-transform: uppercase;
+    color: var(--ink);
+    text-decoration: none;
+  }
+  .logo span { color: var(--accent); }
+  .status-pill {
+    font-family: var(--display);
+    font-size: 0.65rem;
+    font-weight: 600;
+    letter-spacing: 0.14em;
+    text-transform: uppercase;
+    color: var(--ink-lighter);
+    border: 1px solid var(--border);
+    padding: 0.3rem 0.9rem;
+    border-radius: 100px;
+  }
+
+  /* ── HERO ── */
+  .hero {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    padding: 4rem 2.5rem 3rem;
+    max-width: 820px;
+    margin: 0 auto;
+    width: 100%;
+  }
+
+  .eyebrow {
+    font-family: var(--display);
+    font-size: 0.68rem;
+    font-weight: 600;
+    letter-spacing: 0.18em;
+    text-transform: uppercase;
+    color: var(--accent);
+    margin-bottom: 1.5rem;
+    opacity: 0;
+    animation: fadeUp 0.6s ease forwards 0.25s;
+    display: flex;
+    align-items: center;
+    gap: 0.7rem;
+  }
+  .eyebrow::before {
+    content: '';
+    display: inline-block;
+    width: 28px;
+    height: 2px;
+    background: var(--accent);
+    border-radius: 2px;
+  }
+
+  h1 {
+    font-family: var(--display);
+    font-size: clamp(2.4rem, 5.5vw, 3.9rem);
+    font-weight: 700;
+    line-height: 1.12;
+    letter-spacing: -0.025em;
+    color: var(--ink);
+    margin-bottom: 1.75rem;
+    opacity: 0;
+    animation: fadeUp 0.7s ease forwards 0.4s;
+  }
+  h1 .accent-word {
+    color: var(--accent);
+    font-weight: 600;
+    font-style: italic;
+    font-family: var(--body);
+  }
+
+  .hero-body {
+    font-family: var(--body);
+    font-size: 1rem;
+    font-weight: 300;
+    color: var(--ink-light);
+    max-width: 560px;
+    line-height: 1.9;
+    opacity: 0;
+    animation: fadeUp 0.7s ease forwards 0.55s;
+  }
+  .hero-body strong {
+    color: var(--ink);
+    font-weight: 600;
+  }
+
+  /* ── DIVIDER ── */
+  .divider {
+    width: 100%;
+    max-width: 820px;
+    margin: 0 auto;
+    padding: 0 2.5rem;
+    opacity: 0;
+    animation: fadeUp 0.6s ease forwards 0.65s;
+  }
+  .divider hr {
+    border: none;
+    border-top: 1px solid var(--border);
+  }
+
+  /* ── BELOW FOLD GRID ── */
+  .below-fold {
+    max-width: 820px;
+    margin: 0 auto;
+    width: 100%;
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 3.5rem;
+    padding: 3rem 2.5rem;
+    opacity: 0;
+    animation: fadeUp 0.7s ease forwards 0.75s;
+  }
+
+  /* ── LEFT COL ── */
+  .left-col h2 {
+    font-family: var(--display);
+    font-size: 1.25rem;
+    font-weight: 600;
+    line-height: 1.35;
+    margin-bottom: 1rem;
+    letter-spacing: -0.01em;
+    color: var(--ink);
+  }
+  .left-col p {
+    font-family: var(--body);
+    font-size: 0.93rem;
+    font-weight: 300;
+    color: var(--ink-light);
+    line-height: 1.9;
+  }
+  .left-col p strong {
+    color: var(--ink);
+    font-weight: 600;
+  }
+
+  /* ── FORM COL ── */
+  .form-col h2 {
+    font-family: var(--display);
+    font-size: 1.15rem;
+    font-weight: 600;
+    margin-bottom: 0.3rem;
+    letter-spacing: -0.01em;
+    color: var(--ink);
+  }
+  .form-col p.form-sub {
+    font-family: var(--body);
+    font-size: 0.82rem;
+    font-weight: 300;
+    color: var(--ink-lighter);
+    margin-bottom: 1.3rem;
+    font-style: italic;
+  }
+
+  .form-group { margin-bottom: 0.8rem; }
+  .form-group input,
+  .form-group textarea {
+    width: 100%;
+    background: white;
+    border: 1px solid var(--border);
+    border-radius: 7px;
+    padding: 0.72rem 0.95rem;
+    font-family: var(--body);
+    font-size: 0.85rem;
+    font-weight: 300;
+    color: var(--ink);
+    transition: border-color 0.2s, box-shadow 0.2s;
+    outline: none;
+    resize: none;
+  }
+  .form-group input::placeholder,
+  .form-group textarea::placeholder { color: #bbb; }
+  .form-group input:focus,
+  .form-group textarea:focus {
+    border-color: var(--accent);
+    box-shadow: 0 0 0 3px rgba(252,76,2,0.08);
+  }
+  .form-group input.error { border-color: var(--accent); }
+
+  .btn {
+    width: 100%;
+    background: var(--accent);
+    color: white;
+    border: none;
+    border-radius: 7px;
+    padding: 0.82rem 1.5rem;
+    font-family: var(--display);
+    font-size: 0.8rem;
+    font-weight: 600;
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+    cursor: pointer;
+    transition: background 0.2s, transform 0.15s, box-shadow 0.2s;
+    box-shadow: 0 4px 14px rgba(252,76,2,0.25);
+  }
+  .btn:hover {
+    background: var(--accent-hover);
+    transform: translateY(-1px);
+    box-shadow: 0 6px 18px rgba(252,76,2,0.32);
+  }
+  .btn:active { transform: translateY(0); box-shadow: none; }
+
+  .form-success {
+    display: none;
+    text-align: center;
+    padding: 1.75rem 1.25rem;
+    background: white;
+    border: 1px solid var(--border);
+    border-radius: 7px;
+  }
+  .form-success .success-icon {
+    font-size: 1.8rem;
+    margin-bottom: 0.5rem;
+  }
+  .form-success strong {
+    display: block;
+    font-family: var(--display);
+    font-size: 1rem;
+    font-weight: 600;
+    color: var(--ink);
+    margin-bottom: 0.4rem;
+  }
+  .form-success p {
+    font-size: 0.85rem;
+    font-weight: 300;
+    color: var(--ink-light);
+  }
+
+  /* ── FOOTER ── */
+  footer {
+    max-width: 820px;
+    margin: 0 auto;
+    width: 100%;
+    padding: 1.5rem 2.5rem 2.5rem;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    border-top: 1px solid var(--border);
+    opacity: 0;
+    animation: fadeUp 0.6s ease forwards 1.05s;
+  }
+  .footer-note {
+    font-family: var(--body);
+    font-size: 0.78rem;
+    font-weight: 300;
+    color: var(--ink-lighter);
+    font-style: italic;
+  }
+  .copyright {
+    font-family: var(--display);
+    font-size: 0.7rem;
+    font-weight: 600;
+    color: var(--ink-lighter);
+    letter-spacing: 0.06em;
+    text-transform: uppercase;
+  }
+
+  /* ── ANIMATIONS ── */
+  @keyframes fadeUp {
+    from { opacity: 0; transform: translateY(16px); }
+    to   { opacity: 1; transform: translateY(0); }
+  }
+
+  /* ── MOBILE ── */
+  @media (max-width: 640px) {
+    header { padding: 1.5rem; }
+    .hero { padding: 3rem 1.5rem 2rem; }
+    .divider { padding: 0 1.5rem; }
+    .below-fold {
+      grid-template-columns: 1fr;
+      gap: 2.5rem;
+      padding: 2.5rem 1.5rem;
+    }
+    footer {
+      padding: 1.5rem;
+      flex-direction: column;
+      gap: 0.5rem;
+      text-align: center;
+    }
+  }
+</style>
+</head>
+<body>
+
+<header>
+  <a class="logo" href="#">Betty<span>.</span>Jeng</a>
+  <span class="status-pill">Coming Soon</span>
+</header>
+
+<section class="hero">
+  <div class="eyebrow">Something new is coming</div>
+  <h1>Built with intention.<br><span class="accent-word">Launched with purpose.</span></h1>
+  <p class="hero-body">
+    I'm <strong>Betty Jeng</strong> — a multidisciplinary program and change management leader with a soft spot for the messy middle: the integrations, the releases, the transformations that actually stick. I'm building a focused space to share my work, my thinking, and the projects that have me genuinely excited.
+    <br><br>
+    Open to opportunities with <strong>employers, clients, and collaborators</strong> who want someone who brings both the strategy and the follow-through.
+  </p>
+</section>
+
+<div class="divider"><hr></div>
+
+<div class="below-fold">
+
+  <div class="left-col">
+    <h2>New work &amp; collaborations<br>are launching soon.</h2>
+    <p>
+      I'm curating a portfolio of MVPs, content strategy, and change management work — the kind that moves organizations forward without breaking the humans inside them.<br><br>
+      If you're <strong>hiring, commissioning, or just want to think out loud together</strong> — I'm all ears.
+    </p>
+  </div>
+
+  <div class="form-col">
+    <h2>Let's get in touch.</h2>
+    <p class="form-sub">No pitch decks required — just say hello.</p>
+    <iframe name="hidden-submit" style="display:none;"></iframe>
+    <form id="contact-form" name="contact" netlify data-netlify="true" target="hidden-submit" onsubmit="handleSubmit(event)">
+      <input type="hidden" name="form-name" value="contact" />
+      <div class="form-group">
+        <input type="email" id="email" name="email" placeholder="Your email address" />
+      </div>
+      <div class="form-group">
+        <textarea id="note" name="note" rows="4" placeholder="What's on your mind? (hiring, collaborating, commissioning, or just curious...)"></textarea>
+      </div>
+      <button type="submit" class="btn">Contact Me →</button>
+    </form>
+    <div class="form-success" id="form-success">
+      <div class="success-icon">🧡</div>
+      <strong>Message sent — thank you!</strong>
+      <p>I'll be in touch soon. Good things are coming.</p>
+    </div>
+  </div>
+
+</div>
+
+<footer>
+  <span class="footer-note">Good things take a little time. Thanks for stopping by.</span>
+  <span class="copyright">© 2026 Betty Jeng</span>
+</footer>
+
+<script>
+function handleSubmit(e) {
+  const emailEl = document.getElementById('email');
+  const email   = emailEl.value.trim();
+
+  emailEl.classList.remove('error');
+
+  if (!email || !email.includes('@')) {
+    e.preventDefault();
+    emailEl.classList.add('error');
+    emailEl.focus();
+    return;
+  }
+
+  // Let the form submit naturally to the hidden iframe (no redirect)
+  // then swap UI after a short delay to confirm success
+  setTimeout(function() {
+    document.getElementById('contact-form').style.display = 'none';
+    document.getElementById('form-success').style.display = 'block';
+  }, 600);
+}
+
+// Responsive grid
+function checkMobile() {
+  const grid = document.querySelector('.below-fold');
+  if (!grid) return;
+  if (window.innerWidth <= 640) {
+    grid.style.gridTemplateColumns = '1fr';
+    grid.style.padding = '2.5rem 1.5rem';
+  } else {
+    grid.style.gridTemplateColumns = '1fr 1fr';
+    grid.style.padding = '3rem 2.5rem';
+  }
+}
+checkMobile();
+window.addEventListener('resize', checkMobile);
+</script>
+
+</body>
+</html>

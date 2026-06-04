@@ -8,12 +8,12 @@
 <!-- Social sharing preview (LinkedIn, X, etc.) -->
 <meta property="og:type" content="website">
 <meta property="og:url" content="https://bettyjeng.com/ai-readiness/">
-<meta property="og:title" content="Is your team ready for AI? The Human-First Readiness Check.">
-<meta property="og:description" content="Five honest questions. One personalized, human-first adoption plan. A free 90 second assessment by Betty Jeng.">
+<meta property="og:title" content="Is your team ready for AI? The Human-First Readiness Check">
+<meta property="og:description" content="Five honest questions. One personalized, human-first adoption plan. A free tool by Betty Jeng.">
 <meta property="og:image" content="https://bettyjeng.com/ai-readiness/preview.png">
 <meta name="twitter:card" content="summary_large_image">
-<meta name="twitter:title" content="Is your team ready for AI? The Human-First Readiness Check.">
-<meta name="twitter:description" content="Five honest questions. One personalized, human-first adoption plan. A free 90 second assessment by Betty Jeng.">
+<meta name="twitter:title" content="Is your team ready for AI? The Human-First Readiness Check">
+<meta name="twitter:description" content="Five honest questions. One personalized, human-first adoption plan. A free tool by Betty Jeng.">
 <meta name="twitter:image" content="https://bettyjeng.com/ai-readiness/preview.png">
 <script type="application/ld+json">
 {"@context":"https://schema.org","@type":"WebApplication","name":"AI Adoption Readiness Check","applicationCategory":"BusinessApplication","operatingSystem":"Web","offers":{"@type":"Offer","price":"0","priceCurrency":"USD"},"author":{"@type":"Person","name":"Betty Jeng","url":"https://bettyjeng.com/"},"description":"A free self-check that reveals whether your team is ready to adopt AI and generates a personalized, human-first adoption plan."}
@@ -54,7 +54,8 @@
   .wrap{width:100%;max-width:680px;position:relative;z-index:1}
 
   /* ---------- header ---------- */
-  .brand{display:flex;align-items:center;gap:11px;margin-bottom:clamp(22px,5vw,40px)}
+  .brand{display:flex;align-items:center;gap:11px;margin-bottom:clamp(22px,5vw,40px);text-decoration:none;cursor:pointer}
+  .brand:hover span{color:var(--ink-soft)}
   .mark{width:34px;height:34px;border-radius:50%;flex:none;position:relative;
     background:linear-gradient(140deg,#FF7A3D,var(--accent));box-shadow:0 4px 14px rgba(252,76,2,.32)}
   .mark::after{content:"";position:absolute;inset:6px 6px 50% 6px;border-radius:50% 50% 0 0;
@@ -144,14 +145,17 @@
 
   .foot{text-align:center;margin-top:26px;font-size:12.5px;color:var(--ink-faint);font-style:italic;
     font-family:var(--body)}
+  .foot-cta{text-align:center;margin-top:10px}
+  .foot-cta a{font-family:var(--body);font-weight:600;font-size:14px;color:var(--accent);text-decoration:none}
+  .foot-cta a:hover{color:var(--accent-deep)}
   .hidden{display:none}
 </style>
 
 <div class="wrap">
-  <div class="brand">
+  <a class="brand" href="/">
     <div class="mark"></div>
     <span>The Human Mirror</span>
-  </div>
+  </a>
 
   <!-- INTRO -->
   <div class="card" id="intro">
@@ -181,6 +185,7 @@
   <div class="card hidden" id="result"></div>
 
   <div class="foot">A human-first tool. AI is a mirror of our best ideals.</div>
+  <div class="foot-cta"><a href="/">Built by Betty Jeng — want to talk? Get in touch →</a></div>
 </div>
 
 <script>

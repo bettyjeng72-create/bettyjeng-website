@@ -1,0 +1,411 @@
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>AI Adoption Readiness Check — A Human-First Tool by Betty Jeng</title>
+<meta name="description" content="A free 90-second self-check that reveals whether your team is truly ready to adopt AI — then hands you a personalized, human-first adoption plan. Built by change-management leader Betty Jeng.">
+<meta name="author" content="Betty Jeng">
+<meta name="robots" content="index, follow">
+<link rel="canonical" href="https://bettyjeng.com/ai-readiness/">
+<!-- Social sharing preview (LinkedIn, X, etc.) -->
+<meta property="og:type" content="website">
+<meta property="og:url" content="https://bettyjeng.com/ai-readiness/">
+<meta property="og:title" content="Is your team ready for AI? The Human-First Readiness Check">
+<meta property="og:description" content="Five honest questions. One personalized, human-first adoption plan. A free tool by Betty Jeng.">
+<meta property="og:image" content="https://bettyjeng.com/ai-readiness/preview.png">
+<meta name="twitter:card" content="summary_large_image">
+<meta name="twitter:title" content="Is your team ready for AI? The Human-First Readiness Check">
+<meta name="twitter:description" content="Five honest questions. One personalized, human-first adoption plan. A free tool by Betty Jeng.">
+<meta name="twitter:image" content="https://bettyjeng.com/ai-readiness/preview.png">
+<script type="application/ld+json">
+{"@context":"https://schema.org","@type":"WebApplication","name":"AI Adoption Readiness Check","applicationCategory":"BusinessApplication","operatingSystem":"Web","offers":{"@type":"Offer","price":"0","priceCurrency":"USD"},"author":{"@type":"Person","name":"Betty Jeng","url":"https://bettyjeng.com/"},"description":"A free self-check that reveals whether your team is ready to adopt AI and generates a personalized, human-first adoption plan."}
+</script>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Montserrat:ital,wght@0,400;0,500;0,600;0,700;1,500;1,600&family=Poppins:ital,wght@0,400;0,500;0,600;1,400&display=swap" rel="stylesheet">
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+<style>
+  :root{
+    --bg:#FFFFFF;
+    --tint:#FAF7F3;
+    --ink:#1a1a1a;
+    --ink-soft:#4a4a4a;
+    --ink-faint:#888888;
+    --accent:#FC4C02;
+    --accent-deep:#e04000;
+    --line:#e8e5e0;
+    --off:#dcd8d2;
+    --shadow:rgba(26,26,26,.12);
+    --display:'Montserrat',sans-serif;
+    --body:'Poppins',sans-serif;
+  }
+  *{box-sizing:border-box;margin:0;padding:0}
+  html,body{background:var(--bg);color:var(--ink);font-family:var(--body)}
+  body{
+    min-height:100vh;
+    background:
+      radial-gradient(90% 60% at 88% -8%, rgba(252,76,2,.055), transparent 60%),
+      var(--bg);
+    display:flex;justify-content:center;
+    padding:clamp(16px,4vw,48px);
+  }
+  body::before{
+    content:"";position:fixed;inset:0;pointer-events:none;opacity:.35;mix-blend-mode:multiply;
+    background-image:url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='120' height='120'><filter id='n'><feTurbulence type='fractalNoise' baseFrequency='.9' numOctaves='2'/></filter><rect width='100%25' height='100%25' filter='url(%23n)' opacity='.035'/></svg>");
+  }
+  .wrap{width:100%;max-width:680px;position:relative;z-index:1}
+
+  /* ---------- header ---------- */
+  .brand{display:flex;align-items:center;gap:11px;margin-bottom:clamp(22px,5vw,40px)}
+  .mark{width:34px;height:34px;border-radius:50%;flex:none;position:relative;
+    background:linear-gradient(140deg,#FF7A3D,var(--accent));box-shadow:0 4px 14px rgba(252,76,2,.32)}
+  .mark::after{content:"";position:absolute;inset:6px 6px 50% 6px;border-radius:50% 50% 0 0;
+    background:rgba(255,255,255,.55)}
+  .brand span{font-family:var(--body);font-weight:600;font-size:12px;letter-spacing:.18em;
+    text-transform:uppercase;color:var(--ink-faint)}
+
+  .card{
+    background:var(--bg);border:1px solid var(--line);border-radius:20px;
+    padding:clamp(26px,5vw,46px);box-shadow:0 20px 46px -30px var(--shadow);
+    animation:rise .6s cubic-bezier(.2,.7,.2,1) both;
+  }
+  @keyframes rise{from{opacity:0;transform:translateY(14px)}to{opacity:1;transform:none}}
+  @keyframes fade{from{opacity:0;transform:translateY(8px)}to{opacity:1;transform:none}}
+
+  .eyebrow{font-family:var(--body);font-weight:600;font-size:12px;letter-spacing:.16em;
+    text-transform:uppercase;color:var(--accent);margin-bottom:14px}
+  h1{font-family:var(--display);font-weight:700;font-size:clamp(29px,6.2vw,44px);
+    line-height:1.08;letter-spacing:-.02em;margin-bottom:16px}
+  h1 em{font-style:italic;font-weight:600;color:var(--accent)}
+  .lede{font-size:clamp(15px,2.4vw,17px);line-height:1.6;color:var(--ink-soft);max-width:52ch;font-weight:400}
+  .meta{margin-top:22px;font-size:13.5px;color:var(--ink-faint);display:flex;gap:18px;flex-wrap:wrap}
+  .meta b{color:var(--ink);font-weight:600}
+
+  .btn{
+    appearance:none;border:none;cursor:pointer;font-family:var(--body);font-weight:600;
+    font-size:15.5px;color:#fff;background:var(--ink);padding:15px 26px;border-radius:12px;
+    transition:transform .15s ease, background .2s ease;margin-top:30px;display:inline-flex;
+    align-items:center;gap:10px;
+  }
+  .btn:hover{transform:translateY(-2px);background:var(--accent)}
+  .btn.ghost{background:transparent;color:var(--ink);border:1.5px solid var(--line);margin-top:0}
+  .btn.ghost:hover{background:var(--tint);color:var(--ink)}
+
+  /* ---------- progress ---------- */
+  .progress{display:flex;align-items:center;gap:13px;margin-bottom:30px}
+  .track{flex:1;height:7px;border-radius:99px;background:var(--tint);overflow:hidden;border:1px solid var(--line)}
+  .fill{height:100%;width:0;border-radius:99px;background:var(--accent);
+    transition:width .5s cubic-bezier(.2,.7,.2,1)}
+  .count{font-size:12.5px;font-weight:600;color:var(--ink-faint);font-variant-numeric:tabular-nums;white-space:nowrap}
+
+  .qdim{font-family:var(--body);font-weight:600;font-size:12px;letter-spacing:.16em;
+    text-transform:uppercase;color:var(--accent);margin-bottom:12px}
+  .qtext{font-family:var(--display);font-weight:600;font-size:clamp(21px,4.2vw,29px);
+    line-height:1.22;letter-spacing:-.01em;margin-bottom:26px}
+  .opts{display:flex;flex-direction:column;gap:12px}
+  .opt{
+    text-align:left;cursor:pointer;font-family:var(--body);font-size:15.5px;line-height:1.45;font-weight:400;
+    color:var(--ink);background:var(--bg);border:1.5px solid var(--line);border-radius:13px;
+    padding:17px 19px;transition:border-color .18s ease, background .18s ease, transform .12s ease;
+    display:flex;gap:14px;align-items:flex-start;animation:fade .4s both;
+  }
+  .opt:hover{border-color:var(--accent);background:var(--tint);transform:translateX(3px)}
+  .dot{width:20px;height:20px;border-radius:50%;border:2px solid var(--off);flex:none;margin-top:1px;transition:.18s}
+  .opt:hover .dot{border-color:var(--accent);box-shadow:inset 0 0 0 4px var(--accent)}
+  .opt.selected{border-color:var(--accent);background:var(--tint)}
+  .opt.selected .dot{border-color:var(--accent);box-shadow:inset 0 0 0 4px var(--accent)}
+
+  .nav{display:flex;justify-content:space-between;align-items:center;gap:12px;margin-top:28px}
+  .nav .btn{margin-top:0}
+  .btn:disabled{opacity:.38;cursor:not-allowed;transform:none}
+  .btn:disabled:hover{background:var(--ink);transform:none}
+  .btn.ghost.invis{visibility:hidden}
+
+  /* ---------- results ---------- */
+  .tierbadge{display:inline-flex;align-items:center;gap:9px;font-family:var(--body);font-weight:600;
+    font-size:12px;letter-spacing:.1em;text-transform:uppercase;color:var(--accent);
+    background:var(--tint);border:1px solid var(--line);padding:8px 14px;border-radius:99px;margin-bottom:18px}
+  .scorebig{font-family:var(--display);font-weight:700;font-size:clamp(32px,7vw,50px);
+    line-height:1.05;margin-bottom:12px;letter-spacing:-.02em}
+  .tiersum{font-size:15.5px;line-height:1.6;color:var(--ink-soft);max-width:54ch;margin-bottom:6px;font-weight:400}
+  .planhead{margin:34px 0 4px;font-family:var(--body);font-weight:600;font-size:12px;letter-spacing:.16em;
+    text-transform:uppercase;color:var(--ink-faint)}
+  .plan{display:flex;flex-direction:column;gap:2px;margin-top:14px}
+  .step{padding:20px 0;border-top:1px solid var(--line);animation:fade .5s both}
+  .step:last-child{border-bottom:1px solid var(--line)}
+  .step-top{display:flex;align-items:center;gap:12px;margin-bottom:8px}
+  .pips{display:flex;gap:4px}
+  .pip{width:8px;height:8px;border-radius:50%;background:var(--off)}
+  .pip.on{background:var(--accent)}
+  .step-name{font-family:var(--display);font-weight:600;font-size:18px}
+  .step-body{font-size:15px;line-height:1.62;color:var(--ink-soft);font-weight:400}
+  .actions{display:flex;gap:12px;flex-wrap:wrap;margin-top:32px;align-items:center}
+  .actions .btn{margin-top:0}
+  .copied{font-size:13.5px;font-weight:600;color:var(--accent);opacity:0;transition:.2s}
+  .copied.show{opacity:1}
+
+  .foot{text-align:center;margin-top:26px;font-size:12.5px;color:var(--ink-faint);font-style:italic;
+    font-family:var(--body)}
+  .hidden{display:none}
+</style>
+
+<div class="wrap">
+  <div class="brand">
+    <div class="mark"></div>
+    <span>The Human Mirror</span>
+  </div>
+
+  <!-- INTRO -->
+  <div class="card" id="intro">
+    <div class="eyebrow">A human-first self-check</div>
+    <h1>Is your team <em>ready</em> for AI?<br>Not the tech &mdash; the <em>people</em>.</h1>
+    <p class="lede">Five honest questions. One personalized plan. This isn't about whether you have the right tools &mdash; it's about whether your people are set up to actually adopt them. Because adoption moves at the speed of trust.</p>
+    <div class="meta"><span><b>5</b> questions</span><span><b>~90</b> seconds</span><span><b>0</b> jargon</span></div>
+    <button class="btn" onclick="start()">Start the check &nbsp;&rarr;</button>
+  </div>
+
+  <!-- QUIZ -->
+  <div class="card hidden" id="quiz">
+    <div class="progress">
+      <div class="track"><div class="fill" id="fill"></div></div>
+      <div class="count" id="count">1 / 5</div>
+    </div>
+    <div class="qdim" id="qdim"></div>
+    <div class="qtext" id="qtext"></div>
+    <div class="opts" id="opts"></div>
+    <div class="nav">
+      <button class="btn ghost" id="prevBtn" onclick="prev()">&larr;&nbsp; Previous</button>
+      <button class="btn" id="nextBtn" onclick="next()" disabled>Next &nbsp;&rarr;</button>
+    </div>
+  </div>
+
+  <!-- RESULT -->
+  <div class="card hidden" id="result"></div>
+
+  <div class="foot">A human-first tool. AI is a mirror of our best ideals.</div>
+</div>
+
+<script>
+const QUESTIONS = [
+  { key:"vision", dim:"Vision", name:"A clear reason why",
+    q:"Why is your organization pursuing AI?",
+    opts:[
+      {t:"There's pressure to \u201Cdo AI,\u201D but we haven't defined why.",s:1},
+      {t:"A few leaders are interested, but it's not formalized.",s:2},
+      {t:"We have a clear, shared reason AI matters to our mission.",s:3},
+    ]},
+  { key:"culture", dim:"Culture", name:"How people feel",
+    q:"How does your team feel about AI right now?",
+    opts:[
+      {t:"Anxious \u2014 people worry about their jobs.",s:1},
+      {t:"Mixed \u2014 some curious, some resistant.",s:2},
+      {t:"Mostly curious and willing to experiment.",s:3},
+    ]},
+  { key:"skills", dim:"Skills", name:"AI literacy",
+    q:"Where is your team's hands-on AI literacy?",
+    opts:[
+      {t:"Most people have barely used AI tools.",s:1},
+      {t:"A few power users; everyone else is behind.",s:2},
+      {t:"Broad comfort with everyday AI tools.",s:3},
+    ]},
+  { key:"process", dim:"Process", name:"Workflow readiness",
+    q:"How would AI fit into how you actually work?",
+    opts:[
+      {t:"We'd bolt AI onto our current processes as-is.",s:1},
+      {t:"We've talked about redesigning but haven't yet.",s:2},
+      {t:"We're actively redesigning workflows around AI.",s:3},
+    ]},
+  { key:"purpose", dim:"Purpose", name:"Augment vs. replace",
+    q:"What's the real goal behind adopting AI?",
+    opts:[
+      {t:"Honestly, mostly to cut costs and headcount.",s:1},
+      {t:"Unclear \u2014 maybe both.",s:2},
+      {t:"To augment people and retrain them for higher-value work.",s:3},
+    ]},
+];
+
+const ADVICE = {
+  vision:{
+    1:"Name the \u201Cwhy\u201D before the \u201Cwhat.\u201D Pressure to \u201Cdo AI\u201D without a shared reason is exactly how pilots stall. Write one honest sentence: what does AI make possible for the people you serve? Everything else hangs off that.",
+    2:"Turn interest into intent. A few curious leaders is a great start \u2014 now make it official. Have that group co-author a short, shared statement of why AI matters here, so the purpose survives past the early enthusiasm.",
+    3:"You have the rarest thing: a clear why. Protect it. Say it out loud at the start of every AI conversation, so purpose leads and the tools follow \u2014 never the other way around."
+  },
+  culture:{
+    1:"Start with safety, not software. Before any tool rolls out, name the fear out loud: no one is being automated away. Hold a short, judgment-free session where people share what worries them, then commit \u2014 in writing \u2014 to retraining over replacement. Adoption moves at the speed of trust, and trust starts with honesty.",
+    2:"Meet people where they are. Mixed feelings are normal and healthy. Pair your curious early adopters with the more hesitant folks as buddies \u2014 peer trust converts skeptics far faster than any top-down mandate.",
+    3:"Channel the curiosity before it cools. Willingness is a window, not a guarantee. Give people a low-stakes sandbox and explicit permission to play this month, so enthusiasm hardens into real habits."
+  },
+  skills:{
+    1:"Begin with everyday wins, not grand training. If most people have barely touched AI, skip the heavy curriculum. Show each person one genuinely useful ten-minute task \u2014 that first \u201Coh, that's helpful\u201D moment does more than a dozen workshops.",
+    2:"Spread the power, don't silo it. Your handful of power users is a hidden asset. Ask them to run short, informal \u201Cshow me how you did that\u201D sessions \u2014 internal teachers build literacy and confidence at the same time.",
+    3:"Level up from using to judging. Broad comfort means it's time to teach discernment: when to trust AI output, when to question it, and how to keep human judgment in the loop. That's the skill that separates real adoption from blind reliance."
+  },
+  process:{
+    1:"Resist the bolt-on. Dropping AI onto an unchanged process usually just adds a step. Pick one workflow and ask: \u201Cif we redesigned this around what AI does well, what would we stop doing?\u201D Redesign is where the real gains live.",
+    2:"Move from talking to one experiment. You've discussed redesign \u2014 now prove it small. Choose a single workflow, rebuild it end-to-end with AI in the loop, and measure the before and after. One visible win unlocks the rest.",
+    3:"You're doing the hard part \u2014 make it repeatable. Active redesign is rare and valuable. Capture what's working as a simple, reusable playbook so the next workflow takes a fraction of the effort. Repeatability is the real edge."
+  },
+  purpose:{
+    1:"This is the fork in the road. Using AI mainly to cut headcount feels efficient and quietly erodes the very trust adoption depends on. Reframe the goal: what higher-value work could your people move toward if AI carried the repetitive load? Augmentation keeps your talent \u2014 and your culture \u2014 intact.",
+    2:"Get clear, out loud. \u201CMaybe both\u201D is the most dangerous answer, because your team fills the silence with fear. Decide and say it plainly: AI is here to augment and retrain, not replace. Clarity is a kindness.",
+    3:"This is your superpower \u2014 say it louder. Choosing to augment and retrain isn't just ethical, it's what makes adoption actually stick. Make this promise visible and public; it's the single biggest reason people lean in instead of bracing for impact."
+  }
+};
+
+const TIERS = [
+  {min:5,max:8, name:"Curious Starter",
+   sum:"You're at the very beginning \u2014 and that's exactly the right place to build from. The foundations you set now will decide whether AI sticks or stalls. Good news: every item below is within reach."},
+  {min:9,max:11,name:"Building Momentum",
+   sum:"You've got real traction. A few focused moves will turn scattered progress into genuine, durable adoption. You're closer than it feels."},
+  {min:12,max:15,name:"Adoption-Ready",
+   sum:"You're in rare company \u2014 most organizations never get here. Your job now is to protect what's working and make it repeatable across the whole organization."},
+];
+
+let idx=0, answers=new Array(QUESTIONS.length).fill(null);
+const byId=id=>document.getElementById(id);
+
+function start(){ idx=0; answers=new Array(QUESTIONS.length).fill(null);
+  byId("intro").classList.add("hidden");
+  byId("result").classList.add("hidden"); byId("quiz").classList.remove("hidden"); render(); }
+
+function render(){
+  const Q=QUESTIONS[idx];
+  byId("fill").style.width=(idx/QUESTIONS.length*100)+"%";
+  byId("count").textContent=(idx+1)+" / "+QUESTIONS.length;
+  byId("qdim").textContent=Q.dim;
+  byId("qtext").textContent=Q.q;
+  const box=byId("opts"); box.innerHTML="";
+  Q.opts.forEach((o,i)=>{
+    const b=document.createElement("button");
+    b.className="opt"+(answers[idx]&&answers[idx].optIndex===i?" selected":"");
+    b.style.animationDelay=(i*60)+"ms";
+    b.innerHTML='<span class="dot"></span><span>'+o.t+'</span>';
+    b.onclick=()=>select(i);
+    box.appendChild(b);
+  });
+  // nav state
+  byId("prevBtn").classList.toggle("invis", idx===0);
+  const nx=byId("nextBtn");
+  nx.textContent = idx===QUESTIONS.length-1 ? "See my plan  \u2192" : "Next  \u2192";
+  nx.disabled = !answers[idx];
+}
+
+function select(i){
+  const Q=QUESTIONS[idx], o=Q.opts[i];
+  answers[idx]={key:Q.key,dim:Q.dim,name:Q.name,score:o.s,optIndex:i};
+  [...byId("opts").children].forEach((el,j)=>el.classList.toggle("selected",j===i));
+  byId("nextBtn").disabled=false;
+}
+
+function next(){
+  if(!answers[idx]) return;
+  if(idx<QUESTIONS.length-1){ idx++; render(); }
+  else { byId("fill").style.width="100%"; finish(); }
+}
+
+function prev(){ if(idx>0){ idx--; render(); } }
+
+function finish(){
+  const total=answers.reduce((a,b)=>a+b.score,0);
+  const tier=TIERS.find(t=>total>=t.min&&total<=t.max);
+  const ordered=[...answers].sort((a,b)=>a.score-b.score); // biggest opportunities first
+  const steps=ordered.map((a,i)=>{
+    const pips=[1,2,3].map(n=>'<span class="pip '+(n<=a.score?"on":"")+'"></span>').join("");
+    return '<div class="step" style="animation-delay:'+(i*80+120)+'ms">'+
+      '<div class="step-top"><span class="pips">'+pips+'</span><span class="step-name">'+a.name+'</span></div>'+
+      '<div class="step-body">'+ADVICE[a.key][a.score]+'</div></div>';
+  }).join("");
+
+  byId("result").innerHTML=
+    '<div class="tierbadge">Your readiness \u2022 '+total+' / 15</div>'+
+    '<div class="scorebig">'+tier.name+'</div>'+
+    '<p class="tiersum">'+tier.sum+'</p>'+
+    '<div class="planhead">Your human-first plan \u2014 biggest opportunities first</div>'+
+    '<div class="plan">'+steps+'</div>'+
+    '<div class="actions">'+
+      '<button class="btn" onclick="downloadPDF()">Download my plan (PDF)</button>'+
+      '<button class="btn ghost" onclick="copyPlan()">Copy as text</button>'+
+      '<button class="btn ghost" onclick="start()">Start over</button>'+
+      '<span class="copied" id="copied">Copied \u2713</span>'+
+    '</div>';
+  byId("quiz").classList.add("hidden");
+  byId("result").classList.remove("hidden");
+  byId("result").scrollIntoView({behavior:"smooth",block:"start"});
+}
+
+function copyPlan(){
+  const total=answers.reduce((a,b)=>a+b.score,0);
+  const tier=TIERS.find(t=>total>=t.min&&total<=t.max);
+  const ordered=[...answers].sort((a,b)=>a.score-b.score);
+  let txt="THE AI ADOPTION READINESS CHECK\n";
+  txt+="Result: "+tier.name+" ("+total+"/15)\n\n"+tier.sum+"\n\nYOUR HUMAN-FIRST PLAN\n";
+  ordered.forEach((a,i)=>{ txt+="\n"+(i+1)+". "+a.name+"\n"+ADVICE[a.key][a.score]+"\n"; });
+  txt+="\n\u2014 A human-first tool. AI is a mirror of our best ideals.";
+  navigator.clipboard.writeText(txt).then(()=>{
+    const c=byId("copied"); c.classList.add("show"); setTimeout(()=>c.classList.remove("show"),1800);
+  });
+}
+
+// strip characters the PDF core fonts render unreliably
+function clean(s){
+  return s.replace(/[\u201C\u201D]/g,'"').replace(/[\u2018\u2019]/g,"'").replace(/\u2014/g," \u2014 ");
+}
+// write a wrapped paragraph, breaking pages as needed; returns new y
+function addPara(doc,text,x,y,maxW,lh){
+  const lines=doc.splitTextToSize(clean(text),maxW);
+  lines.forEach(line=>{ if(y>752){doc.addPage();y=56;} doc.text(line,x,y); y+=lh; });
+  return y;
+}
+
+function downloadPDF(){
+  if(!window.jspdf||!window.jspdf.jsPDF){ copyPlan(); return; } // fallback if CDN blocked
+  const { jsPDF }=window.jspdf;
+  const total=answers.reduce((a,b)=>a+b.score,0);
+  const tier=TIERS.find(t=>total>=t.min&&total<=t.max);
+  const ordered=[...answers].sort((a,b)=>a.score-b.score);
+
+  const doc=new jsPDF({unit:"pt",format:"letter"});
+  const M=56, maxW=612-M*2;
+  let y=M+4;
+
+  doc.setFont("helvetica","bold"); doc.setFontSize(9); doc.setTextColor(252,76,2);
+  doc.text("THE AI ADOPTION READINESS CHECK", M, y);
+  // thin accent rule
+  doc.setDrawColor(252,76,2); doc.setLineWidth(2); doc.line(M, y+9, M+34, y+9);
+
+  y+=42; doc.setFont("helvetica","bold"); doc.setFontSize(26); doc.setTextColor(26,26,26);
+  doc.text(tier.name, M, y);
+  doc.setFont("helvetica","normal"); doc.setFontSize(11); doc.setTextColor(136,136,136);
+  doc.text("Readiness  "+total+" / 15", M, y+19);
+
+  y+=44; doc.setFontSize(11); doc.setTextColor(74,74,74);
+  y=addPara(doc, tier.sum, M, y, maxW, 16)+12;
+
+  doc.setFont("helvetica","bold"); doc.setFontSize(9); doc.setTextColor(136,136,136);
+  doc.text("YOUR HUMAN-FIRST PLAN  \u2014  BIGGEST OPPORTUNITIES FIRST", M, y); y+=20;
+
+  ordered.forEach(a=>{
+    if(y>720){ doc.addPage(); y=M; }
+    // score pips
+    let px=M; const py=y-4;
+    for(let n=1;n<=3;n++){
+      if(n<=a.score){ doc.setFillColor(252,76,2); doc.circle(px+3,py,3,"F"); }
+      else { doc.setDrawColor(210,205,200); doc.setLineWidth(1); doc.circle(px+3,py,3,"S"); }
+      px+=11;
+    }
+    doc.setFont("helvetica","bold"); doc.setFontSize(13); doc.setTextColor(26,26,26);
+    doc.text(a.name, M+44, y);
+    y+=18; doc.setFont("helvetica","normal"); doc.setFontSize(10.5); doc.setTextColor(74,74,74);
+    y=addPara(doc, ADVICE[a.key][a.score], M, y, maxW, 14.5)+16;
+  });
+
+  if(y>740){ doc.addPage(); y=740; }
+  doc.setFont("helvetica","italic"); doc.setFontSize(9); doc.setTextColor(136,136,136);
+  doc.text("A human-first tool.  AI is a mirror of our best ideals.", M, 772);
+
+  try {
+    doc.save("AI-Adoption-Readiness-Plan.pdf");
+  } catch(e){
+    try { window.open(doc.output("bloburl"),"_blank"); }
+    catch(e2){ copyPlan(); }
+  }
+}
+</script>

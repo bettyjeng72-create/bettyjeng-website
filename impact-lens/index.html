@@ -219,6 +219,7 @@
     .tablescroll{overflow:visible!important}
     table{table-layout:fixed;width:100%;font-size:8.5px}
     th,td{padding:4px 5px;word-break:break-word;overflow-wrap:anywhere;vertical-align:top}
+    th{font-size:7px;letter-spacing:0;word-break:normal;overflow-wrap:break-word;line-height:1.18}
     th:first-child,td:first-child{width:15%}
     th:nth-child(2),td:nth-child(2){width:7%}
     th:last-child,td:last-child{width:22%}
@@ -555,7 +556,7 @@ function qcap(x,y,t,c,anchor){return '<text x="'+x+'" y="'+y+'" text-anchor="'+(
 function tableHTML(){
   const a=activeDims();
   let h='<div class="tablescroll"><table><thead><tr><th>Group</th><th>People</th>';
-  a.forEach(d=>h+='<th>'+d+'</th>'); h+='<th>Suggested mitigation</th></tr></thead><tbody>';
+  a.forEach(d=>h+='<th>'+d.replace(/\//g,'/<wbr>')+'</th>'); h+='<th>Suggested mitigation</th></tr></thead><tbody>';
   state.groups.forEach((g,gi)=>{
     h+='<tr><td class="tg">'+escapeHtml(g.name||'Group '+(gi+1))+'<small>'+escapeHtml(g.role||'')+' · '+g.readiness+' readiness</small></td>';
     h+='<td>'+((g.users!==''&&g.users!=null)?g.users:'-')+'</td>';
@@ -620,7 +621,7 @@ function showExportSheet(){
     '<h3>Save your report as a PDF</h3>'+
     '<p>Tap <b>Open print</b> below, then save instead of sending to a printer:</p>'+
     '<ul>'+
-      '<li><b>iPhone / iPad:</b> pinch outward on the page preview to open it, then tap the Share icon and choose <b>Save to Files</b>.</li>'+
+      '<li><b>iPhone / iPad:</b> tap <b>Print</b> (top right), then under the Share options choose <b>Save to Files</b>.</li>'+
       '<li><b>Android:</b> open the printer dropdown at the top and pick <b>Save as PDF</b>.</li>'+
     '</ul>'+
     '<div class="es-actions"><button type="button" class="es-cancel">Cancel</button><button type="button" class="es-go">Open print</button></div>'+

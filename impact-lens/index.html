@@ -72,7 +72,7 @@
   @media(max-width:980px){.wrap{grid-template-columns:1fr}}
   .card{background:var(--bg);border:1px solid var(--line);border-radius:var(--radius);box-shadow:0 20px 46px -30px var(--shadow);animation:rise .6s cubic-bezier(.2,.7,.2,1) both}
   @keyframes rise{from{opacity:0;transform:translateY(12px)}to{opacity:1;transform:none}}
-  .builder{display:flex;flex-direction:column;gap:18px}
+  .builder{display:flex;flex-direction:column;gap:18px;min-width:0}
   .panel{padding:22px}
   .panel h2{font-size:16px;margin:0 0 15px;display:flex;align-items:center;gap:10px}
   .panel h2 i{font-style:normal;font-family:var(--display);font-size:12px;color:var(--accent);font-weight:700;background:var(--accent-soft);border:1px solid #F3CBB9;width:23px;height:23px;display:inline-flex;align-items:center;justify-content:center;border-radius:8px}
@@ -113,7 +113,7 @@
   .addgroup:hover{border-color:var(--accent);color:var(--accent-deep);background:var(--tint)}
 
   /* ---------- canvas ---------- */
-  .canvas{position:sticky;top:80px}
+  .canvas{position:sticky;top:80px;min-width:0}
   @media(max-width:980px){.canvas{position:static}}
   .tabs{display:flex;gap:4px;padding:6px;background:var(--tint);border:1px solid var(--line);border-radius:13px;margin-bottom:16px;width:fit-content}
   .tab{border:0;background:transparent;padding:9px 17px;border-radius:9px;font-size:13px;font-weight:600;color:var(--ink-faint);transition:.15s}
@@ -182,6 +182,18 @@
   .qnote{font-size:11.5px;color:var(--ink-faint);margin:11px 2px 0;line-height:1.5;font-style:italic}
   .disclaimer{font-size:12px;color:var(--ink-soft);font-style:italic;margin:14px 0 0;padding:11px 14px;background:var(--tint);border:1px solid var(--line);border-radius:11px;line-height:1.55}
   .printreport{display:none}
+  /* mobile save-as-PDF helper sheet */
+  .exportsheet{position:fixed;inset:0;z-index:60;display:flex;align-items:flex-end;justify-content:center;background:rgba(26,26,26,.46)}
+  .exportsheet .es-card{background:#fff;border-radius:18px 18px 0 0;max-width:520px;width:100%;padding:22px 22px 28px;box-shadow:0 -10px 34px rgba(0,0,0,.22);animation:esUp .22s ease}
+  @keyframes esUp{from{transform:translateY(40px);opacity:.4}to{transform:translateY(0);opacity:1}}
+  .exportsheet h3{font-family:var(--display);font-size:17px;font-weight:700;margin:0 0 5px;color:var(--ink)}
+  .exportsheet p{font-size:13px;color:var(--ink-soft);margin:0 0 11px;line-height:1.5}
+  .exportsheet ul{margin:0 0 17px;padding-left:19px;font-size:13px;color:var(--ink-soft);line-height:1.55}
+  .exportsheet li{margin-bottom:7px}
+  .exportsheet li b{color:var(--ink)}
+  .es-actions{display:flex;gap:10px}
+  .es-actions button{flex:1;border-radius:12px;padding:12px;font-size:14px;font-weight:600;font-family:var(--body);border:1.5px solid var(--line);background:#fff;color:var(--ink);cursor:pointer}
+  .es-actions .es-go{background:var(--ink);border-color:var(--ink);color:#fff}
 
   /* ---------- print ---------- */
   @media print{
@@ -197,6 +209,7 @@
     .printonly .rule{width:34px;height:2px;background:var(--accent);margin:6px 0 8px}
     .printonly p{margin:0;color:#555;font-size:12px}
     .printreport{display:block!important}
+    .exportsheet{display:none!important}
     .print-sec{margin:0 0 16px}
     .print-sec.brk{break-before:page;page-break-before:always}
     .print-h{font-family:var(--display);font-weight:700;font-size:14px;color:var(--accent-deep);margin:0 0 9px;break-after:avoid}
@@ -593,6 +606,31 @@ function buildPrintReport(){
     '<section class="print-sec brk"><h3 class="print-h">Personas: group by group</h3>'+personaHTML()+'</section>';
 }
 
+function exportPDF(){
+  buildPrintReport();
+  var mobile = window.matchMedia('(max-width:820px)').matches || /iPhone|iPad|iPod|Android/i.test(navigator.userAgent);
+  if(!mobile){ window.print(); return; }
+  showExportSheet();
+}
+function showExportSheet(){
+  if(document.getElementById('exportSheet')) return;
+  var o=document.createElement('div');
+  o.className='exportsheet'; o.id='exportSheet';
+  o.innerHTML='<div class="es-card" role="dialog" aria-label="Save as PDF">'+
+    '<h3>Save your report as a PDF</h3>'+
+    '<p>Tap <b>Open print</b> below, then save instead of sending to a printer:</p>'+
+    '<ul>'+
+      '<li><b>iPhone / iPad:</b> pinch outward on the page preview to open it, then tap the Share icon and choose <b>Save to Files</b>.</li>'+
+      '<li><b>Android:</b> open the printer dropdown at the top and pick <b>Save as PDF</b>.</li>'+
+    '</ul>'+
+    '<div class="es-actions"><button type="button" class="es-cancel">Cancel</button><button type="button" class="es-go">Open print</button></div>'+
+  '</div>';
+  document.body.appendChild(o);
+  o.querySelector('.es-cancel').onclick=function(){o.remove();};
+  o.addEventListener('click',function(e){ if(e.target===o) o.remove(); });
+  o.querySelector('.es-go').onclick=function(){ o.remove(); setTimeout(function(){window.print();},60); };
+}
+
 /* ---------------- chrome / events ---------------- */
 function syncTabs(){document.querySelectorAll('.tab').forEach(t=>t.setAttribute('aria-selected',t.dataset.view===state.view));}
 document.querySelectorAll('.tab').forEach(t=>t.onclick=()=>{state.view=t.dataset.view;renderCanvas();});
@@ -601,7 +639,7 @@ document.getElementById('initiative').oninput=e=>{state.initiative=e.target.valu
 document.getElementById('description').oninput=e=>{state.description=e.target.value;};
 document.getElementById('addGroup').onclick=()=>{state.groups.push(newGroup());renderGroups();renderCanvas();};
 document.getElementById('resetBtn').onclick=()=>{if(confirm('Clear everything and start over?')){state=blank();syncInputs();renderDims();renderGroups();renderCanvas();}};
-document.getElementById('exportBtn').onclick=()=>{buildPrintReport();window.print();};
+document.getElementById('exportBtn').onclick=exportPDF;
 document.getElementById('exampleBtn').onclick=loadExample;
 window.addEventListener('beforeprint',()=>{document.__t=document.title;document.title='Impact Lens: Impact Assessment';});
 window.addEventListener('afterprint',()=>{if(document.__t)document.title=document.__t;});

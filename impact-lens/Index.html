@@ -1,0 +1,956 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Impact Lens: A Human-First Change Tool by Betty Jeng</title>
+<meta name="description" content="Map who a change affects, how hard, and how ready they are, then get a human-first impact assessment as a quadrant, table, or persona breakout. A free tool by change-management leader Betty Jeng.">
+<meta name="author" content="Betty Jeng">
+<meta name="robots" content="index, follow">
+<link rel="canonical" href="https://bettyjeng.com/impact-lens/">
+<meta property="og:type" content="website">
+<meta property="og:url" content="https://bettyjeng.com/impact-lens/">
+<meta property="og:title" content="Impact Lens: change impact, mapped in minutes">
+<meta property="og:description" content="A free, human-first impact-assessment tool. Map affected groups on an impact-vs-readiness quadrant. By Betty Jeng.">
+<meta property="og:image" content="https://bettyjeng.com/impact-lens/preview.png">
+<meta name="twitter:card" content="summary_large_image">
+<meta name="twitter:title" content="Impact Lens: change impact, mapped in minutes">
+<meta name="twitter:description" content="A free, human-first impact-assessment tool by Betty Jeng.">
+<meta name="twitter:image" content="https://bettyjeng.com/impact-lens/preview.png">
+<script type="application/ld+json">
+{"@context":"https://schema.org","@type":"WebApplication","name":"Impact Lens","applicationCategory":"BusinessApplication","operatingSystem":"Web","offers":{"@type":"Offer","price":"0","priceCurrency":"USD"},"author":{"@type":"Person","name":"Betty Jeng","url":"https://bettyjeng.com/"},"description":"A free, human-first impact-assessment tool that maps affected groups on an impact-versus-readiness quadrant and generates table and persona views."}
+</script>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Montserrat:ital,wght@0,400;0,500;0,600;0,700;1,500;1,600&family=Poppins:ital,wght@0,400;0,500;0,600;1,400&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --bg:#FFFFFF; --tint:#FAF7F3; --ink:#1a1a1a; --ink-soft:#4a4a4a; --ink-faint:#888888;
+    --accent:#FC4C02; --accent-deep:#e04000; --accent-soft:#FBE2D6;
+    --line:#e8e5e0; --off:#dcd8d2; --shadow:rgba(26,26,26,.12);
+    --display:'Montserrat',sans-serif; --body:'Poppins',sans-serif;
+    --radius:18px;
+    --sev-none-bg:#ECE8E2; --sev-none-tx:#9a938a;
+    --sev-low-bg:#F6E7CB; --sev-low-tx:#8a6620; --sev-low-dot:#D9B25C;
+    --sev-med-bg:#FCDBC4; --sev-med-tx:#B5531A; --sev-med-dot:#F2873E;
+    --sev-high-bg:#FBD2C6; --sev-high-tx:#C5340A; --sev-high-dot:#FC4C02;
+  }
+  *{box-sizing:border-box}
+  html,body{margin:0;padding:0}
+  html,body{-webkit-text-size-adjust:100%;-moz-text-size-adjust:100%;text-size-adjust:100%}
+  body{
+    font-family:var(--body); color:var(--ink);
+    background:radial-gradient(90% 60% at 88% -6%, rgba(252,76,2,.06), transparent 60%), var(--bg);
+    line-height:1.5; -webkit-font-smoothing:antialiased; min-height:100vh;
+  }
+  body::before{
+    content:"";position:fixed;inset:0;pointer-events:none;z-index:0;opacity:.35;mix-blend-mode:multiply;
+    background-image:url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='120' height='120'><filter id='n'><feTurbulence type='fractalNoise' baseFrequency='.9' numOctaves='2'/></filter><rect width='100%25' height='100%25' filter='url(%23n)' opacity='.035'/></svg>");
+  }
+  h1,h2,h3,.disp{font-family:var(--display);letter-spacing:-.01em}
+  .eyebrow{font-family:var(--body);font-size:12px;font-weight:600;letter-spacing:.16em;text-transform:uppercase;color:var(--accent);margin:0 0 6px}
+  button{font-family:inherit;cursor:pointer}
+  input,select,textarea{font-family:inherit;font-size:13.5px;color:var(--ink)}
+  a{color:var(--accent-deep)}
+
+  /* ---------- header ---------- */
+  .topbar{position:sticky;top:0;z-index:20;background:rgba(255,255,255,.86);backdrop-filter:blur(8px);border-bottom:1px solid var(--line)}
+  .topbar-in{max-width:1240px;margin:0 auto;padding:14px 22px;display:flex;align-items:center;gap:16px;flex-wrap:wrap}
+  .wordmark{display:flex;align-items:center;gap:11px;margin-right:auto;text-decoration:none;color:inherit;cursor:pointer}
+  .mark{width:34px;height:34px;flex:none;border-radius:50%;box-shadow:0 4px 14px rgba(252,76,2,.32)}
+  .wordmark b{font-family:var(--display);font-weight:700;font-size:18px;letter-spacing:-.02em;transition:color .18s}
+  .wordmark:hover b{color:var(--accent)}
+  .wordmark span{display:block;font-size:11px;color:var(--ink-faint);font-weight:500;margin-top:-1px;letter-spacing:.02em}
+  .actions{display:flex;gap:8px;flex-wrap:wrap}
+  .btn{border:1.5px solid var(--line);background:transparent;color:var(--ink);padding:10px 15px;border-radius:12px;font-size:13.5px;font-weight:600;font-family:var(--body);transition:transform .15s ease,background .2s ease,border-color .2s ease}
+  .btn:hover{background:var(--tint);border-color:var(--off);transform:translateY(-1px)}
+  .btn.primary{background:var(--ink);border-color:var(--ink);color:#fff}
+  .btn.primary:hover{background:var(--accent);border-color:var(--accent)}
+  .btn:focus-visible,a:focus-visible,.chip:focus-visible,.tab:focus-visible,input:focus-visible,select:focus-visible,textarea:focus-visible,.dimtog:focus-visible,.seg button:focus-visible{outline:2px solid var(--accent);outline-offset:2px}
+
+  /* ---------- layout ---------- */
+  .wrap{max-width:1240px;margin:0 auto;padding:24px 22px 70px;display:grid;grid-template-columns:minmax(340px,42%) 1fr;gap:24px;align-items:start;position:relative;z-index:1}
+  @media(max-width:980px){.wrap{grid-template-columns:1fr}}
+  .card{background:var(--bg);border:1px solid var(--line);border-radius:var(--radius);box-shadow:0 20px 46px -30px var(--shadow);animation:rise .6s cubic-bezier(.2,.7,.2,1) both}
+  @keyframes rise{from{opacity:0;transform:translateY(12px)}to{opacity:1;transform:none}}
+  .builder{display:flex;flex-direction:column;gap:18px;min-width:0}
+  .panel{padding:22px}
+  .panel h2{font-size:16px;margin:0 0 15px;display:flex;align-items:center;gap:10px}
+  .panel h2 i{font-style:normal;font-family:var(--display);font-size:12px;color:var(--accent);font-weight:700;background:var(--accent-soft);border:1px solid #F3CBB9;width:23px;height:23px;display:inline-flex;align-items:center;justify-content:center;border-radius:8px}
+
+  label.fld{display:block;margin-bottom:13px}
+  label.fld>span{display:block;font-size:12px;font-weight:600;color:var(--ink-soft);margin-bottom:5px}
+  .input,textarea.input{width:100%;border:1.5px solid var(--line);border-radius:11px;padding:10px 12px;background:#fff;transition:border-color .18s}
+  textarea.input{resize:vertical;min-height:54px}
+  .input:focus{border-color:var(--accent)}
+
+  .seg{display:inline-flex;border:1.5px solid var(--line);border-radius:11px;overflow:hidden;background:#fff}
+  .seg button{border:0;background:#fff;padding:8px 13px;font-size:12.5px;font-weight:600;color:var(--ink-faint);border-right:1px solid var(--line);transition:.15s}
+  .seg button:last-child{border-right:0}
+  .seg button[aria-pressed="true"]{background:var(--ink);color:#fff}
+
+  .dims{display:flex;flex-wrap:wrap;gap:7px}
+  .dimtog{border:1.5px solid var(--line);background:#fff;border-radius:999px;padding:7px 13px;font-size:12px;font-weight:600;color:var(--ink-faint);transition:.15s}
+  .dimtog[aria-pressed="true"]{background:var(--accent-soft);border-color:#F3CBB9;color:var(--accent-deep)}
+
+  /* ---------- group editors ---------- */
+  .group{border:1.5px solid var(--line);border-radius:14px;padding:15px;margin-bottom:12px;background:var(--tint)}
+  .group-top{display:flex;gap:8px;margin-bottom:11px}
+  .group-top .input{flex:1;background:#fff}
+  .iconbtn{border:1.5px solid var(--line);background:#fff;border-radius:11px;width:40px;flex:none;color:var(--ink-faint);font-size:17px;line-height:1;transition:.15s}
+  .iconbtn:hover{border-color:var(--accent);color:var(--accent)}
+  .grouprow{display:flex;align-items:center;gap:10px;flex-wrap:wrap;margin-bottom:11px}
+  .grouprow>span.lbl{font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:.06em;color:var(--ink-faint);width:74px;flex:none}
+  .sevgrid{display:flex;flex-wrap:wrap;gap:6px;margin-bottom:10px}
+  .chip{border:1.5px solid var(--line);border-radius:10px;padding:6px 9px;font-size:11.5px;font-weight:600;display:inline-flex;align-items:center;gap:6px;background:#fff;transition:.12s}
+  .chip:hover{border-color:var(--off)}
+  .chip .dot{width:8px;height:8px;border-radius:50%;flex:none;background:var(--sev-none-tx)}
+  .chip .dname{color:var(--ink-soft)}
+  .chip .sval{font-family:var(--display);font-size:10.5px;font-weight:600;padding:1px 6px;border-radius:6px;background:var(--sev-none-bg);color:var(--sev-none-tx)}
+  .chip[data-sev="Low"] .dot{background:var(--sev-low-dot)} .chip[data-sev="Low"] .sval{background:var(--sev-low-bg);color:var(--sev-low-tx)}
+  .chip[data-sev="Medium"] .dot{background:var(--sev-med-dot)} .chip[data-sev="Medium"] .sval{background:var(--sev-med-bg);color:var(--sev-med-tx)}
+  .chip[data-sev="High"] .dot{background:var(--sev-high-dot)} .chip[data-sev="High"] .sval{background:var(--sev-high-bg);color:var(--sev-high-tx)}
+  .addgroup{width:100%;border:1.5px dashed var(--off);background:#fff;border-radius:12px;padding:12px;font-size:13px;font-weight:600;color:var(--ink-soft);transition:.15s}
+  .addgroup:hover{border-color:var(--accent);color:var(--accent-deep);background:var(--tint)}
+
+  /* ---------- canvas ---------- */
+  .canvas{position:sticky;top:80px;min-width:0}
+  @media(max-width:980px){.canvas{position:static}}
+  .tabs{display:flex;gap:4px;padding:6px;background:var(--tint);border:1px solid var(--line);border-radius:13px;margin-bottom:16px;width:fit-content}
+  .tab{border:0;background:transparent;padding:9px 17px;border-radius:9px;font-size:13px;font-weight:600;color:var(--ink-faint);transition:.15s}
+  .tab[aria-selected="true"]{background:#fff;color:var(--ink);box-shadow:0 1px 3px rgba(26,26,26,.1)}
+  .summary{font-size:13.5px;color:var(--ink-soft);margin:0 0 16px;padding-left:14px;border-left:3px solid var(--accent)}
+  .summary b{color:var(--ink);font-weight:600}
+  .empty{padding:50px 26px;text-align:center;color:var(--ink-faint)}
+  .empty h3{color:var(--ink);font-size:18px;margin:0 0 6px;font-weight:600}
+  .quadempty{position:relative}
+  .quadempty .quad{opacity:.8}
+  .quadempty-msg{position:absolute;left:50%;top:50%;transform:translate(-50%,-50%);text-align:center;background:rgba(255,255,255,.9);border:1px solid var(--line);border-radius:14px;padding:20px 24px;max-width:320px;box-shadow:0 12px 30px -14px rgba(26,26,26,.28);animation:qmsgIn .5s cubic-bezier(.2,.7,.3,1) .12s both}
+  @keyframes qmsgIn{from{opacity:0;transform:translate(-50%,calc(-50% + 12px)) scale(.95)}to{opacity:1;transform:translate(-50%,-50%) scale(1)}}
+  .quadempty-msg h3{color:var(--ink);font-size:17px;margin:0 0 6px;font-weight:600;font-family:var(--display)}
+  .quadempty-msg p{color:var(--ink-soft);font-size:13px;margin:0;line-height:1.5}
+
+  /* quadrant */
+  .quad-head{display:flex;justify-content:space-between;align-items:flex-end;margin-bottom:12px;flex-wrap:wrap;gap:8px}
+  .quad-head h3{font-size:17px;margin:0;font-weight:600}
+  .legend{display:flex;gap:14px;flex-wrap:wrap;font-size:11.5px;color:var(--ink-faint)}
+  .legend i{display:inline-block;width:9px;height:9px;border-radius:50%;margin-right:5px;vertical-align:middle}
+  svg.quad{width:100%;height:auto;display:block}
+  @media(prefers-reduced-motion:no-preference){
+    .qdot{animation:pop .5s cubic-bezier(.2,.8,.3,1.2) backwards}
+    @keyframes pop{from{opacity:0;transform:scale(.4)}to{opacity:1;transform:scale(1)}}
+  }
+
+  /* table */
+  table{width:100%;border-collapse:collapse;font-size:12.5px}
+  th,td{text-align:left;padding:10px;border-bottom:1px solid var(--line);vertical-align:top}
+  th{font-family:var(--display);font-size:11px;text-transform:uppercase;letter-spacing:.05em;color:var(--ink-faint);font-weight:600}
+  .tg{font-weight:600;color:var(--ink)}
+  .tg small{display:block;font-weight:400;color:var(--ink-faint)}
+  .sv{display:inline-block;padding:2px 9px;border-radius:8px;font-size:11px;font-weight:600;font-family:var(--display)}
+  .sv.None{background:var(--sev-none-bg);color:var(--sev-none-tx)}
+  .sv.Low{background:var(--sev-low-bg);color:var(--sev-low-tx)}
+  .sv.Medium{background:var(--sev-med-bg);color:var(--sev-med-tx)}
+  .sv.High{background:var(--sev-high-bg);color:var(--sev-high-tx)}
+  .mit{font-size:12px;color:var(--ink-soft)}
+  .mit[contenteditable]:focus{outline:2px solid var(--accent);outline-offset:2px;border-radius:4px;background:#fff}
+  .tablescroll{overflow-x:auto}
+
+  /* personas */
+  .pgrid{display:grid;grid-template-columns:repeat(auto-fill,minmax(250px,1fr));gap:14px}
+  .pcard{border:1px solid var(--line);border-radius:14px;padding:17px;background:var(--tint)}
+  .pcard .pname{font-family:var(--display);font-weight:700;font-size:15px;margin:0}
+  .pcard .prole{font-size:12px;color:var(--ink-faint);margin:0 0 12px}
+  .pcard h4{font-size:11px;text-transform:uppercase;letter-spacing:.06em;color:var(--accent);margin:13px 0 5px;font-family:var(--body);font-weight:600}
+  .pcard ul{margin:0;padding-left:17px;font-size:12.5px;color:var(--ink-soft)}
+  .pcard li{margin-bottom:3px}
+  .ptag{display:inline-block;font-size:10.5px;font-weight:600;font-family:var(--display);padding:2px 9px;border-radius:8px;margin-top:2px}
+
+  .pagefoot{max-width:1240px;margin:0 auto;padding:6px 22px 50px;text-align:center;font-size:12.5px;color:var(--ink-faint);font-style:italic;position:relative;z-index:1}
+  .pagefoot a{font-weight:600;font-style:normal;text-decoration:none}
+  .pagefoot a:hover{color:var(--accent)}
+  .printonly{display:none}
+
+  /* intro guide + helpers */
+  .intro{border:1px solid #F3CBB9;background:linear-gradient(180deg,#FFF6F1,#fff)}
+  .intro h2 i{background:var(--accent);color:#fff;border-color:var(--accent)}
+  .introlede{font-size:13.5px;color:var(--ink-soft);margin:0 0 12px}
+  .introsteps{margin:0 0 14px;padding-left:20px;font-size:13px;color:var(--ink-soft)}
+  .introsteps li{margin-bottom:6px}
+  .introsteps b{color:var(--ink);font-weight:600}
+  .introtip{font-size:12.5px;color:var(--ink-soft);background:var(--tint);border:1px solid var(--line);border-radius:11px;padding:12px 14px;margin:0}
+  .introtip b{color:var(--accent-deep)}
+  .hint{font-size:11.5px;color:var(--ink-faint);margin:5px 0 0;line-height:1.45}
+  .usersfld{display:flex;align-items:center;gap:9px;margin-bottom:6px;flex-wrap:wrap}
+  .usersfld label{font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:.06em;color:var(--ink-faint)}
+  .usersfld input{width:100px;border:1.5px solid var(--line);border-radius:9px;padding:7px 10px;background:#fff}
+  .usersfld input:focus{border-color:var(--accent)}
+  .pl-brand{font-family:var(--body);font-weight:600;font-size:11px;letter-spacing:.16em;text-transform:uppercase;color:var(--accent)}
+  .qnote{font-size:11.5px;color:var(--ink-faint);margin:11px 2px 0;line-height:1.5;font-style:italic}
+  .disclaimer{font-size:12px;color:var(--ink-soft);font-style:italic;margin:14px 0 0;padding:11px 14px;background:var(--tint);border:1px solid var(--line);border-radius:11px;line-height:1.55}
+  .printreport{display:none}
+  /* mobile save-as-PDF helper sheet */
+  .exportsheet{position:fixed;inset:0;z-index:60;display:flex;align-items:flex-end;justify-content:center;background:rgba(26,26,26,.46)}
+  .exportsheet .es-card{background:#fff;border-radius:18px 18px 0 0;max-width:520px;width:100%;padding:22px 22px 28px;box-shadow:0 -10px 34px rgba(0,0,0,.22);animation:esUp .22s ease}
+  @keyframes esUp{from{transform:translateY(40px);opacity:.4}to{transform:translateY(0);opacity:1}}
+  .exportsheet h3{font-family:var(--display);font-size:17px;font-weight:700;margin:0 0 5px;color:var(--ink)}
+  .exportsheet p{font-size:13px;color:var(--ink-soft);margin:0 0 11px;line-height:1.5}
+  .exportsheet ul{margin:0 0 17px;padding-left:19px;font-size:13px;color:var(--ink-soft);line-height:1.55}
+  .exportsheet li{margin-bottom:7px}
+  .exportsheet li b{color:var(--ink)}
+  .es-actions{display:flex;gap:10px}
+  .es-actions button{flex:1;border-radius:12px;padding:12px;font-size:14px;font-weight:600;font-family:var(--body);border:1.5px solid var(--line);background:#fff;color:var(--ink);cursor:pointer}
+  .es-actions .es-go{background:var(--ink);border-color:var(--ink);color:#fff}
+
+  /* ---------- print ---------- */
+  @media print{
+    @page{margin:14mm}
+    body{background:#fff}
+    body::before,.topbar,.builder,.tabs,.actions,.pagefoot,#output{display:none!important}
+    .wrap{display:block;padding:0;max-width:none}
+    .canvas{position:static}
+    .card{border:0;box-shadow:none;animation:none}
+    .printonly{display:block;margin-bottom:14px}
+    .printonly .pl-brand{margin-bottom:4px}
+    .printonly h1{font-family:var(--display);font-size:21px;margin:0 0 2px}
+    .printonly .rule{width:34px;height:2px;background:var(--accent);margin:6px 0 8px}
+    .printonly p{margin:0;color:#555;font-size:12px}
+    .printreport{display:block!important}
+    .exportsheet{display:none!important}
+    .print-sec{margin:0 0 16px}
+    .print-sec.brk{break-before:page;page-break-before:always}
+    .print-h{font-family:var(--display);font-weight:700;font-size:14px;color:var(--accent-deep);margin:0 0 9px;break-after:avoid}
+    .printreport svg.quad{max-width:520px;display:block;margin:0 auto}
+    .qnote{font-size:10px}
+    /* table fits portrait, no columns cropped */
+    .tablescroll{overflow:visible!important}
+    table{table-layout:fixed;width:100%;font-size:8.5px}
+    th,td{padding:4px 5px;word-break:break-word;overflow-wrap:anywhere;vertical-align:top}
+    th{font-size:7px;letter-spacing:0;word-break:normal;overflow-wrap:break-word;line-height:1.18}
+    th:first-child,td:first-child{width:15%}
+    th:nth-child(2),td:nth-child(2){width:7%}
+    th:last-child,td:last-child{width:22%}
+    .sv{padding:1px 5px;font-size:8px}
+    .mit{font-size:8px}
+    tr,.pcard{break-inside:avoid}
+    .pgrid{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+  }
+</style>
+</head>
+<body>
+
+<header class="topbar">
+  <div class="topbar-in">
+    <a class="wordmark" href="/" title="Back to Betty Jeng home">
+      <svg class="mark" viewBox="0 0 40 40" aria-hidden="true">
+        <defs><linearGradient id="g" x1="0" y1="0" x2="1" y2="1">
+          <stop offset="0" stop-color="#FF7A3D"/><stop offset="1" stop-color="#FC4C02"/>
+        </linearGradient></defs>
+        <circle cx="20" cy="20" r="19" fill="url(#g)"/>
+        <path d="M5 16 A19 19 0 0 1 35 16 Z" fill="#fff" opacity=".30"/>
+        <circle cx="20" cy="20" r="9.5" fill="none" stroke="#fff" stroke-width="2.4" opacity=".92"/>
+        <circle cx="20" cy="20" r="3.1" fill="#fff"/>
+      </svg>
+      <div>
+        <b>Impact Lens</b>
+        <span>Change impact, mapped in minutes</span>
+      </div>
+    </a>
+    <div class="actions">
+      <button class="btn" id="exampleBtn">Load example</button>
+      <button class="btn" id="resetBtn">Reset</button>
+      <button class="btn" id="deckBtn">Export slides</button>
+      <button class="btn primary" id="exportBtn">Export PDF</button>
+    </div>
+  </div>
+</header>
+
+<main class="wrap">
+  <section class="builder" aria-label="Assessment builder">
+    <div class="card panel intro" id="introCard">
+      <h2><i>&#9733;</i> Start here</h2>
+      <p class="introlede">An impact assessment maps <b>who</b> a change touches, <b>how hard</b> it hits each group, and <b>how ready</b> they are, so you can aim your energy where it matters most. Work top to bottom; a rough first draft beats a perfect one that never gets done.</p>
+      <ol class="introsteps">
+        <li><b>Name the change</b> and pick its reach: one person, a team, or the whole enterprise.</li>
+        <li><b>List every affected group</b>, including the easy-to-forget ones (IT, security, support, managers, leadership), not just the obvious team.</li>
+        <li><b>For each group, set the severity</b> on each dimension, the number of people, and how ready they feel. <b>Tap a dimension box to cycle</b> None &rarr; Low &rarr; Medium &rarr; High.</li>
+        <li><b>Read the quadrant.</b> Groups in the top-left (high impact, low readiness) need your attention first.</li>
+      </ol>
+      <p class="introtip"><b>New or accidental change manager? Start upstream.</b> Before you can assess impact, get clear on <b>what's changing and why you're on this project</b>. Begin at the source: <b>review the business requirements, user stories, and the business case</b>. That's your source of truth for the change. Then <b>engage your leadership and sponsors</b> to confirm the scope and the goal, and <b>list the stakeholders the change touches</b>. <i>Only then</i> go to the people: a 15-minute chat with a few frontline managers, a short pulse survey, or one stakeholder workshop tells you more than any desk guess. Ask each group: &ldquo;What changes day to day? How big a shift is it? How ready do you feel? What worries you?&rdquo; And remember, <b>readiness is self-reported</b>, so pressure-test any &ldquo;High&rdquo; against real evidence; sponsors tend to over-rate it.</p>
+    </div>
+
+    <div class="card panel">
+      <h2><i>1</i> The change</h2>
+      <label class="fld"><span>Initiative name</span>
+        <input class="input" id="initiative" placeholder="e.g. AI customer-support copilot rollout"></label>
+      <p class="hint" style="margin-top:-8px;margin-bottom:13px">What's changing? Use the project or rollout name.</p>
+      <label class="fld"><span>Deployment level</span></label>
+      <div class="seg" id="levelSeg" role="group" aria-label="Deployment level" style="margin-bottom:13px">
+        <button data-level="Personal">Personal</button>
+        <button data-level="Team" aria-pressed="true">Team</button>
+        <button data-level="Enterprise">Enterprise</button>
+      </div>
+      <p class="hint" style="margin-top:-6px;margin-bottom:13px">Wider reach means more rigor and a longer runway. Enterprise change rarely shows value in one quarter, so plan for it.</p>
+      <label class="fld"><span>Short description</span>
+        <textarea class="input" id="description" placeholder="One or two lines on what's changing and why."></textarea></label>
+      <label class="fld"><span>Impact dimensions to assess</span></label>
+      <div class="dims" id="dimToggles"></div>
+      <p class="hint">Click a dimension to include or exclude it. Highlighted = included in the assessment.</p>
+    </div>
+
+    <div class="card panel">
+      <h2><i>2</i> Affected groups</h2>
+      <div id="groupList"></div>
+      <button class="addgroup" id="addGroup">+ Add an affected group</button>
+    </div>
+  </section>
+
+  <section class="canvas" aria-label="Assessment output">
+    <div class="tabs" role="tablist">
+      <button class="tab" role="tab" data-view="quadrant" aria-selected="true">Quadrant</button>
+      <button class="tab" role="tab" data-view="table" aria-selected="false">Table</button>
+      <button class="tab" role="tab" data-view="personas" aria-selected="false">Personas</button>
+    </div>
+    <div class="printonly" id="printHead"></div>
+    <p class="summary" id="summary"></p>
+    <div class="card panel" id="output" style="min-height:420px"></div>
+    <div class="printreport" id="printReport"></div>
+    <p class="disclaimer" id="disclaimer">A starting point for conversation, not a substitute for it. Validate with the people affected. And remember, an impact assessment is only the front end: plan reinforcement and a post-go-live check-in so the change actually sticks.</p>
+  </section>
+</main>
+
+<footer class="pagefoot">
+  Built by <a href="https://bettyjeng.com/">Betty Jeng</a> · change &amp; AI-adoption strategist. &nbsp;<!-- ✏️ Edit name/link here -->
+  This tool runs entirely in your browser, so nothing you enter is sent anywhere. AI is a mirror of our best ideals.
+</footer>
+
+<script src="https://cdn.jsdelivr.net/npm/pptxgenjs@4.0.1/dist/pptxgen.bundle.js"></script>
+<script>
+/* ---------------- data ---------------- */
+const DIMENSIONS = ["Process","Technology/Tools","Skills/Training","Role/Job Design","Culture/Mindset","Workload","Reporting/Metrics"];
+const SEV = ["None","Low","Medium","High"];
+const SEVW = {None:0,Low:1,Medium:2,High:3};
+const RDW = {Low:1,Medium:2,High:3};
+
+const MITIGATIONS = {
+  "Process":{Medium:["Map the new vs. old workflow side by side and walk teams through it","Name a process owner to field questions in week one"],High:["Run a short pilot before full cutover","Build a quick-reference 'what changed' one-pager","Hold a daily 10-min stand-up through the transition"]},
+  "Technology/Tools":{Medium:["Hands-on sandbox time before go-live","Pin a 'top 5 things to try first' guide"],High:["Pair power-users with newcomers as tool buddies","Stand up a fast feedback channel for friction points","Stage access so no one faces the whole tool at once"]},
+  "Skills/Training":{Medium:["Targeted micro-learning over a long course","Offer optional drop-in clinics"],High:["Micro-learning + buddy pairing + a 2-week reinforcement check-in","Define a clear 'good enough to start' skill bar","Celebrate early wins publicly to lower the stakes"]},
+  "Role/Job Design":{Medium:["Clarify what stays the same, not just what changes","Update the role's success measures openly"],High:["Hold 1:1s on 'what this means for my job'","Co-design the new role with the people in it","Offer a visible reskill/transition path"]},
+  "Culture/Mindset":{Medium:["Surface and answer the real worries, don't dismiss them","Have a respected peer model the new way"],High:["Keep framing AI as capability, not replacement","Make it safe to say 'this isn't working yet'","Give leaders the words to address fear honestly"]},
+  "Workload":{Medium:["Audit what gets removed, not just added","Protect time for the learning curve"],High:["Temporarily reduce other load during ramp-up","Watch for the dip and staff a backstop","Set realistic week-one expectations out loud"]},
+  "Reporting/Metrics":{Medium:["Check the metric still measures the right thing","Add a leading adoption indicator, not just outcomes"],High:["Redesign metrics so they don't punish the learning curve","Track efficiency/quality/human gains, not ROI alone","Align incentives with the behaviour you actually want"]}
+};
+const WORRY = {
+  "Process":"the new way of working will feel slower at first",
+  "Technology/Tools":"the tool will be confusing or they'll look incompetent",
+  "Skills/Training":"they'll fall behind or won't keep up",
+  "Role/Job Design":"their role, or even their job, is being quietly redefined",
+  "Culture/Mindset":"this is the start of being replaced",
+  "Workload":"this is one more thing on an already full plate",
+  "Reporting/Metrics":"they'll be measured unfairly during the transition"
+};
+const BENEFIT = {
+  "Process":"less friction once the new flow clicks",
+  "Technology/Tools":"a capable assistant for the tedious parts",
+  "Skills/Training":"a genuinely valuable, portable skill",
+  "Role/Job Design":"more time on the work that matters",
+  "Culture/Mindset":"a chance to shape how AI shows up here",
+  "Workload":"routine tasks handled, mental load lifted",
+  "Reporting/Metrics":"credit for the gains that usually go unseen"
+};
+
+let state = blank();
+function blank(){
+  const dims={}; DIMENSIONS.forEach((d,i)=>dims[d]= i<5);
+  return {initiative:"",level:"Team",description:"",dimensions:dims,groups:[],view:"quadrant"};
+}
+let gid=1;
+function newGroup(seed){
+  const sev={}; DIMENSIONS.forEach(d=>sev[d]= seed? (seed.sev[d]||"None") : "None");
+  return {id:gid++,name:seed?seed.name:"",role:seed?seed.role:"",readiness:seed?seed.readiness:"Medium",users:seed&&seed.users!=null?seed.users:'',notes:seed?seed.notes:"",sev};
+}
+const activeDims=()=>DIMENSIONS.filter(d=>state.dimensions[d]);
+function impactScore(g){const a=activeDims();if(!a.length)return 0;return a.reduce((s,d)=>s+SEVW[g.sev[d]],0)/a.length;}
+
+/* ---------------- builder render ---------------- */
+function renderDims(){
+  const box=document.getElementById('dimToggles'); box.innerHTML='';
+  DIMENSIONS.forEach(d=>{
+    const b=document.createElement('button');
+    b.className='dimtog'; b.textContent=d; b.setAttribute('aria-pressed',state.dimensions[d]);
+    b.onclick=()=>{state.dimensions[d]=!state.dimensions[d];renderDims();renderGroups();renderCanvas();};
+    box.appendChild(b);
+  });
+}
+function renderGroups(){
+  const list=document.getElementById('groupList'); list.innerHTML='';
+  state.groups.forEach((g)=>{
+    const el=document.createElement('div'); el.className='group';
+    const top=document.createElement('div'); top.className='group-top';
+    const n=mkInput(g.name,'Group name (e.g. Support agents)',v=>{g.name=v;renderCanvas();});
+    const r=mkInput(g.role,'Role / persona',v=>{g.role=v;renderCanvas();});
+    const del=document.createElement('button'); del.className='iconbtn'; del.innerHTML='&times;'; del.setAttribute('aria-label','Remove group');
+    del.onclick=()=>{state.groups=state.groups.filter(x=>x.id!==g.id);renderGroups();renderCanvas();};
+    top.append(n,r,del); el.appendChild(top);
+    const rr=document.createElement('div'); rr.className='grouprow';
+    const rl=document.createElement('span'); rl.className='lbl'; rl.textContent='Readiness';
+    const seg=document.createElement('div'); seg.className='seg'; seg.setAttribute('role','group');
+    ['Low','Medium','High'].forEach(v=>{const b=document.createElement('button');b.textContent=v;b.setAttribute('aria-pressed',g.readiness===v);b.onclick=()=>{g.readiness=v;renderGroups();renderCanvas();};seg.appendChild(b);});
+    rr.append(rl,seg); el.appendChild(rr);
+    // users impacted
+    const uf=document.createElement('div'); uf.className='usersfld';
+    const ul=document.createElement('label'); ul.textContent='# Users impacted';
+    const ui=document.createElement('input'); ui.type='number'; ui.min='0'; ui.placeholder='e.g. 40'; ui.value=(g.users===''||g.users==null)?'':g.users;
+    ui.oninput=e=>{g.users=e.target.value===''?'':Math.max(0,parseInt(e.target.value)||0);renderCanvas();};
+    uf.append(ul,ui); el.appendChild(uf);
+    const sh=document.createElement('p'); sh.className='hint'; sh.style.margin='2px 0 8px'; sh.textContent='Tap each box to cycle: None \u2192 Low \u2192 Medium \u2192 High.';
+    el.appendChild(sh);
+    const sg=document.createElement('div'); sg.className='sevgrid';
+    activeDims().forEach(d=>{
+      const c=document.createElement('button'); c.className='chip'; c.dataset.sev=g.sev[d];
+      c.setAttribute('aria-label',d+': '+g.sev[d]+'. Click to change.');
+      c.innerHTML='<span class="dot"></span><span class="dname">'+d+'</span><span class="sval">'+g.sev[d]+'</span>';
+      c.onclick=()=>{const i=SEV.indexOf(g.sev[d]);g.sev[d]=SEV[(i+1)%4];renderGroups();renderCanvas();};
+      sg.appendChild(c);
+    });
+    el.appendChild(sg);
+    const nt=document.createElement('textarea'); nt.className='input'; nt.placeholder='Notes for this group (optional)'; nt.value=g.notes;
+    nt.style.minHeight='40px'; nt.oninput=e=>{g.notes=e.target.value;renderCanvas();};
+    el.appendChild(nt);
+    list.appendChild(el);
+  });
+}
+function mkInput(val,ph,on){const i=document.createElement('input');i.className='input';i.value=val;i.placeholder=ph;i.oninput=e=>on(e.target.value);return i;}
+
+/* ---------------- canvas render ---------------- */
+function renderCanvas(){
+  syncTabs(); renderSummary();
+  const out=document.getElementById('output');
+  if(!state.groups.length){
+    if(state.view==='quadrant'){
+      out.innerHTML='<div class="quadempty">'+quadHTML()+'<div class="quadempty-msg"><h3>Your map starts here</h3><p>Add an affected group on the left, or hit <b>Load example</b> to see a finished assessment.</p></div></div>';
+    } else {
+      out.innerHTML='<div class="empty"><h3>Nothing mapped yet</h3><p>Add an affected group on the left, or hit <b>Load example</b> to see a finished assessment.</p></div>';
+    }
+    return;
+  }
+  if(state.view==='quadrant') out.innerHTML=quadHTML();
+  else if(state.view==='table') out.innerHTML=tableHTML();
+  else out.innerHTML=personaHTML();
+  if(state.view==='table') wireMitEdits();
+}
+function renderSummary(){
+  const s=document.getElementById('summary');
+  const head=document.getElementById('printHead');
+  if(!state.groups.length){s.textContent='';head.innerHTML='';return;}
+  const hi=state.groups.filter(g=>impactScore(g)>=1.5 && RDW[g.readiness]<2);
+  const totalU=state.groups.reduce((a,g)=>a+(+g.users||0),0);
+  const name=state.initiative||'Untitled initiative';
+  s.innerHTML='<b>'+escapeHtml(name)+'</b> · '+state.level+'-level · '+state.groups.length+' group'+(state.groups.length>1?'s':'')+(totalU>0?' · ~'+totalU+' people impacted':'')+' assessed.'+
+    (hi.length? ' <b>'+hi.length+'</b> need'+(hi.length>1?'':'s')+' priority intervention (high impact, low readiness).':' No groups in the priority-intervention zone, a good position to scale from.');
+  head.innerHTML='<div class="pl-brand">Impact Lens</div><h1>'+escapeHtml(name)+': Impact Assessment</h1><div class="rule"></div><p>'+state.level+'-level · '+new Date().toLocaleDateString(undefined,{year:'numeric',month:'long',day:'numeric'})+'</p>';
+}
+
+/* quadrant */
+function wrapLabel(s,max,maxLines){
+  const words=String(s).trim().split(/\s+/); const lines=[]; let cur='';
+  words.forEach(w=>{
+    if(((cur+' '+w).trim()).length<=max){cur=(cur+' '+w).trim();}
+    else{ if(cur)lines.push(cur); cur=w.length>max? w.slice(0,max-1)+'\u2026':w; }
+  });
+  if(cur)lines.push(cur);
+  if(lines.length>maxLines){ const kept=lines.slice(0,maxLines); kept[maxLines-1]=kept[maxLines-1].slice(0,max-1).replace(/\s+$/,'')+'\u2026'; return kept; }
+  return lines.length?lines:[''];
+}
+function _ovl(a,b){const x=Math.max(0,Math.min(a.x+a.w,b.x+b.w)-Math.max(a.x,b.x));const y=Math.max(0,Math.min(a.y+a.h,b.y+b.h)-Math.max(a.y,b.y));return x*y;}
+function quadHTML(){
+  const W=560,H=470,P=54, ix=[P,W-26], iy=[30,H-P];
+  const px0=ix[0]+36, px1=ix[1]-36, py0=iy[0]+40, py1=iy[1]-30;   // inset bubble area, off the corners
+  const xpos=r=>px0+((RDW[r]-1)/2)*(px1-px0);
+  const ypos=v=>py1-((v)/3)*(py1-py0);
+  const midX=xpos('Medium'), midY=ypos(1.5);
+  const maxU=Math.max(1,...state.groups.map(g=>+g.users||0));
+  const anyU=state.groups.some(g=>(+g.users)>0);
+  // bubble positions
+  const pts=state.groups.map((g,i)=>{
+    const u=+g.users||0;
+    const r=anyU?(u>0?9+Math.sqrt(u/maxU)*12:6.5):9;
+    return {g,x:xpos(g.readiness),y:ypos(impactScore(g)),r,imp:impactScore(g),u};
+  });
+  // gentle de-overlap so bubbles never stack (handles exact overlap with a deterministic nudge)
+  for(let pass=0;pass<90;pass++){
+    for(let a=0;a<pts.length;a++)for(let b=a+1;b<pts.length;b++){
+      let dx=pts[b].x-pts[a].x, dy=pts[b].y-pts[a].y, d=Math.hypot(dx,dy), nx, ny;
+      if(d<0.01){ const ang=a*2.399+b*1.137; nx=Math.cos(ang); ny=Math.sin(ang); d=0; }
+      else { nx=dx/d; ny=dy/d; }
+      const need=pts[a].r+pts[b].r+8;
+      if(d<need){const push=(need-d)/2;
+        pts[a].x-=push*nx; pts[a].y-=push*ny; pts[b].x+=push*nx; pts[b].y+=push*ny;}
+    }
+    pts.forEach(p=>{p.x=Math.max(ix[0]+p.r+2,Math.min(ix[1]-p.r-2,p.x));p.y=Math.max(iy[0]+p.r+2,Math.min(iy[1]-p.r-2,p.y));});
+  }
+  // obstacles labels should avoid: quadrant captions + every bubble
+  const caps=[
+    {x:ix[0]+8,y:iy[0]+9,w:170,h:15},
+    {x:ix[1]-10-152,y:iy[0]+9,w:160,h:15},
+    {x:ix[0]+8,y:iy[1]-23,w:80,h:15},
+    {x:ix[1]-10-88,y:iy[1]-23,w:92,h:15}
+  ];
+  const bubbleBoxes=pts.map(p=>({x:p.x-p.r,y:p.y-p.r,w:2*p.r,h:2*p.r}));
+  const placed=[]; const labelSVG=[];
+  // place most important labels first so they win the best spots
+  const order=[...pts.keys()].sort((a,b)=> (pts[b].imp-pts[a].imp) || (pts[b].u-pts[a].u));
+  order.forEach(idx=>{
+    const p=pts[idx];
+    const full=p.g.name||'Group '+(idx+1);
+    const lines=wrapLabel(full,14,2);
+    const lineH=12, maxLen=Math.max.apply(null,lines.map(l=>l.length));
+    const w=maxLen*6.1+10, h=lines.length*lineH+6;
+    const cxA=Math.max(ix[0]+w/2+2,Math.min(ix[1]-w/2-2,p.x));
+    const cands=[
+      {box:{x:cxA-w/2,y:p.y-p.r-6-h,w,h},anchor:'middle',tx:cxA},      // above
+      {box:{x:cxA-w/2,y:p.y+p.r+6,w,h},anchor:'middle',tx:cxA},        // below
+      {box:{x:p.x+p.r+6,y:p.y-h/2,w,h},anchor:'start',tx:p.x+p.r+10},  // right
+      {box:{x:p.x-p.r-6-w,y:p.y-h/2,w,h},anchor:'end',tx:p.x-p.r-10}   // left
+    ];
+    let best=null,bestScore=Infinity;
+    cands.forEach(c=>{
+      const b=c.box; let score=0;
+      if(b.x<3||b.y<3||b.x+b.w>W-3||b.y+b.h>H-3) score+=10000;        // keep on-canvas
+      caps.forEach(o=>score+=_ovl(b,o)*3);                             // captions matter most
+      bubbleBoxes.forEach(o=>score+=_ovl(b,o));
+      placed.forEach(o=>score+=_ovl(b,o)*2);
+      if(score<bestScore){bestScore=score;best=c;}
+    });
+    placed.push(best.box);
+    const b=best.box, baseY=b.y+11;
+    let ts=''; lines.forEach((ln,k)=>{ ts+='<tspan x="'+best.tx.toFixed(1)+'" dy="'+(k===0?0:lineH)+'">'+escapeHtml(ln)+'</tspan>'; });
+    labelSVG.push('<g class="qlabel">'+
+      '<rect x="'+b.x.toFixed(1)+'" y="'+b.y.toFixed(1)+'" width="'+b.w.toFixed(1)+'" height="'+b.h.toFixed(1)+'" rx="4" fill="#ffffff" fill-opacity=".82"/>'+
+      '<text x="'+best.tx.toFixed(1)+'" y="'+baseY.toFixed(1)+'" text-anchor="'+best.anchor+'" font-family="Poppins" font-size="10.5" font-weight="600" fill="#1a1a1a">'+ts+'</text></g>');
+  });
+  // dots
+  let dots='';
+  pts.forEach((p,i)=>{
+    const hi=p.imp>=1.5, lowR=RDW[p.g.readiness]<2;
+    const col= hi&&lowR?'#D14E66': hi&&!lowR?'#5E9C7E': !hi&&lowR?'#E0A93F':'#7F94A8';
+    dots+='<g class="qdot" style="animation-delay:'+(i*60)+'ms"><title>'+escapeHtml(p.g.name||'Group '+(i+1))+(p.u?' \u2014 '+p.u+' people':'')+'</title>'+
+      '<circle cx="'+p.x.toFixed(1)+'" cy="'+p.y.toFixed(1)+'" r="'+p.r.toFixed(1)+'" fill="'+col+'" fill-opacity=".92" stroke="#fff" stroke-width="2"/></g>';
+  });
+  return '<div class="quad-head"><h3>Impact vs. readiness</h3>'+
+    '<div class="legend">'+
+    '<span><i style="background:#D14E66"></i>Priority intervention</span>'+
+    '<span><i style="background:#5E9C7E"></i>Enable &amp; accelerate</span>'+
+    '<span><i style="background:#E0A93F"></i>Monitor</span>'+
+    '<span><i style="background:#7F94A8"></i>Low-touch</span>'+
+    (anyU?'<span style="opacity:.85">&#9711; bubble size = people impacted</span>':'')+'</div></div>'+
+  '<svg class="quad" viewBox="0 0 '+W+' '+H+'" role="img" aria-label="Impact versus readiness quadrant">'+
+    '<rect x="'+ix[0]+'" y="'+iy[0]+'" width="'+(midX-ix[0])+'" height="'+(midY-iy[0])+'" fill="#E50D56" opacity=".10"/>'+
+    '<rect x="'+midX+'" y="'+iy[0]+'" width="'+(ix[1]-midX)+'" height="'+(midY-iy[0])+'" fill="#5E9C7E" opacity=".12"/>'+
+    '<rect x="'+ix[0]+'" y="'+midY+'" width="'+(midX-ix[0])+'" height="'+(iy[1]-midY)+'" fill="#F7B500" opacity=".11"/>'+
+    '<rect x="'+midX+'" y="'+midY+'" width="'+(ix[1]-midX)+'" height="'+(iy[1]-midY)+'" fill="#7F94A8" opacity=".13"/>'+
+    qcap(ix[0]+10,iy[0]+19,'PRIORITY INTERVENTION','#B23A52')+
+    qcap(ix[1]-10,iy[0]+19,'ENABLE & ACCELERATE','#3E7A5E','end')+
+    qcap(ix[0]+10,iy[1]-11,'MONITOR','#9A6E1C')+
+    qcap(ix[1]-10,iy[1]-11,'LOW-TOUCH','#5A6E82','end')+
+    '<line x1="'+midX+'" y1="'+iy[0]+'" x2="'+midX+'" y2="'+iy[1]+'" stroke="#dcd8d2" stroke-dasharray="4 4"/>'+
+    '<line x1="'+ix[0]+'" y1="'+midY+'" x2="'+ix[1]+'" y2="'+midY+'" stroke="#dcd8d2" stroke-dasharray="4 4"/>'+
+    '<line x1="'+ix[0]+'" y1="'+iy[0]+'" x2="'+ix[0]+'" y2="'+iy[1]+'" stroke="#1a1a1a" stroke-width="1.4"/>'+
+    '<line x1="'+ix[0]+'" y1="'+iy[1]+'" x2="'+ix[1]+'" y2="'+iy[1]+'" stroke="#1a1a1a" stroke-width="1.4"/>'+
+    '<text x="'+ix[0]+'" y="'+(H-12)+'" font-family="Montserrat" font-size="11" font-weight="600" fill="#888888">Low readiness</text>'+
+    '<text x="'+ix[1]+'" y="'+(H-12)+'" text-anchor="end" font-family="Montserrat" font-size="11" font-weight="600" fill="#888888">High readiness</text>'+
+    '<text transform="translate(16,'+iy[1]+') rotate(-90)" font-family="Montserrat" font-size="11" font-weight="600" fill="#888888">Low impact</text>'+
+    '<text transform="translate(16,'+(iy[0]+62)+') rotate(-90)" text-anchor="end" font-family="Montserrat" font-size="11" font-weight="600" fill="#888888">High impact</text>'+
+    dots + labelSVG.join('') +
+  '</svg>'+
+  '<p class="qnote">Position shows how hard the change hits and how ready each group is. Bubble size shows how many people. The two are kept separate on purpose, because a small team can still be hit hard.</p>';
+}
+function qcap(x,y,t,c,anchor){return '<text x="'+x+'" y="'+y+'" text-anchor="'+(anchor||'start')+'" font-family="Montserrat" font-size="10" font-weight="700" letter-spacing="1" fill="'+c+'" opacity=".82">'+t+'</text>';}
+
+/* table */
+function tableHTML(){
+  const a=activeDims();
+  let h='<div class="tablescroll"><table><thead><tr><th>Group</th><th>People</th>';
+  a.forEach(d=>h+='<th>'+d.replace(/\//g,'/<wbr>')+'</th>'); h+='<th>Suggested mitigation</th></tr></thead><tbody>';
+  state.groups.forEach((g,gi)=>{
+    h+='<tr><td class="tg">'+escapeHtml(g.name||'Group '+(gi+1))+'<small>'+escapeHtml(g.role||'')+' · '+g.readiness+' readiness</small></td>';
+    h+='<td>'+((g.users!==''&&g.users!=null)?g.users:'-')+'</td>';
+    a.forEach(d=>h+='<td><span class="sv '+g.sev[d]+'">'+g.sev[d]+'</span></td>');
+    h+='<td class="mit" contenteditable="true" data-g="'+gi+'">'+escapeHtml(mitFor(g))+'</td></tr>';
+  });
+  return h+'</tbody></table></div>';
+}
+function mitFor(g){
+  if(g.mitOverride!=null && g.mitOverride.trim()!=='') return g.mitOverride;
+  const picks=[];
+  activeDims().forEach(d=>{const s=g.sev[d];if((s==='High'||s==='Medium')&&MITIGATIONS[d]&&MITIGATIONS[d][s])picks.push(MITIGATIONS[d][s][0]);});
+  return picks.length?picks.slice(0,2).join('; '):'Low impact, light-touch comms only.';
+}
+function wireMitEdits(){document.querySelectorAll('.mit[contenteditable]').forEach(c=>{c.onblur=()=>{const gi=+c.dataset.g;if(state.groups[gi])state.groups[gi].mitOverride=c.textContent;};});}
+
+/* personas */
+function personaHTML(){
+  let h='<div class="pgrid">';
+  state.groups.forEach((g,gi)=>{
+    const ranked=activeDims().filter(d=>SEVW[g.sev[d]]>0).sort((a,b)=>SEVW[g.sev[b]]-SEVW[g.sev[a]]);
+    const top=ranked.slice(0,3);
+    const worries=top.filter(d=>SEVW[g.sev[d]]>=2).map(d=>WORRY[d]).slice(0,2);
+    const benefits=top.map(d=>BENEFIT[d]).slice(0,2);
+    const actions=top.flatMap(d=>{const s=g.sev[d];return (s==='High'||s==='Medium')&&MITIGATIONS[d]?[MITIGATIONS[d][s][0]]:[];}).slice(0,3);
+    const tag=top.length&&SEVW[g.sev[top[0]]]>=3?{t:'High impact',bg:'var(--sev-high-bg)',c:'var(--sev-high-tx)'}:top.length&&SEVW[g.sev[top[0]]]>=2?{t:'Moderate impact',bg:'var(--sev-med-bg)',c:'var(--sev-med-tx)'}:{t:'Light impact',bg:'var(--sev-low-bg)',c:'var(--sev-low-tx)'};
+    h+='<div class="pcard"><p class="pname">'+escapeHtml(g.name||'Group '+(gi+1))+'</p>'+
+       '<p class="prole">'+escapeHtml(g.role||'-')+' · '+g.readiness+' readiness'+((g.users!==''&&g.users!=null&&g.users!==0)?' · '+g.users+' people':'')+'</p>'+
+       '<span class="ptag" style="background:'+tag.bg+';color:'+tag.c+'">'+tag.t+'</span>'+
+       '<h4>Most affected</h4><ul>'+(top.length?top.map(d=>'<li>'+d+' <span class="sv '+g.sev[d]+'" style="font-size:9.5px;padding:0 5px">'+g.sev[d]+'</span></li>').join(''):'<li>Minimal impact</li>')+'</ul>'+
+       (worries.length?'<h4>What worries them</h4><ul>'+worries.map(w=>'<li>That '+w+'.</li>').join('')+'</ul>':'')+
+       '<h4>What\'s in it for them</h4><ul>'+(benefits.length?benefits.map(b=>'<li>'+cap(b)+'.</li>').join(''):'<li>Stability, with little changing for them.</li>')+'</ul>'+
+       (actions.length?'<h4>Recommended actions</h4><ul>'+actions.map(a=>'<li>'+a+'</li>').join('')+'</ul>':'')+
+       (g.notes?'<h4>Notes</h4><ul><li>'+escapeHtml(g.notes)+'</li></ul>':'')+
+       '</div>';
+  });
+  return h+'</div>';
+}
+
+/* ---------------- consolidated print report ---------------- */
+function buildPrintReport(){
+  const el=document.getElementById('printReport');
+  if(!el) return;
+  if(!state.groups.length){ el.innerHTML='<p style="color:#888;font-style:italic">Add at least one affected group to generate a report.</p>'; return; }
+  el.innerHTML=
+    '<section class="print-sec"><h3 class="print-h">Quadrant: impact vs. readiness</h3>'+quadHTML()+'</section>'+
+    '<section class="print-sec brk"><h3 class="print-h">Table: impact by dimension</h3>'+tableHTML()+'</section>'+
+    '<section class="print-sec brk"><h3 class="print-h">Personas: group by group</h3>'+personaHTML()+'</section>';
+}
+
+function exportPDF(){
+  buildPrintReport();
+  var mobile = window.matchMedia('(max-width:820px)').matches || /iPhone|iPad|iPod|Android/i.test(navigator.userAgent);
+  if(!mobile){ window.print(); return; }
+  showExportSheet();
+}
+function showExportSheet(){
+  if(document.getElementById('exportSheet')) return;
+  var o=document.createElement('div');
+  o.className='exportsheet'; o.id='exportSheet';
+  o.innerHTML='<div class="es-card" role="dialog" aria-label="Save as PDF">'+
+    '<h3>Save your report as a PDF</h3>'+
+    '<p>Tap <b>Open print</b> below, then save instead of sending to a printer:</p>'+
+    '<ul>'+
+      '<li><b>iPhone / iPad:</b> tap <b>Print</b> (top right), then under the Share options choose <b>Save to Files</b>.</li>'+
+      '<li><b>Android:</b> open the printer dropdown at the top and pick <b>Save as PDF</b>.</li>'+
+    '</ul>'+
+    '<div class="es-actions"><button type="button" class="es-cancel">Cancel</button><button type="button" class="es-go">Open print</button></div>'+
+  '</div>';
+  document.body.appendChild(o);
+  o.querySelector('.es-cancel').onclick=function(){o.remove();};
+  o.addEventListener('click',function(e){ if(e.target===o) o.remove(); });
+  o.querySelector('.es-go').onclick=function(){ o.remove(); setTimeout(function(){window.print();},60); };
+}
+
+/* ---------------- chrome / events ---------------- */
+function syncTabs(){document.querySelectorAll('.tab').forEach(t=>t.setAttribute('aria-selected',t.dataset.view===state.view));}
+document.querySelectorAll('.tab').forEach(t=>t.onclick=()=>{state.view=t.dataset.view;renderCanvas();});
+document.querySelectorAll('#levelSeg button').forEach(b=>b.onclick=()=>{state.level=b.dataset.level;document.querySelectorAll('#levelSeg button').forEach(x=>x.setAttribute('aria-pressed',x===b));renderSummary();});
+document.getElementById('initiative').oninput=e=>{state.initiative=e.target.value;renderSummary();};
+document.getElementById('description').oninput=e=>{state.description=e.target.value;};
+document.getElementById('addGroup').onclick=()=>{state.groups.push(newGroup());renderGroups();renderCanvas();};
+document.getElementById('resetBtn').onclick=()=>{if(confirm('Clear everything and start over?')){state=blank();syncInputs();renderDims();renderGroups();renderCanvas();}};
+document.getElementById('exportBtn').onclick=exportPDF;
+document.getElementById('exampleBtn').onclick=loadExample;
+window.addEventListener('beforeprint',()=>{document.__t=document.title;document.title='Impact Lens: Impact Assessment';});
+window.addEventListener('afterprint',()=>{if(document.__t)document.title=document.__t;});
+
+function syncInputs(){
+  document.getElementById('initiative').value=state.initiative;
+  document.getElementById('description').value=state.description;
+  document.querySelectorAll('#levelSeg button').forEach(x=>x.setAttribute('aria-pressed',x.dataset.level===state.level));
+}
+function loadExample(){
+  state=blank();
+  state.initiative="AI customer-support copilot rollout";
+  state.level="Enterprise";
+  state.description="Deploying an AI assistant that drafts replies and surfaces knowledge-base answers for the support org.";
+  state.dimensions={"Process":true,"Technology/Tools":true,"Skills/Training":true,"Role/Job Design":true,"Culture/Mindset":true,"Workload":false,"Reporting/Metrics":true};
+  const seeds=[
+    {name:"Frontline support agents",role:"Daily tool users",readiness:"Low",users:220,notes:"Most anxious group; fear of being replaced is high.",sev:{Process:"High","Technology/Tools":"High","Skills/Training":"High","Role/Job Design":"High","Culture/Mindset":"High","Reporting/Metrics":"Medium"}},
+    {name:"Team leads",role:"First-line managers",readiness:"Medium",users:28,notes:"Need to coach the team through the dip.",sev:{Process:"Medium","Technology/Tools":"Medium","Skills/Training":"Medium","Role/Job Design":"Medium","Culture/Mindset":"High","Reporting/Metrics":"High"}},
+    {name:"QA & knowledge team",role:"Content owners",readiness:"High",users:12,notes:"Excited about the efficiency upside.",sev:{Process:"Medium","Technology/Tools":"Low","Skills/Training":"Low","Role/Job Design":"Low","Culture/Mindset":"Low","Reporting/Metrics":"Medium"}},
+    {name:"Support leadership",role:"Sponsors",readiness:"High",users:6,notes:"Watch for ROI-only metric framing.",sev:{Process:"Low","Technology/Tools":"Low","Skills/Training":"None","Role/Job Design":"Low","Culture/Mindset":"Medium","Reporting/Metrics":"High"}},
+    {name:"IT & security",role:"Enablers",readiness:"Medium",users:15,notes:"Data-handling sign-off needed early.",sev:{Process:"Medium","Technology/Tools":"High","Skills/Training":"Low","Role/Job Design":"None","Culture/Mindset":"Low","Reporting/Metrics":"Low"}}
+  ];
+  state.groups=seeds.map(s=>newGroup(s));
+  syncInputs();renderDims();renderGroups();renderCanvas();
+}
+
+/* ---------------- utils ---------------- */
+function escapeHtml(s){return (s||'').replace(/[&<>"']/g,m=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[m]));}
+function cap(s){return s.charAt(0).toUpperCase()+s.slice(1);}
+
+/* ============ Impact Lens: PPTX slide export ============ */
+function impactDeckData(){
+  const dims=activeDims();
+  const groups=state.groups.map((g,gi)=>{
+    const ranked=dims.filter(d=>SEVW[g.sev[d]]>0).sort((a,b)=>SEVW[g.sev[b]]-SEVW[g.sev[a]]);
+    const top=ranked.slice(0,3);
+    const worries=top.filter(d=>SEVW[g.sev[d]]>=2).map(d=>WORRY[d]).slice(0,2);
+    const benefits=top.map(d=>BENEFIT[d]).slice(0,2);
+    const actions=top.flatMap(d=>{const s=g.sev[d];return (s==='High'||s==='Medium')&&MITIGATIONS[d]?[MITIGATIONS[d][s][0]]:[];}).slice(0,3);
+    const score=impactScore(g);
+    const tag = (top.length&&SEVW[g.sev[top[0]]]>=3)?'High impact':(top.length&&SEVW[g.sev[top[0]]]>=2)?'Moderate impact':'Light impact';
+    const sev={}; dims.forEach(d=>sev[d]=g.sev[d]);
+    return {name:g.name||('Group '+(gi+1)), role:g.role||'', readiness:g.readiness,
+      users:(g.users!==''&&g.users!=null&&g.users!==0)?(+g.users):null, notes:g.notes||'',
+      sev, score, top:top.map(d=>({d,sev:g.sev[d]})), worries, benefits, actions, mit:mitFor(g), tag};
+  });
+  const totalU=state.groups.reduce((a,g)=>a+(+g.users||0),0);
+  const priority=state.groups.filter(g=>impactScore(g)>=1.5 && RDW[g.readiness]<2).length;
+  return {initiative:state.initiative||'Untitled initiative', level:state.level, description:state.description||'',
+    date:new Date().toLocaleDateString(undefined,{year:'numeric',month:'long',day:'numeric'}),
+    dims, groups, totalU, priority};
+}
+
+/*PPTX_DECK_START*/
+function buildImpactDeck(pptx, data){
+  pptx.defineLayout({name:'IL',width:13.33,height:7.5});
+  pptx.layout='IL';
+  pptx.author='Impact Lens by Betty Jeng';
+  pptx.company='Betty Jeng';
+  pptx.title=data.initiative+' — Change Impact Assessment';
+
+  const W=13.33,H=7.5,M=0.7;
+  const ACCENT='FC4C02',DEEP='E04000',INK='1A1A1A',SOFT='4A4A4A',FAINT='8A8A8A',
+        CREAM='FAF7F3',LINE='E8E5E0',WHITE='FFFFFF';
+  const SEVBG={None:'ECE8E2',Low:'F6E7CB',Medium:'FCDBC4',High:'FBD2C6'};
+  const SEVTX={None:'9A938A',Low:'8A6620',Medium:'B5531A',High:'C5340A'};
+  const TAGCOL={'High impact':{bg:'FBD2C6',tx:'C5340A'},'Moderate impact':{bg:'FCDBC4',tx:'B5531A'},'Light impact':{bg:'F6E7CB',tx:'8A6620'}};
+  const R=pptx.ShapeType.rect, RR=pptx.ShapeType.roundRect, EL=pptx.ShapeType.ellipse, LN=pptx.ShapeType.line;
+  const DISP='Montserrat', BODY='Poppins';
+  const cap1=s=>s?s.charAt(0).toUpperCase()+s.slice(1):s;
+
+  function foot(s){
+    s.addText([{text:'Impact Lens',options:{bold:true,color:ACCENT,fontFace:DISP}},
+      {text:'   ·   by Betty Jeng   ·   bettyjeng.com',options:{color:FAINT,fontFace:BODY}}],
+      {x:M,y:H-0.5,w:W-2*M,h:0.3,fontSize:9,align:'left',valign:'middle'});
+  }
+  function header(s,title){
+    s.addShape(R,{x:M,y:0.62,w:0.5,h:0.06,fill:{color:ACCENT}});
+    s.addText(title,{x:M,y:0.78,w:W-2*M,h:0.7,fontFace:DISP,fontSize:26,bold:true,color:INK,valign:'top'});
+  }
+
+  /* ---- Slide 1: title (WHITE bg) ---- */
+  let s=pptx.addSlide(); s.background={color:WHITE};
+  s.addShape(R,{x:0,y:0,w:0.28,h:H,fill:{color:ACCENT}});
+  s.addText('IMPACT LENS',{x:M,y:1.55,w:W-2*M,h:0.4,fontFace:DISP,fontSize:14,bold:true,color:ACCENT,charSpacing:3});
+  s.addText(data.initiative,{x:M,y:2.05,w:W-2*M-1.5,h:1.7,fontFace:DISP,fontSize:38,bold:true,color:INK,valign:'top'});
+  s.addShape(R,{x:M,y:3.85,w:0.7,h:0.06,fill:{color:ACCENT}});
+  s.addText('Change Impact Assessment',{x:M,y:4.05,w:W-2*M,h:0.5,fontFace:BODY,fontSize:20,color:SOFT});
+  s.addText(data.level+'-level     ·     '+data.date,{x:M,y:4.62,w:W-2*M,h:0.4,fontFace:BODY,fontSize:13,color:FAINT});
+  if(data.description) s.addText(data.description,{x:M,y:5.15,w:W-2*M-2.5,h:1.1,fontFace:BODY,fontSize:13,color:SOFT,valign:'top'});
+  foot(s);
+
+  /* ---- Slide 2: at a glance ---- */
+  s=pptx.addSlide(); s.background={color:WHITE};
+  header(s,'At a glance');
+  const summ=data.initiative+'  ·  '+data.level+'-level  ·  '+data.groups.length+' group'+(data.groups.length>1?'s':'')+
+    (data.totalU>0?('  ·  ~'+data.totalU+' people impacted'):'')+' assessed.'+
+    (data.priority?('  '+data.priority+' need'+(data.priority>1?'':'s')+' priority intervention (high impact, low readiness).'):'  No groups in the priority-intervention zone, a good position to scale from.');
+  s.addText(summ,{x:M,y:1.7,w:W-2*M,h:0.7,fontFace:BODY,fontSize:14,color:SOFT,valign:'top'});
+  const cards=[['Groups assessed',String(data.groups.length)],
+               ['People impacted',data.totalU>0?('~'+data.totalU):'—'],
+               ['Priority groups',String(data.priority)]];
+  const cw=(W-2*M-2*0.45)/3, cy=2.9, ch=2.0;
+  cards.forEach((c,i)=>{
+    const cx=M+i*(cw+0.45);
+    s.addShape(RR,{x:cx,y:cy,w:cw,h:ch,fill:{color:CREAM},line:{color:LINE,width:1},rectRadius:0.14});
+    s.addText(c[1],{x:cx,y:cy+0.25,w:cw,h:1.05,fontFace:DISP,fontSize:46,bold:true,color:(i===2&&data.priority>0)?ACCENT:INK,align:'center',valign:'middle'});
+    s.addText(c[0],{x:cx,y:cy+1.32,w:cw,h:0.5,fontFace:BODY,fontSize:13,color:SOFT,align:'center'});
+  });
+  s.addText('Aim your energy at the priority groups first: high impact, low readiness.',{x:M,y:cy+ch+0.3,w:W-2*M,h:0.4,fontFace:BODY,fontSize:12,italic:true,color:FAINT,align:'center'});
+  foot(s);
+
+  /* ---- Slide 3: quadrant (faithful port of the tool) ---- */
+  s=pptx.addSlide(); s.background={color:WHITE};
+  header(s,'Impact vs. readiness');
+  const RDW={Low:1,Medium:2,High:3};
+  const QW=560,QH=470,QP=54, qix=[QP,QW-26], qiy=[30,QH-QP];
+  const qpx0=qix[0]+36,qpx1=qix[1]-36,qpy0=qiy[0]+40,qpy1=qiy[1]-30;
+  const xposR=r=>qpx0+((RDW[r]-1)/2)*(qpx1-qpx0);
+  const yposV=v=>qpy1-((v)/3)*(qpy1-qpy0);
+  const qmidX=xposR('Medium'), qmidY=yposV(1.5);
+  const maxU=Math.max(1,...data.groups.map(g=>g.users||0));
+  const anyU=data.groups.some(g=>(g.users||0)>0);
+  const pts=data.groups.map((g,i)=>{const u=g.users||0; const r=anyU?(u>0?9+Math.sqrt(u/maxU)*12:6.5):9; return {g,x:xposR(g.readiness),y:yposV(g.score),r,imp:g.score,u};});
+  for(let pass=0;pass<90;pass++){
+    for(let a=0;a<pts.length;a++)for(let b=a+1;b<pts.length;b++){
+      let dx=pts[b].x-pts[a].x,dy=pts[b].y-pts[a].y,d=Math.hypot(dx,dy),nx,ny;
+      if(d<0.01){const ang=a*2.399+b*1.137;nx=Math.cos(ang);ny=Math.sin(ang);d=0;}else{nx=dx/d;ny=dy/d;}
+      const need=pts[a].r+pts[b].r+8;
+      if(d<need){const push=(need-d)/2;pts[a].x-=push*nx;pts[a].y-=push*ny;pts[b].x+=push*nx;pts[b].y+=push*ny;}
+    }
+    pts.forEach(p=>{p.x=Math.max(qix[0]+p.r+2,Math.min(qix[1]-p.r-2,p.x));p.y=Math.max(qiy[0]+p.r+2,Math.min(qiy[1]-p.r-2,p.y));});
+  }
+  const ovl=(a,b)=>{const x=Math.max(0,Math.min(a.x+a.w,b.x+b.w)-Math.max(a.x,b.x));const y=Math.max(0,Math.min(a.y+a.h,b.y+b.h)-Math.max(a.y,b.y));return x*y;};
+  const wrapL=(str,max,maxLines)=>{const words=String(str).trim().split(/\s+/);const lines=[];let cur='';words.forEach(w=>{if(((cur+' '+w).trim()).length<=max){cur=(cur+' '+w).trim();}else{if(cur)lines.push(cur);cur=w.length>max?w.slice(0,max-1)+'\u2026':w;}});if(cur)lines.push(cur);if(lines.length>maxLines){const kept=lines.slice(0,maxLines);kept[maxLines-1]=kept[maxLines-1].slice(0,max-1).replace(/\s+$/,'')+'\u2026';return kept;}return lines.length?lines:[''];};
+  const caps=[{x:qix[0]+8,y:qiy[0]+9,w:170,h:15},{x:qix[1]-10-152,y:qiy[0]+9,w:160,h:15},{x:qix[0]+8,y:qiy[1]-23,w:80,h:15},{x:qix[1]-10-88,y:qiy[1]-23,w:92,h:15}];
+  const bubbleBoxes=pts.map(p=>({x:p.x-p.r,y:p.y-p.r,w:2*p.r,h:2*p.r}));
+  const placed=[]; const labels=[];
+  const order=[...pts.keys()].sort((a,b)=>(pts[b].imp-pts[a].imp)||(pts[b].u-pts[a].u));
+  order.forEach(idx=>{
+    const p=pts[idx]; const full=p.g.name; const lns=wrapL(full,14,2);
+    const lineH=14,maxLen=Math.max.apply(null,lns.map(l=>l.length));
+    const w=maxLen*6.8+26,h=lns.length*lineH+16;
+    const cxA=Math.max(qix[0]+w/2+2,Math.min(qix[1]-w/2-2,p.x));
+    const cands=[
+      {box:{x:cxA-w/2,y:p.y-p.r-6-h,w,h},align:'center'},
+      {box:{x:cxA-w/2,y:p.y+p.r+6,w,h},align:'center'},
+      {box:{x:p.x+p.r+6,y:p.y-h/2,w,h},align:'left'},
+      {box:{x:p.x-p.r-6-w,y:p.y-h/2,w,h},align:'right'}
+    ];
+    let best=null,bestScore=Infinity;
+    cands.forEach(c=>{const b=c.box;let score=0;if(b.x<3||b.y<3||b.x+b.w>QW-3||b.y+b.h>QH-3)score+=10000;caps.forEach(o=>score+=ovl(b,o)*3);bubbleBoxes.forEach(o=>score+=ovl(b,o));placed.forEach(o=>score+=ovl(b,o)*2);if(score<bestScore){bestScore=score;best=c;}});
+    placed.push(best.box);
+    labels.push({box:best.box,align:best.align,lines:lns});
+  });
+  // emit, scaled to inches
+  const PX0=3.45,PY0=1.55,SC=6.2/560;
+  const X=px=>PX0+px*SC, Y=px=>PY0+px*SC, L=len=>len*SC, FS=px=>+(px*SC*72).toFixed(1);
+  const trc=o=>Math.round((1-o)*100);
+  s.addShape(R,{x:X(qix[0]),y:Y(qiy[0]),w:L(qmidX-qix[0]),h:L(qmidY-qiy[0]),fill:{color:'E50D56',transparency:trc(.10)}});
+  s.addShape(R,{x:X(qmidX),y:Y(qiy[0]),w:L(qix[1]-qmidX),h:L(qmidY-qiy[0]),fill:{color:'5E9C7E',transparency:trc(.12)}});
+  s.addShape(R,{x:X(qix[0]),y:Y(qmidY),w:L(qmidX-qix[0]),h:L(qiy[1]-qmidY),fill:{color:'F7B500',transparency:trc(.11)}});
+  s.addShape(R,{x:X(qmidX),y:Y(qmidY),w:L(qix[1]-qmidX),h:L(qiy[1]-qmidY),fill:{color:'7F94A8',transparency:trc(.13)}});
+  const qcapP=(px,py,t,c,al)=>s.addText(t,{x:al==='right'?X(px)-2.4:X(px),y:Y(py)-0.16,w:2.4,h:0.26,align:al||'left',valign:'middle',fontFace:DISP,fontSize:FS(10),bold:true,color:c,charSpacing:1});
+  qcapP(qix[0]+10,qiy[0]+13,'PRIORITY INTERVENTION','B23A52');
+  qcapP(qix[1]-10,qiy[0]+13,'ENABLE & ACCELERATE','3E7A5E','right');
+  qcapP(qix[0]+10,qiy[1]-15,'MONITOR','9A6E1C');
+  qcapP(qix[1]-10,qiy[1]-15,'LOW-TOUCH','5A6E82','right');
+  s.addShape(LN,{x:X(qmidX),y:Y(qiy[0]),w:0,h:L(qiy[1]-qiy[0]),line:{color:'DCD8D2',width:0.75,dashType:'dash'}});
+  s.addShape(LN,{x:X(qix[0]),y:Y(qmidY),w:L(qix[1]-qix[0]),h:0,line:{color:'DCD8D2',width:0.75,dashType:'dash'}});
+  s.addShape(LN,{x:X(qix[0]),y:Y(qiy[0]),w:0,h:L(qiy[1]-qiy[0]),line:{color:INK,width:1.1}});
+  s.addShape(LN,{x:X(qix[0]),y:Y(qiy[1]),w:L(qix[1]-qix[0]),h:0,line:{color:INK,width:1.1}});
+  s.addText('Low readiness',{x:X(qix[0]),y:Y(QH-14),w:1.7,h:0.26,fontFace:DISP,fontSize:FS(11),bold:true,color:FAINT,valign:'middle'});
+  s.addText('High readiness',{x:X(qix[1])-1.7,y:Y(QH-14),w:1.7,h:0.26,align:'right',fontFace:DISP,fontSize:FS(11),bold:true,color:FAINT,valign:'middle'});
+  s.addText('High impact',{x:X(8)-0.7,y:Y(qiy[0]+95)-0.15,w:1.4,h:0.3,rotate:270,align:'center',valign:'middle',fontFace:DISP,fontSize:FS(11),bold:true,color:FAINT});
+  s.addText('Low impact',{x:X(8)-0.7,y:Y(qiy[1]-95)-0.15,w:1.4,h:0.3,rotate:270,align:'center',valign:'middle',fontFace:DISP,fontSize:FS(11),bold:true,color:FAINT});
+  pts.forEach(p=>{
+    const hi=p.imp>=1.5, lowR=RDW[p.g.readiness]<2;
+    const col=hi&&lowR?'D14E66':hi&&!lowR?'5E9C7E':!hi&&lowR?'E0A93F':'7F94A8';
+    s.addShape(EL,{x:X(p.x-p.r),y:Y(p.y-p.r),w:L(2*p.r),h:L(2*p.r),fill:{color:col,transparency:trc(.92)},line:{color:'FFFFFF',width:1.6}});
+  });
+  labels.forEach(lb=>{const b=lb.box;
+    s.addShape(RR,{x:X(b.x),y:Y(b.y),w:L(b.w),h:L(b.h),fill:{color:'FFFFFF',transparency:18},rectRadius:0.05,line:{type:'none'}});
+    s.addText(lb.lines.join('\n'),{x:X(b.x),y:Y(b.y),w:L(b.w),h:L(b.h),align:lb.align,valign:'middle',fontFace:BODY,fontSize:FS(10.5),bold:true,color:INK,wrap:false,margin:2});
+  });
+  // notes (left column) + legend (right column)
+  s.addText('Position shows how hard the change hits and how ready each group is.\n\nBubble size shows how many people. The two are kept separate on purpose, because a small team can still be hit hard.',
+    {x:0.5,y:2.7,w:2.55,h:3.2,fontFace:BODY,fontSize:12,color:SOFT,valign:'top',paraSpaceAfter:8});
+  const lx=9.8, lw=3.0; let ly=2.6;
+  [['D14E66','Priority intervention'],['5E9C7E','Enable & accelerate'],['E0A93F','Monitor'],['7F94A8','Low-touch']].forEach(it=>{
+    s.addShape(EL,{x:lx,y:ly+0.05,w:0.2,h:0.2,fill:{color:it[0]}});
+    s.addText(it[1],{x:lx+0.32,y:ly-0.03,w:lw-0.32,h:0.36,fontFace:BODY,fontSize:11.5,color:INK,valign:'middle'});
+    ly+=0.52;
+  });
+  if(anyU){
+    s.addShape(EL,{x:lx,y:ly+0.05,w:0.2,h:0.2,fill:{color:WHITE},line:{color:'B9B2A8',width:1}});
+    s.addText('Bubble size = people impacted',{x:lx+0.32,y:ly-0.05,w:lw-0.32,h:0.5,fontFace:BODY,fontSize:11,italic:true,color:SOFT,valign:'middle'});
+  }
+  foot(s);
+
+  /* ---- Slide 4+: table (slash-wrap + font scaling, manual pagination) ---- */
+  const nd=data.dims.length;
+  const headFs = nd>=7?7 : nd>=6?7.5 : 9;
+  const sevFs  = nd>=7?8 : nd>=6?8.5 : 9;
+  const mitFs  = nd>=7?7.5 : 8;
+  const groupW = nd>=7?1.8:2.1, peopleW=nd>=7?0.55:0.6, mitW = nd>=7?2.5:2.95;
+  const dimW=Math.max(0.6,(W-2*M-groupW-peopleW-mitW)/nd);
+  const colW=[groupW,peopleW].concat(data.dims.map(()=>dimW)).concat([mitW]);
+  const hb=t=>t.replace(/\//g,'/\n');   // hard break after slashes: headers wrap by whole token, never mid-word
+  const head=['Group','People'].concat(data.dims.map(hb)).concat(['Suggested mitigation']);
+  const makeHeadRow=()=>head.map(t=>({text:t,options:{bold:true,color:WHITE,fill:{color:INK},fontFace:DISP,fontSize:headFs,align:'center',valign:'middle'}}));
+  const CHUNK=8;
+  for(let ci=0; ci<data.groups.length; ci+=CHUNK){
+    const chunk=data.groups.slice(ci,ci+CHUNK);
+    const ts=pptx.addSlide(); ts.background={color:WHITE};
+    header(ts, ci===0?'Impact by dimension':'Impact by dimension (cont.)');
+    const rows=[makeHeadRow()];
+    chunk.forEach(g=>{
+      const r=[];
+      r.push({text:[{text:g.name,options:{bold:true,fontSize:Math.min(9,headFs+1),color:INK,breakLine:true}},
+        {text:(g.role?g.role+' · ':'')+g.readiness+' readiness',options:{fontSize:7,color:FAINT}}],
+        options:{fill:{color:WHITE},align:'left',valign:'middle',fontFace:BODY,margin:2}});
+      r.push({text:g.users!=null?String(g.users):'—',options:{align:'center',fontSize:sevFs,color:SOFT,fill:{color:WHITE},fontFace:BODY}});
+      data.dims.forEach(d=>{const sv=g.sev[d];r.push({text:sv,options:{align:'center',fontSize:sevFs,bold:true,color:SEVTX[sv],fill:{color:SEVBG[sv]},fontFace:DISP,valign:'middle'}});});
+      r.push({text:g.mit,options:{align:'left',fontSize:mitFs,color:SOFT,fill:{color:WHITE},fontFace:BODY,margin:2}});
+      rows.push(r);
+    });
+    ts.addTable(rows,{x:M,y:1.65,w:W-2*M,colW,border:{type:'solid',color:LINE,pt:0.5},valign:'middle',margin:3});
+    foot(ts);
+  }
+
+  /* ---- Persona slides (shaded section cards) ---- */
+  function pcard(sl,x,y,w,h,dotCol,title,items,empty){
+    sl.addShape(RR,{x,y,w,h,fill:{color:CREAM},line:{color:LINE,width:1},rectRadius:0.12});
+    const pad=0.2;
+    const runs=[{text:'\u25CF  ',options:{color:dotCol,fontFace:BODY,fontSize:11}},
+                {text:title,options:{bold:true,fontFace:DISP,fontSize:12,color:DEEP,breakLine:true,paraSpaceAfter:6}}];
+    if(items&&items.length) items.forEach(t=>runs.push({text:t,options:{fontFace:BODY,fontSize:10.5,color:INK,bullet:{indent:13},breakLine:true,paraSpaceAfter:3}}));
+    else runs.push({text:empty,options:{fontFace:BODY,fontSize:10.5,italic:true,color:FAINT,breakLine:true}});
+    sl.addText(runs,{x:x+pad,y:y+pad-0.04,w:w-2*pad,h:h-2*pad,valign:'top'});
+  }
+  data.groups.forEach(g=>{
+    const s2=pptx.addSlide(); s2.background={color:WHITE};
+    header(s2,g.name);
+    s2.addText((g.role||'—')+'     ·     '+g.readiness+' readiness'+(g.users!=null?('     ·     '+g.users+' people'):''),
+      {x:M,y:1.5,w:W-2*M-2.4,h:0.4,fontFace:BODY,fontSize:13,color:SOFT});
+    const tc=TAGCOL[g.tag];
+    s2.addShape(RR,{x:W-M-2.0,y:0.72,w:2.0,h:0.5,fill:{color:tc.bg},rectRadius:0.1});
+    s2.addText(g.tag,{x:W-M-2.0,y:0.72,w:2.0,h:0.5,align:'center',valign:'middle',fontFace:DISP,fontSize:12,bold:true,color:tc.tx});
+    const colW2=(W-2*M-0.5)/2, lx2=M, rx2=M+colW2+0.5;
+    pcard(s2,lx2,2.15,colW2,1.95,'C5340A','Most affected',
+      g.top.length?g.top.map(t=>t.d+'   ('+t.sev+')'):null,'Minimal impact across the assessed dimensions.');
+    pcard(s2,lx2,4.25,colW2,2.0,'B5531A','What worries them',
+      g.worries.length?g.worries.map(w=>'That '+w+'.'):null,'No major worries surfaced at this severity.');
+    pcard(s2,rx2,2.15,colW2,1.95,'B8860B',"What's in it for them",
+      g.benefits.length?g.benefits.map(b=>cap1(b)+'.'):null,'Stability, with little changing for them.');
+    pcard(s2,rx2,4.25,colW2,2.0,'FC4C02','Recommended actions',
+      g.actions.length?g.actions:null,'Light-touch communications only.');
+    if(g.notes) s2.addText([{text:'Notes:  ',options:{bold:true,color:DEEP,fontFace:DISP}},{text:g.notes,options:{color:SOFT,fontFace:BODY}}],
+      {x:M,y:6.42,w:W-2*M,h:0.45,fontSize:10.5,valign:'top'});
+    foot(s2);
+  });
+
+  /* ---- Closing slide (WHITE bg) ---- */
+  s=pptx.addSlide(); s.background={color:WHITE};
+  s.addShape(R,{x:0,y:0,w:W,h:0.28,fill:{color:ACCENT}});
+  s.addText('Created with Impact Lens',{x:M,y:2.4,w:W-2*M,h:0.7,fontFace:DISP,fontSize:30,bold:true,color:INK,align:'center'});
+  s.addShape(R,{x:W/2-0.35,y:3.2,w:0.7,h:0.06,fill:{color:ACCENT}});
+  s.addText('A starting point for conversation, not a substitute for it. Validate with the people affected, then plan reinforcement and a post go-live check-in so the change actually sticks.',
+    {x:W/2-4.6,y:3.45,w:9.2,h:1.2,fontFace:BODY,fontSize:14,color:SOFT,align:'center',valign:'top'});
+  s.addText([{text:'Betty Jeng',options:{bold:true,color:ACCENT,fontFace:DISP}},
+    {text:'     ·     human-first AI-adoption tools     ·     bettyjeng.com',options:{color:SOFT,fontFace:BODY}}],
+    {x:M,y:5.05,w:W-2*M,h:0.4,fontSize:14,align:'center'});
+  return pptx;
+}
+/*PPTX_DECK_END*/
+
+function exportPPTX(){
+  if(!state.groups.length){ alert('Add an affected group first, then export your slides.'); return; }
+  if(typeof PptxGenJS==='undefined'){ alert('Slide export is still loading. Give it a second and try again.'); return; }
+  const btn=document.getElementById('deckBtn'); const label=btn?btn.textContent:'';
+  if(btn){ btn.textContent='Building…'; btn.disabled=true; }
+  try{
+    const pptx=new PptxGenJS();
+    buildImpactDeck(pptx, impactDeckData());
+    const safe=(state.initiative||'impact-assessment').replace(/[^\w\- ]+/g,'').trim().replace(/\s+/g,'-').toLowerCase()||'impact-assessment';
+    pptx.writeFile({fileName:'ImpactLens-'+safe+'.pptx'}).then(()=>{ if(btn){btn.textContent=label;btn.disabled=false;} })
+      .catch(()=>{ if(btn){btn.textContent=label;btn.disabled=false;} alert('Sorry, the slide export hit a snag. Please try again.'); });
+  }catch(e){ if(btn){btn.textContent=label;btn.disabled=false;} alert('Sorry, the slide export hit a snag. Please try again.'); }
+}
+document.getElementById('deckBtn').onclick=exportPPTX;
+
+/* ---------------- init ---------------- */
+renderDims();renderGroups();renderCanvas();
+</script>
+</body>
+</html>

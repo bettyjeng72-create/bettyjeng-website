@@ -1,0 +1,989 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>Alora, turn a workflow pain into a Blueprint</title>
+<meta name="description" content="Describe a workflow that isn't working. Alora hands back a Blueprint: what's really wrong, what to change, where AI fits and where it doesn't, and what to do next." />
+<link rel="preconnect" href="https://fonts.googleapis.com" />
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+<link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@500;600;700;800&family=Poppins:wght@400;500;600&display=swap" rel="stylesheet" />
+<style>
+  :root{
+    --tint:#FAF7F3; --white:#FFFFFF; --ink:#1A1A1A; --ink-soft:#4A4A4A; --ink-faint:#8A8A8A;
+    --accent:#FC4C02; --accent-deep:#E04000; --accent-soft:#FBE2D6; --line:#E8E5E0;
+    --auto:#5E9C7E; --auto-bg:#E9F2EC; --assist:#E04000; --assist-bg:#FBE2D6;
+    --human:#5A6E82; --human-bg:#EBEEF2; --gold:#9A6E1C; --gold-bg:#F6E7CB;
+    --disp:'Montserrat',system-ui,sans-serif; --body:'Poppins',system-ui,sans-serif;
+    --radius:14px; --shadow:0 1px 2px rgba(26,26,26,.04),0 8px 28px rgba(26,26,26,.06);
+  }
+  *{box-sizing:border-box}
+  html{scroll-behavior:smooth}
+  body{margin:0;background:var(--tint);color:var(--ink);font-family:var(--body);line-height:1.55;-webkit-font-smoothing:antialiased}
+  .wrap{max-width:940px;margin:0 auto;padding:0 20px}
+
+  /* header */
+  .app-header{padding:46px 0 24px;text-align:center}
+  .wordmark{font-family:var(--disp);font-weight:800;font-size:clamp(34px,6vw,52px);letter-spacing:-.02em;margin:0;color:var(--ink)}
+  .wordmark .dot{color:var(--accent)}
+  .tagline{font-size:clamp(15px,2.3vw,17px);color:var(--ink-soft);max-width:620px;margin:10px auto 0}
+  .eyebrow-top{font-family:var(--disp);font-weight:700;font-size:12px;letter-spacing:.18em;text-transform:uppercase;color:var(--accent);margin:0 0 6px}
+
+  /* card + intake */
+  .card{background:var(--white);border:1px solid var(--line);border-radius:var(--radius);box-shadow:var(--shadow)}
+  .intake{padding:24px 26px 22px;margin-top:6px}
+
+  /* privacy note */
+  .privacy-note{display:flex;gap:10px;align-items:flex-start;background:var(--tint);border:1px solid var(--line);border-radius:11px;padding:12px 15px;margin-bottom:22px;font-size:12.5px;color:var(--ink-soft)}
+  .privacy-note b{font-family:var(--disp);font-weight:600;color:var(--ink)}
+
+  /* fields */
+  .field{margin-bottom:20px}
+  .field:last-of-type{margin-bottom:6px}
+  .fhead{display:flex;align-items:center;gap:10px;margin-bottom:5px}
+  .fnum{flex:0 0 auto;width:26px;height:26px;border-radius:7px;background:var(--accent-soft);color:var(--accent-deep);font-family:var(--disp);font-weight:700;font-size:12px;display:flex;align-items:center;justify-content:center}
+  label.flabel{font-family:var(--disp);font-weight:600;font-size:14.5px;color:var(--ink)}
+  label.flabel .opt{font-family:var(--body);font-weight:500;font-size:12px;color:var(--ink-faint);margin-left:6px}
+  .fhint{font-size:12.5px;color:var(--ink-faint);margin:0 0 8px 36px}
+  .fbody{margin-left:36px}
+  textarea,input[type=text],input[type=number],select{width:100%;font-family:var(--body);font-size:14px;color:var(--ink);background:var(--tint);border:1px solid var(--line);border-radius:10px;padding:10px 12px;resize:vertical}
+  textarea{min-height:58px}
+  textarea:focus,input:focus,select:focus{outline:none;border-color:var(--accent);box-shadow:0 0 0 3px var(--accent-soft);background:var(--white)}
+  textarea::placeholder,input::placeholder{color:#b8b2a8}
+  select{cursor:pointer;appearance:none;background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='8' viewBox='0 0 12 8'%3E%3Cpath fill='%238A8A8A' d='M1 1l5 5 5-5'/%3E%3C/svg%3E");background-repeat:no-repeat;background-position:right 13px center;padding-right:32px}
+  .counter{font-size:11px;color:var(--ink-faint);text-align:right;margin-top:4px;font-family:var(--disp)}
+  .counter.over{color:var(--accent-deep)}
+
+  /* structured context */
+  .ctx-grid{display:grid;grid-template-columns:1fr 1fr;gap:14px}
+  .ctx-field label{display:block;font-family:var(--disp);font-weight:600;font-size:12px;color:var(--ink-soft);margin-bottom:4px}
+  .ctx-field.full{grid-column:1 / -1}
+  .seg{display:flex;gap:6px}
+  .seg-btn{flex:1;font-family:var(--disp);font-weight:600;font-size:13px;padding:9px 8px;border:1px solid var(--line);background:var(--tint);color:var(--ink-soft);border-radius:9px;cursor:pointer;transition:all .12s}
+  .seg-btn[aria-pressed=true]{background:var(--accent-soft);border-color:var(--accent);color:var(--accent-deep)}
+  .seg-btn:focus-visible{outline:none;box-shadow:0 0 0 3px var(--accent-soft)}
+
+  /* buttons */
+  .actions{display:flex;flex-wrap:wrap;gap:10px;margin-top:20px}
+  .btn{font-family:var(--disp);font-weight:600;font-size:14.5px;border-radius:10px;padding:11px 18px;border:1px solid var(--line);background:var(--white);color:var(--ink);cursor:pointer;transition:transform .08s ease,background .15s ease,border-color .15s ease}
+  .btn:hover{border-color:#d8d3cc}
+  .btn:active{transform:translateY(1px)}
+  .btn:focus-visible{outline:none;box-shadow:0 0 0 3px var(--accent-soft)}
+  .btn-primary{background:var(--accent);border-color:var(--accent);color:#fff}
+  .btn-primary:hover{background:var(--accent-deep);border-color:var(--accent-deep)}
+  .btn-ghost{background:transparent}
+
+  /* preview banner */
+  .preview-banner{display:none;align-items:flex-start;gap:10px;margin:22px 0 0;padding:13px 16px;background:var(--accent-soft);border:1px solid #f3c9b6;border-radius:12px;color:var(--accent-deep);font-size:13.5px}
+  .preview-banner.show{display:flex}
+  .preview-banner strong{font-family:var(--disp)}
+
+  /* no-workflow-yet toggle */
+  .modeline{display:flex;align-items:center;gap:8px;margin:2px 0 8px 36px;font-size:12.5px;color:var(--ink-soft)}
+  .modeline input{width:15px;height:15px;accent-color:var(--accent);cursor:pointer}
+  .modeline label{cursor:pointer}
+
+  /* clarify step */
+  #clarifyCard{display:none;margin-top:20px;padding:22px 24px}
+  #clarifyCard.show{display:block}
+  .clarify-head{display:flex;align-items:flex-start;gap:11px;margin-bottom:4px}
+  .clarify-head .cnum{flex:0 0 auto;width:30px;height:30px;border-radius:8px;background:var(--accent-soft);color:var(--accent-deep);font-family:var(--disp);font-weight:700;font-size:13px;display:flex;align-items:center;justify-content:center}
+  .clarify-head h2{font-family:var(--disp);font-weight:800;font-size:18px;margin:0;letter-spacing:-.01em}
+  .clarify-head p{font-size:12.5px;color:var(--ink-faint);margin:2px 0 0}
+  .cq{margin:16px 0}
+  .cq .cqq{font-family:var(--disp);font-weight:600;font-size:14.5px;color:var(--ink);margin-bottom:3px}
+  .cq .cqwhy{font-size:12px;color:var(--ink-faint);margin-bottom:7px}
+  .cq textarea{min-height:58px}
+  .clarify-actions{display:flex;flex-wrap:wrap;gap:10px;margin-top:18px}
+  .btn[disabled]{opacity:.55;cursor:default;pointer-events:none}
+  .btn.loading{position:relative;color:transparent}
+  .btn.loading::after{content:"";position:absolute;inset:0;margin:auto;width:15px;height:15px;border:2px solid currentColor;border-right-color:transparent;border-radius:50%;animation:spin .6s linear infinite}
+  .btn-primary.loading::after{border-color:#fff;border-right-color:transparent}
+  @keyframes spin{to{transform:rotate(360deg)}}
+
+  /* assumptions note on the blueprint */
+  .assume{display:flex;gap:10px;align-items:flex-start;background:var(--gold-bg);border:1px solid #e8d3a6;border-radius:12px;padding:13px 16px;margin-bottom:16px;font-size:13px;color:var(--ink-soft)}
+  .assume b{font-family:var(--disp);font-weight:600;color:var(--gold)}
+  .assume ul{margin:5px 0 0;padding-left:18px}
+  .assume li{margin-bottom:3px}
+
+  /* "what you told Alora" recap on the blueprint */
+  .recap{display:flex;gap:10px;align-items:flex-start;background:var(--tint);border:1px solid var(--line);border-radius:12px;padding:13px 16px;margin-bottom:14px;font-size:13px;color:var(--ink-soft)}
+  .recap b{font-family:var(--disp);font-weight:600;color:var(--accent-deep)}
+  .recap ul{list-style:none;margin:8px 0 0;padding:0}
+  .recap li{margin-bottom:9px}
+  .recap li:last-child{margin-bottom:0}
+  .recap .rq{display:block;font-family:var(--disp);font-weight:600;font-size:12.5px;color:var(--ink)}
+  .recap .ra{display:block;font-size:13px;color:var(--ink-soft);margin-top:1px}
+  .recap .ra::before{content:"↳ ";color:var(--accent)}
+
+  /* result */
+  #result{display:none;margin-top:30px}
+  #result.show{display:block}
+  .result-head{display:flex;flex-wrap:wrap;align-items:center;justify-content:space-between;gap:12px;margin-bottom:6px}
+  .result-head h2{font-family:var(--disp);font-weight:800;font-size:21px;margin:0;letter-spacing:-.01em}
+  .result-head .sub{color:var(--ink-faint);font-size:13px;margin-top:2px}
+  .exports{display:flex;gap:8px;flex-wrap:wrap}
+  .btn-sm{padding:8px 13px;font-size:13px}
+
+  /* blueprint */
+  .bp-section{position:relative;background:var(--white);border:1px solid var(--line);border-left:3px solid var(--accent);border-radius:12px;box-shadow:var(--shadow);padding:20px 22px;margin-bottom:16px}
+  .bp-head{display:flex;align-items:center;gap:11px;margin-bottom:13px}
+  .bp-num{flex:0 0 auto;width:30px;height:30px;border-radius:8px;background:var(--accent-soft);color:var(--accent-deep);font-family:var(--disp);font-weight:700;font-size:13px;display:flex;align-items:center;justify-content:center}
+  .bp-title{font-family:var(--disp);font-weight:700;font-size:17px;margin:0;letter-spacing:-.01em}
+  .bp-sub{color:var(--ink-faint);font-size:12.5px;margin:2px 0 0}
+
+  .verdict{display:inline-flex;align-items:center;gap:7px;font-family:var(--disp);font-weight:700;font-size:13px;padding:6px 12px;border-radius:999px;background:var(--gold-bg);color:var(--gold);margin-bottom:10px}
+  .verdict .tag2{font-family:var(--body);font-weight:500;color:var(--ink-faint);font-size:12px}
+  .bp-section p.body{margin:0;color:var(--ink-soft);font-size:15px}
+
+  .ba-grid{display:grid;grid-template-columns:1fr 1fr;gap:16px}
+  .ba-col{background:var(--tint);border:1px solid var(--line);border-radius:10px;padding:14px 16px}
+  .ba-col.after{background:#fff7f3;border-color:#f3d8c8}
+  .ba-col h4{font-family:var(--disp);font-size:12px;letter-spacing:.1em;text-transform:uppercase;margin:0 0 8px;color:var(--ink-faint)}
+  .ba-col.after h4{color:var(--accent-deep)}
+  .ba-col ol{margin:0;padding-left:18px;font-size:14px;color:var(--ink-soft)}
+  .ba-col ol li{margin-bottom:5px}
+  .changes{margin:14px 0 0;padding:0;list-style:none}
+  .changes li{font-size:14px;color:var(--ink-soft);padding-left:18px;position:relative;margin-bottom:6px}
+  .changes li::before{content:"\2192";position:absolute;left:0;color:var(--accent);font-weight:700}
+  .changes b{color:var(--ink);font-weight:600}
+
+  .buckets{display:grid;grid-template-columns:1fr 1fr;gap:16px}
+  .bucket h4{font-family:var(--disp);font-size:12px;letter-spacing:.08em;text-transform:uppercase;margin:0 0 9px;color:var(--ink-faint)}
+  .fix{border:1px solid var(--line);border-radius:10px;padding:11px 13px;margin-bottom:9px;background:var(--white)}
+  .fix .ftext{font-size:14px;color:var(--ink);margin-bottom:7px}
+  .chips{display:flex;gap:6px;flex-wrap:wrap}
+  .chip{font-family:var(--disp);font-weight:600;font-size:11px;padding:3px 9px;border-radius:999px;background:var(--tint);color:var(--ink-soft);border:1px solid var(--line)}
+
+  .ai-item{display:flex;flex-wrap:wrap;align-items:baseline;gap:8px 12px;padding:12px 0;border-top:1px solid var(--line)}
+  .ai-item:first-child{border-top:none}
+  .ai-step{font-family:var(--disp);font-weight:600;font-size:14.5px;flex:1 1 200px}
+  .pill{font-family:var(--disp);font-weight:700;font-size:11.5px;padding:4px 11px;border-radius:999px;white-space:nowrap}
+  .pill.automate{background:var(--auto-bg);color:var(--auto)}
+  .pill.assist{background:var(--assist-bg);color:var(--assist)}
+  .pill.human{background:var(--human-bg);color:var(--human)}
+  .ai-why{flex:1 1 100%;font-size:13.5px;color:var(--ink-faint)}
+
+  .persona{border:1px solid var(--line);border-radius:10px;padding:14px 16px;margin-bottom:11px;background:var(--tint)}
+  .persona h4{font-family:var(--disp);font-weight:700;font-size:15px;margin:0 0 8px;color:var(--ink)}
+  .prow{font-size:13.5px;margin-bottom:5px;color:var(--ink-soft)}
+  .prow .plab{font-family:var(--disp);font-weight:600;font-size:11px;letter-spacing:.04em;text-transform:uppercase;color:var(--accent-deep);margin-right:6px}
+
+  /* checklist with labeled Action / Who / When */
+  .check{display:flex;align-items:flex-start;gap:12px;padding:14px 0;border-top:1px solid var(--line)}
+  .check:first-child{border-top:none}
+  .check input[type=checkbox]{margin-top:2px;width:17px;height:17px;accent-color:var(--accent);flex:0 0 auto;cursor:pointer}
+  .check .cbody{flex:1}
+  .crow{display:flex;gap:8px;font-size:13.5px;margin-bottom:3px;color:var(--ink-soft)}
+  .crow:last-child{margin-bottom:0}
+  .clab{flex:0 0 52px;font-family:var(--disp);font-weight:700;font-size:10.5px;letter-spacing:.05em;text-transform:uppercase;color:var(--accent-deep);padding-top:1px}
+  .crow.action .ctext{font-size:14.5px;color:var(--ink);font-weight:500}
+  .check input:checked ~ .cbody .crow.action .ctext{text-decoration:line-through;color:var(--ink-faint)}
+
+  footer{text-align:center;padding:34px 20px 50px;color:var(--ink-faint);font-size:13px}
+  footer .brand{font-family:var(--disp);font-weight:700;color:var(--accent)}
+  footer .disclaimer{max-width:580px;margin:0 auto 12px;font-size:12.5px;color:var(--ink-faint)}
+  .toast{position:fixed;left:50%;bottom:26px;transform:translateX(-50%) translateY(20px);background:var(--ink);color:#fff;font-size:13.5px;padding:11px 18px;border-radius:10px;opacity:0;pointer-events:none;transition:opacity .2s,transform .2s;z-index:50;font-family:var(--body)}
+  .toast.show{opacity:1;transform:translateX(-50%) translateY(0)}
+
+  @media (max-width:640px){
+    .ba-grid,.buckets,.ctx-grid{grid-template-columns:1fr}
+    .intake{padding:20px 18px}
+    .bp-section{padding:18px 16px}
+    .fhint,.fbody{margin-left:0}
+  }
+  @media (prefers-reduced-motion:reduce){*{transition:none !important;scroll-behavior:auto}}
+
+  /* print-only blocks (shown only when printing to PDF) */
+  .print-only{display:none}
+  .print-head{margin-bottom:14px}
+  .print-head .pe{font-family:var(--disp);font-weight:700;font-size:11px;letter-spacing:.16em;text-transform:uppercase;color:var(--accent);margin:0 0 4px}
+  .print-foot{margin-top:18px;padding-top:12px;border-top:1px solid var(--line);font-size:11px;color:var(--ink-faint)}
+  .print-foot .pbrand{font-family:var(--disp);font-weight:700;color:var(--accent)}
+
+  /* mobile "save as PDF" helper sheet */
+  .exportsheet{position:fixed;inset:0;background:rgba(26,26,26,.5);display:flex;align-items:flex-end;justify-content:center;z-index:60}
+  .es-card{background:#fff;border-radius:16px 16px 0 0;max-width:480px;width:100%;padding:22px 22px 26px;box-shadow:0 -8px 30px rgba(0,0,0,.18)}
+  .es-card h3{font-family:var(--disp);font-weight:800;font-size:18px;margin:0 0 8px}
+  .es-card p{font-size:13.5px;color:var(--ink-soft);margin:0 0 10px}
+  .es-card ul{margin:0 0 16px;padding-left:18px;font-size:13px;color:var(--ink-soft)}
+  .es-card li{margin-bottom:6px}
+  .es-card b{color:var(--ink)}
+  .es-actions{display:flex;gap:10px;justify-content:flex-end}
+
+  @media print{
+    @page{margin:14mm}
+    body{background:#fff}
+    .app-header,.intake,#clarifyCard,footer,.preview-banner,.toast,.exports,.exportsheet{display:none !important}
+    main.wrap{max-width:none;padding:0;margin:0}
+    #result{display:block !important;margin:0}
+    .result-head{display:block;margin-bottom:14px}
+    .result-head h2{font-size:22px}
+    .print-only{display:block}
+    .bp-section{break-inside:avoid;box-shadow:none;border:1px solid var(--line)}
+    .assume{break-inside:avoid}
+    .check input[type=checkbox]{-webkit-appearance:none;appearance:none;border:1.4px solid #999;border-radius:3px}
+  }
+</style>
+</head>
+<body>
+  <header class="app-header">
+    <div class="wrap">
+      <p class="eyebrow-top">A Human Mirror tool</p>
+      <h1 class="wordmark">Alora<span class="dot">.</span></h1>
+      <p class="tagline">Describe a workflow that isn't working. Alora hands back a Blueprint: what's really wrong, what to change, where AI fits and where it doesn't, and what to do next.</p>
+    </div>
+  </header>
+
+  <main class="wrap">
+    <section class="card intake" aria-label="Describe your workflow">
+
+      <div class="privacy-note">
+        <span aria-hidden="true">🔒</span>
+        <span><b>A quick note on privacy.</b> Alora sends what you type to an AI service to build your Blueprint, so please describe systems generically (like "CRM" or "knowledge base") and don't paste secrets, credentials, or confidential details. Alora doesn't store anything you enter.</span>
+      </div>
+
+      <div class="field">
+        <div class="fhead"><span class="fnum">01</span><label class="flabel" for="pain">What's the pain point?</label></div>
+        <p class="fhint">What's slow, frustrating, or not working, and what is it costing you? A line on what "good" would look like helps too.</p>
+        <div class="fbody">
+          <textarea id="pain" maxlength="1500" placeholder="e.g. We rolled out an AI assistant to cut handle time, but six months in, leadership wants ROI we can't show and adoption has stalled."></textarea>
+          <div class="counter" id="painCount">0 / 1500</div>
+        </div>
+      </div>
+
+      <div class="field">
+        <div class="fhead"><span class="fnum">02</span><label class="flabel" for="flow">What's the current workflow?</label></div>
+        <p class="fhint">Describe how the process works today, step by step. Press Enter to start each new step, and note any pain points you feel along the way. Keep tool names generic (like "knowledge base" or "CRM") unless you're comfortable sharing them.</p>
+        <div class="modeline">
+          <input type="checkbox" id="noFlow" />
+          <label for="noFlow">I have a goal but no workflow yet. Interview me from my goal instead.</label>
+        </div>
+        <div class="fbody">
+          <textarea id="flow" maxlength="4000" style="min-height:120px" placeholder="Ticket arrives in the queue&#10;Agent researches and writes a reply from scratch (slow, lots of tab-switching)&#10;Agent sends the reply&#10;Agent tags and logs the ticket manually (tedious, often skipped)"></textarea>
+          <div class="counter" id="flowCount">0 / 4000</div>
+        </div>
+      </div>
+
+      <div class="field">
+        <div class="fhead"><span class="fnum">03</span><label class="flabel" for="who">Who's involved?<span class="opt">optional</span></label></div>
+        <p class="fhint">Who does the work, who's affected, who else interacts with the process, and is any group a bottleneck?</p>
+        <div class="fbody">
+          <textarea id="who" maxlength="600" placeholder="e.g. Frontline agents (do the work), team leads (oversee and sign off), QA (review), customers (affected)."></textarea>
+          <div class="counter" id="whoCount">0 / 600</div>
+        </div>
+      </div>
+
+      <div class="field">
+        <div class="fhead"><span class="fnum">04</span><label class="flabel" for="constraints">Any constraints?<span class="opt">optional</span></label></div>
+        <p class="fhint">What's blocking progress or limiting your options? For example: tight budget, AI licensing costs, approvals from legal, union, or other teams, or pressure to show ROI. Are any steps outside your control (like a legal review) inflating your metrics?</p>
+        <div class="fbody">
+          <textarea id="constraints" maxlength="1200" placeholder="e.g. Tight budget, no baseline metrics captured, external comms need union review which adds wait time."></textarea>
+          <div class="counter" id="constraintsCount">0 / 1200</div>
+        </div>
+      </div>
+
+      <div class="field">
+        <div class="fhead"><span class="fnum">05</span><label class="flabel">Context<span class="opt">optional</span></label></div>
+        <p class="fhint">A little context sharpens the advice. Nothing here is stored.</p>
+        <div class="fbody">
+          <div class="ctx-grid">
+            <div class="ctx-field">
+              <label for="ctxTeam">Team / group</label>
+              <input type="text" id="ctxTeam" placeholder="e.g. Customer Support" />
+            </div>
+            <div class="ctx-field">
+              <label for="ctxRole">Role / persona</label>
+              <input type="text" id="ctxRole" maxlength="200" placeholder="What do they do?" />
+            </div>
+            <div class="ctx-field full">
+              <label>Deployment level</label>
+              <div class="seg" role="group" aria-label="Deployment level">
+                <button type="button" class="seg-btn" data-deploy="Personal" aria-pressed="false" onclick="setDeploy(this)">Personal</button>
+                <button type="button" class="seg-btn" data-deploy="Team" aria-pressed="false" onclick="setDeploy(this)">Team</button>
+                <button type="button" class="seg-btn" data-deploy="Enterprise" aria-pressed="false" onclick="setDeploy(this)">Enterprise</button>
+              </div>
+            </div>
+            <div class="ctx-field">
+              <label for="ctxUsers"># of users impacted</label>
+              <input type="text" id="ctxUsers" placeholder="e.g. 250 (if known)" />
+            </div>
+            <div class="ctx-field">
+              <label for="ctxIndustry">Industry</label>
+              <select id="ctxIndustry">
+                <option value="">Select one</option>
+                <option>Technology / Software</option>
+                <option>Financial Services</option>
+                <option>Healthcare</option>
+                <option>Manufacturing</option>
+                <option>Retail / E-commerce</option>
+                <option>Government / Public Sector</option>
+                <option>Education</option>
+                <option>Professional Services</option>
+                <option>Telecommunications</option>
+                <option>Energy / Utilities</option>
+                <option>Media / Entertainment</option>
+                <option>Transportation / Logistics</option>
+                <option>Nonprofit</option>
+                <option>Other</option>
+                <option>N/A (personal workflow)</option>
+              </select>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="actions">
+        <button class="btn btn-primary" id="genBtn">Generate Blueprint</button>
+        <button class="btn" id="exampleBtn">Load example</button>
+        <button class="btn btn-ghost" id="resetBtn">Start over</button>
+      </div>
+
+      <input type="text" id="website" tabindex="-1" autocomplete="off" aria-hidden="true"
+             style="position:absolute;left:-9999px;width:1px;height:1px;opacity:0" />
+
+      <div class="preview-banner" id="previewBanner">
+        <span aria-hidden="true">✨</span>
+        <span><strong>This is a saved sample.</strong> It walks the full loop, the questions Alora asks and the Blueprint it builds, without calling the AI. Hit Start over, then describe your own workflow to generate a live one.</span>
+      </div>
+    </section>
+
+    <section class="card" id="clarifyCard" aria-label="A couple of quick questions">
+      <div class="clarify-head">
+        <span class="cnum" aria-hidden="true">?</span>
+        <div>
+          <h2>A couple of quick questions</h2>
+          <p>Alora read your intake and wants to sharpen the diagnosis. Answer what you can, skip what you can't.</p>
+        </div>
+      </div>
+      <div id="clarifyQs"></div>
+      <div class="clarify-actions">
+        <button class="btn btn-primary" id="genFinalBtn">Build my Blueprint</button>
+        <button class="btn btn-ghost" id="skipClarifyBtn">Skip and build anyway</button>
+      </div>
+    </section>
+
+    <section id="result">
+      <div class="print-head print-only">
+        <p class="pe">A Human Mirror tool · Alora</p>
+      </div>
+      <div class="result-head">
+        <div>
+          <h2 id="resultTitle">Insight-to-Action Blueprint</h2>
+          <div class="sub" id="resultSub"></div>
+        </div>
+        <div class="exports">
+          <button class="btn btn-sm" id="pdfBtn">Export PDF</button>
+          <button class="btn btn-sm" id="deckBtn">Export slides</button>
+        </div>
+      </div>
+      <div class="blueprint" id="blueprint"></div>
+      <div class="print-foot print-only">
+        A starting point for the conversation, not a substitute for it. Validate with the people the change touches, then plan the reinforcement that makes it stick.<br>
+        <span class="pbrand">Alora</span> · by Betty Jeng · bettyjeng.com · <span id="printDate"></span>
+      </div>
+    </section>
+  </main>
+
+  <footer>
+    <p class="disclaimer">A starting point for the conversation, not a substitute for it. Validate with the people the change touches, then plan the reinforcement that makes it stick.</p>
+    <span class="brand">Alora</span> &nbsp;·&nbsp; by Betty Jeng &nbsp;·&nbsp; bettyjeng.com
+  </footer>
+
+  <div class="toast" id="toast"></div>
+
+<script src="https://cdn.jsdelivr.net/npm/pptxgenjs@4.0.1/dist/pptxgen.bundle.js"></script>
+<script>
+/* ---------- Example scenario (intake + sample Blueprint output) ---------- */
+const EXAMPLE_INTAKE = {
+  pain: "We rolled out an AI assistant to our customer-support team to cut handle time. Six months in, leadership wants proof of ROI, but we never captured clean before-numbers, adoption is uneven, and some agents have quietly gone back to the old way.",
+  flow: "1. Ticket arrives in the queue\n2. Agent researches and writes a response from scratch (slow, lots of tab-switching)\n3. Agent sends the reply\n4. Agent tags and logs the ticket manually (tedious, often skipped)\n5. QA spot-checks a random sample later",
+  who: "Frontline agents (do the work), team leads (oversee and sign off, the bottleneck), QA (review), customers (affected).",
+  constraints: "Tight budget, no baseline metrics were captured before rollout, and external comms need union review which adds wait time to the handle-time metric.",
+  ctxTeam: "Customer Support",
+  ctxRole: "Frontline agents resolving customer tickets",
+  ctxDeploy: "Enterprise",
+  ctxUsers: "~250",
+  ctxIndustry: "Technology / Software"
+};
+
+const EXAMPLE_BLUEPRINT = {
+  initiative: "AI assistant rollout for the support team",
+  diagnosis: {
+    rootType: "People",
+    secondaryType: "Process",
+    summary: "The tool itself works. Adoption stalled because agents quietly fear it is measuring them or replacing them, and no one redesigned the process around it. The pain reads as \"no ROI,\" but the root is trust plus an unchanged workflow, not the technology."
+  },
+  workflow: {
+    before: [
+      "Ticket arrives in the queue",
+      "Agent researches and writes a response from scratch",
+      "Agent sends the reply",
+      "Agent tags and logs the ticket manually",
+      "QA spot-checks a random sample later"
+    ],
+    after: [
+      "Ticket arrives in the queue",
+      "AI drafts a suggested reply and surfaces relevant knowledge",
+      "Agent reviews, edits, and sends",
+      "AI auto-tags; agent confirms in one click",
+      "QA reviews AI-flagged edge cases first"
+    ],
+    changes: [
+      { change: "AI drafts the first response", why: "Frees agents from blank-page research, the slowest step in the flow" },
+      { change: "Auto-tagging with a human confirm", why: "Cuts manual logging without losing the accuracy check" },
+      { change: "QA reviews flagged cases first", why: "Points limited QA time where the risk actually is" }
+    ]
+  },
+  fixes: [
+    { fix: "Run a two-week pilot with a volunteer pod before full rollout", effort: "Low", impact: "High", bucket: "Quick win" },
+    { fix: "Pair power-users with hesitant agents as buddies", effort: "Low", impact: "Medium", bucket: "Quick win" },
+    { fix: "Redesign the QA metric so it doesn't punish the learning curve", effort: "Medium", impact: "High", bucket: "Bigger bet" },
+    { fix: "Reverse-engineer a baseline from existing ticket logs before measuring ROI", effort: "Medium", impact: "High", bucket: "Bigger bet" }
+  ],
+  aiFit: [
+    { step: "Drafting the first response", verdict: "Automate", why: "High volume and repeatable, and the agent still reviews before anything sends." },
+    { step: "Tagging and logging tickets", verdict: "Human-AI assist", why: "AI suggests, the agent confirms, so accuracy and ownership stay intact." },
+    { step: "Handling upset or sensitive customers", verdict: "Keep human", why: "Judgment and empathy carry the moment, not speed." }
+  ],
+  humanAngle: [
+    { group: "Frontline agents", worry: "That this is the first step toward replacing them", wiifm: "Less blank-page grind, more time on the conversations that need a person", move: "Say out loud what is not changing, and frame AI as a capable assistant, not a replacement" },
+    { group: "Team leads", worry: "That they'll be measured unfairly during the messy middle", wiifm: "Credit for the gains that usually go unseen", move: "Redesign the metric with them, not at them" }
+  ],
+  checklist: [
+    { action: "Pull three months of ticket logs to set a baseline before anything changes", owner: "Ops analyst", when: "This week" },
+    { action: "Recruit a five-person volunteer pilot pod", owner: "Support lead", when: "This week" },
+    { action: "Run the two-week pilot and gather friction notes daily", owner: "Support lead", when: "Weeks 2 to 3" },
+    { action: "Redesign the QA metric to reward learning, not just speed", owner: "QA and Ops", when: "Week 3" },
+    { action: "Hold 1:1s on \"what this means for my job\" before full rollout", owner: "Team leads", when: "Week 4" }
+  ]
+};
+
+/* Canned clarify round, so the offline example showcases the agent loop
+   (the real differentiator) with no API call. Answers are pre-filled to
+   model a completed conversation. */
+const EXAMPLE_QUESTIONS = [
+  {
+    question: "Was using the AI assistant encouraged, required, or tied to performance reviews?",
+    why: "Adoption behaves very differently when a tool is optional versus mandated.",
+    answer: "Encouraged but never required, and never tied to reviews. So the agents who felt unsure just quietly opted back out."
+  },
+  {
+    question: "Is the AI bolted on next to the old workflow, or built into it?",
+    why: "A bolt-on tool adds a step instead of replacing one, which quietly eats the time savings.",
+    answer: "Honestly bolted on. Agents open it in a separate tab, so it feels like one more thing to do, not part of the flow."
+  },
+  {
+    question: "How does leadership define the ROI they're asking for?",
+    why: "If success is measured only as handle time, the human gains stay invisible.",
+    answer: "Mostly average handle time and ticket volume. No one has defined quality or the agent's experience as part of ROI."
+  }
+];
+const $ = (id) => document.getElementById(id);
+const esc = (s) => String(s == null ? "" : s).replace(/[&<>"]/g, c => ({ "&":"&amp;","<":"&lt;",">":"&gt;","\"":"&quot;" }[c]));
+function toast(msg){ const t=$("toast"); t.textContent=msg; t.classList.add("show"); clearTimeout(t._t); t._t=setTimeout(()=>t.classList.remove("show"),2600); }
+
+let deployValue = "";
+function setDeploy(btn){
+  document.querySelectorAll(".seg-btn").forEach(b=>b.setAttribute("aria-pressed","false"));
+  btn.setAttribute("aria-pressed","true");
+  deployValue = btn.dataset.deploy;
+}
+
+/* character counters */
+function wireCounter(inputId, countId, max){
+  const el=$(inputId), c=$(countId);
+  const upd=()=>{ const n=el.value.length; c.textContent=n+" / "+max; c.classList.toggle("over", n>=max); };
+  el.addEventListener("input", upd); upd();
+}
+
+/* ---------- render the six-section Blueprint ---------- */
+function section(num, title, sub, inner){
+  return `<section class="bp-section">
+    <div class="bp-head">
+      <span class="bp-num">${num}</span>
+      <div><h3 class="bp-title">${esc(title)}</h3>${sub?`<p class="bp-sub">${esc(sub)}</p>`:""}</div>
+    </div>${inner}</section>`;
+}
+
+function renderBlueprint(d){
+  d = normalizeBlueprint(d);
+  lastBlueprint = d;
+  let html = "";
+
+  const answered = (lastQA||[]).filter(x=>x && x.answer && String(x.answer).trim());
+  if(answered.length){
+    html += `<div class="recap"><span aria-hidden="true">💬</span><div>
+      <b>What you told Alora</b> (your answers shaped this Blueprint):
+      <ul>${answered.map(x=>`<li><span class="rq">${esc(x.question)}</span><span class="ra">${esc(x.answer)}</span></li>`).join("")}</ul></div></div>`;
+  }
+
+  if (d.assumptions && d.assumptions.length){
+    html += `<div class="assume"><span aria-hidden="true">📝</span><div>
+      <b>What Alora assumed</b> (because a few things weren't spelled out):
+      <ul>${d.assumptions.map(a=>`<li>${esc(a)}</li>`).join("")}</ul></div></div>`;
+  }
+
+  html += section("01","Diagnosis","The real root, not just the symptom",
+    `<div class="verdict">${esc(d.diagnosis.rootType)} problem${d.diagnosis.secondaryType?`<span class="tag2">with a ${esc(d.diagnosis.secondaryType)} thread</span>`:""}</div>
+     <p class="body">${esc(d.diagnosis.summary)}</p>`);
+
+  const beforeLi = d.workflow.before.map(s=>`<li>${esc(s)}</li>`).join("");
+  const afterLi  = d.workflow.after.map(s=>`<li>${esc(s)}</li>`).join("");
+  const changes  = d.workflow.changes.map(c=>`<li><b>${esc(c.change)}.</b> ${esc(c.why)}.</li>`).join("");
+  html += section("02","Before and after","The workflow, redrawn lean",
+    `<div class="ba-grid">
+       <div class="ba-col"><h4>Today</h4><ol>${beforeLi}</ol></div>
+       <div class="ba-col after"><h4>Leaner</h4><ol>${afterLi}</ol></div>
+     </div>
+     <ul class="changes">${changes}</ul>`);
+
+  const fixCard = (f)=>`<div class="fix"><div class="ftext">${esc(f.fix)}</div>
+     <div class="chips"><span class="chip">Effort: ${esc(f.effort)}</span><span class="chip">Impact: ${esc(f.impact)}</span></div></div>`;
+  const wins = d.fixes.filter(f=>/quick/i.test(f.bucket)).map(fixCard).join("") || `<p class="bp-sub">None flagged.</p>`;
+  const bets = d.fixes.filter(f=>!/quick/i.test(f.bucket)).map(fixCard).join("") || `<p class="bp-sub">None flagged.</p>`;
+  html += section("03","Quick wins vs. bigger bets","Sorted by effort and impact",
+    `<div class="buckets">
+       <div class="bucket"><h4>Quick wins</h4>${wins}</div>
+       <div class="bucket"><h4>Bigger bets</h4>${bets}</div>
+     </div>`);
+
+  const pcls = (v)=> /keep human/i.test(v) ? "human" : /assist/i.test(v) ? "assist" : "automate";
+  const ai = d.aiFit.map(a=>`<div class="ai-item">
+       <span class="ai-step">${esc(a.step)}</span>
+       <span class="pill ${pcls(a.verdict)}">${esc(a.verdict)}</span>
+       <span class="ai-why">${esc(a.why)}</span></div>`).join("");
+  html += section("04","Where AI helps, and where it doesn't","Automation candidates vs. keep-human",ai);
+
+  const personas = d.humanAngle.map(p=>`<div class="persona">
+       <h4>${esc(p.group)}</h4>
+       <div class="prow"><span class="plab">Worry</span>${esc(p.worry)}.</div>
+       <div class="prow"><span class="plab">In it for them</span>${esc(p.wiifm)}.</div>
+       <div class="prow"><span class="plab">The move</span>${esc(p.move)}.</div>
+     </div>`).join("");
+  html += section("05","The human angle","Who it touches, and how to bring them along",personas);
+
+  const checks = d.checklist.map(c=>`<label class="check">
+       <input type="checkbox" />
+       <span class="cbody">
+         <span class="crow action"><span class="clab">Action</span><span class="ctext">${esc(c.action)}</span></span>
+         <span class="crow"><span class="clab">Who</span><span>${esc(c.owner)}</span></span>
+         <span class="crow"><span class="clab">When</span><span>${esc(c.when)}</span></span>
+       </span>
+     </label>`).join("");
+  html += section("06","Action checklist","Your next moves, quick wins first",checks);
+
+  $("blueprint").innerHTML = html;
+  $("resultTitle").textContent = d.initiative ? `Insight-to-Action Blueprint: ${d.initiative}` : "Insight-to-Action Blueprint";
+  $("resultSub").textContent = "Six parts, grounded in Hear, Trust, Co-create, Own.";
+}
+
+/* ---------- live wiring (Phase 2) ---------- */
+const ALORA_ENDPOINT = "/.netlify/functions/alora";
+let currentQuestions = [];   // questions the agent asked this round
+let exampleMode = false;     // true while the offline sample is being walked
+let lastBlueprint = null;    // the Blueprint currently on screen, for exports
+let lastQA = [];             // the clarifying Q&A that fed the current Blueprint
+let lastIntake = null;       // the intake we sent, reused at generate time
+
+/* Defensive normalize so a slightly-off model response still renders cleanly. */
+function normalizeBlueprint(d){
+  d = d || {};
+  d.diagnosis = d.diagnosis || {};
+  d.diagnosis.rootType = d.diagnosis.rootType || "Process";
+  d.diagnosis.summary = d.diagnosis.summary || "";
+  d.workflow = d.workflow || {};
+  d.workflow.before = Array.isArray(d.workflow.before) ? d.workflow.before : [];
+  d.workflow.after  = Array.isArray(d.workflow.after)  ? d.workflow.after  : [];
+  d.workflow.changes = Array.isArray(d.workflow.changes) ? d.workflow.changes : [];
+  d.fixes = Array.isArray(d.fixes) ? d.fixes : [];
+  d.aiFit = Array.isArray(d.aiFit) ? d.aiFit : [];
+  d.humanAngle = Array.isArray(d.humanAngle) ? d.humanAngle : [];
+  d.checklist = Array.isArray(d.checklist) ? d.checklist : [];
+  d.assumptions = Array.isArray(d.assumptions) ? d.assumptions.filter(Boolean) : [];
+  return d;
+}
+
+/* Read every field into the intake object the function expects. */
+function collectIntake(){
+  const goalMode = $("noFlow").checked;
+  return {
+    mode: goalMode ? "goal" : "workflow",
+    pain: $("pain").value.trim(),
+    flow: goalMode ? "" : $("flow").value.trim(),
+    who: $("who").value.trim(),
+    constraints: $("constraints").value.trim(),
+    ctxTeam: $("ctxTeam").value.trim(),
+    ctxRole: $("ctxRole").value.trim(),
+    ctxDeploy: deployValue,
+    ctxUsers: $("ctxUsers").value.trim(),
+    ctxIndustry: $("ctxIndustry").value
+  };
+}
+
+function setLoading(btn, on, idleLabel){
+  if(on){ btn.dataset.label = btn.textContent; btn.classList.add("loading"); btn.disabled = true; }
+  else { btn.classList.remove("loading"); btn.disabled = false; if(idleLabel||btn.dataset.label) btn.textContent = idleLabel || btn.dataset.label; }
+}
+
+/* One call to the function. Returns parsed JSON or throws a friendly Error. */
+async function postStage(payload){
+  let res;
+  try {
+    res = await fetch(ALORA_ENDPOINT, {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify(payload)
+    });
+  } catch(_){ throw new Error("Couldn't reach Alora. Check your connection and try again."); }
+  let data = {};
+  try { data = await res.json(); } catch(_){ /* leave empty */ }
+  if(!res.ok) throw new Error(data.error || "Alora ran into a problem. Please try again.");
+  return data;
+}
+
+/* Show a finished Blueprint. keepPreview leaves the sample banner up (offline demo). */
+function showResult(blueprint, keepPreview){
+  renderBlueprint(blueprint);
+  if(!keepPreview) $("previewBanner").classList.remove("show");
+  $("clarifyCard").classList.remove("show");
+  $("result").classList.add("show");
+  $("result").scrollIntoView({behavior:"smooth",block:"start"});
+}
+
+/* Render the agent's follow-up questions as answerable fields.
+   Optional answers[] pre-fills them (used by the offline example). */
+function renderClarify(questions, answers){
+  currentQuestions = questions;
+  $("clarifyQs").innerHTML = questions.map((q,i)=>`
+    <div class="cq">
+      <div class="cqq">${esc(q.question)}</div>
+      ${q.why?`<div class="cqwhy">${esc(q.why)}</div>`:""}
+      <textarea id="ans_${i}" maxlength="1200" placeholder="A sentence or two is plenty. Leave blank to skip.">${answers&&answers[i]?esc(answers[i]):""}</textarea>
+    </div>`).join("");
+  $("clarifyCard").classList.add("show");
+  $("result").classList.remove("show");
+  $("clarifyCard").scrollIntoView({behavior:"smooth",block:"start"});
+}
+
+/* Pair each question with whatever the user typed (blanks allowed). */
+function collectAnswers(){
+  return currentQuestions.map((q,i)=>({ question:q.question, answer:($("ans_"+i)?.value||"").trim() }));
+}
+
+/* Stage 2: generate the Blueprint from intake + answers. */
+async function runGenerate(qa, btn){
+  lastQA = qa || [];
+  setLoading(btn, true);
+  try {
+    const data = await postStage({ stage:"generate", intake:lastIntake, qa, website:$("website").value });
+    showResult(data.blueprint);
+    toast("Blueprint ready");
+  } catch(err){
+    toast(err.message);
+  } finally {
+    setLoading(btn, false);
+  }
+}
+
+/* Load example: fills the form, then walks the SAME loop a live run does
+   (questions, then Blueprint), fully offline at $0 so it never breaks or bills. */
+$("exampleBtn").onclick = ()=>{
+  exampleMode = true;
+  $("noFlow").checked = false;
+  $("pain").value=EXAMPLE_INTAKE.pain; $("flow").value=EXAMPLE_INTAKE.flow;
+  $("who").value=EXAMPLE_INTAKE.who; $("constraints").value=EXAMPLE_INTAKE.constraints;
+  $("ctxTeam").value=EXAMPLE_INTAKE.ctxTeam; $("ctxRole").value=EXAMPLE_INTAKE.ctxRole;
+  $("ctxUsers").value=EXAMPLE_INTAKE.ctxUsers; $("ctxIndustry").value=EXAMPLE_INTAKE.ctxIndustry;
+  document.querySelectorAll(".seg-btn").forEach(b=>{ const on=b.dataset.deploy===EXAMPLE_INTAKE.ctxDeploy; b.setAttribute("aria-pressed", on?"true":"false"); if(on) deployValue=b.dataset.deploy; });
+  updateCounts();
+  $("result").classList.remove("show");
+  $("previewBanner").classList.add("show");
+  renderClarify(EXAMPLE_QUESTIONS, EXAMPLE_QUESTIONS.map(q=>q.answer));
+  toast("Sample loaded. This is the round Alora asks.");
+};
+
+/* Complete the offline sample: render the saved Blueprint, no API call. */
+function finishExample(btn){
+  lastQA = EXAMPLE_QUESTIONS.map(q=>({question:q.question, answer:q.answer}));
+  setLoading(btn, true);
+  setTimeout(()=>{   // tiny beat so it feels like the agent is working
+    showResult(EXAMPLE_BLUEPRINT, true);
+    setLoading(btn, false);
+    toast("Sample Blueprint ready");
+  }, 450);
+}
+
+/* Stage 1: validate, then ask the agent for clarifying questions. */
+$("genBtn").onclick = async ()=>{
+  const goalMode = $("noFlow").checked;
+  const pain=$("pain").value.trim(), flow=$("flow").value.trim();
+  if(!pain){ toast("Tell Alora what's not working first, or load the example."); return; }
+  if(!goalMode && !flow){ toast("Add your current workflow, or tick \"no workflow yet\" above."); return; }
+
+  lastIntake = collectIntake();
+  exampleMode = false;
+  const btn = $("genBtn");
+  setLoading(btn, true);
+  try {
+    const data = await postStage({ stage:"clarify", intake:lastIntake, website:$("website").value });
+    const qs = Array.isArray(data.questions) ? data.questions : [];
+    if(qs.length){
+      renderClarify(qs);
+      toast("A couple of quick questions first");
+    } else {
+      // Nothing to clarify, go straight to the Blueprint.
+      await runGenerate([], btn);
+    }
+  } catch(err){
+    toast(err.message);
+  } finally {
+    setLoading(btn, false);
+  }
+};
+
+$("genFinalBtn").onclick = ()=> exampleMode
+  ? finishExample($("genFinalBtn"))
+  : runGenerate(collectAnswers(), $("genFinalBtn"));
+$("skipClarifyBtn").onclick = ()=> exampleMode
+  ? finishExample($("genFinalBtn"))
+  : runGenerate(currentQuestions.map(q=>({ question:q.question, answer:"" })), $("genFinalBtn"));
+
+$("resetBtn").onclick = ()=>{
+  ["pain","flow","who","constraints","ctxTeam","ctxRole","ctxUsers","ctxIndustry"].forEach(id=>$(id).value="");
+  $("noFlow").checked = false;
+  document.querySelectorAll(".seg-btn").forEach(b=>b.setAttribute("aria-pressed","false")); deployValue="";
+  currentQuestions = []; lastIntake = null; exampleMode = false; lastQA = [];
+  updateCounts();
+  $("result").classList.remove("show");
+  $("previewBanner").classList.remove("show");
+  $("clarifyCard").classList.remove("show");
+  window.scrollTo({top:0,behavior:"smooth"});
+};
+
+/* ===================== EXPORTS ===================== */
+function fmtDate(){ return new Date().toLocaleDateString(undefined,{year:"numeric",month:"long",day:"numeric"}); }
+function safeName(s){ return (s||"blueprint").replace(/[^\w\- ]+/g,"").trim().replace(/\s+/g,"-").toLowerCase()||"blueprint"; }
+function haveBlueprint(){ if(!lastBlueprint){ toast("Generate or load a Blueprint first."); return false; } return true; }
+
+/* ---- PDF: print the real, styled Blueprint (pixel-faithful, auto-paginates) ---- */
+/* Detect a real touch device, not just a narrow window. Width is unreliable:
+   narrow desktop windows and embedded preview panes are not phones. */
+function isMobileDevice(){
+  const ua = navigator.userAgent || "";
+  const iOS = /iPhone|iPad|iPod/i.test(ua);
+  const iPadOS = /Macintosh/i.test(ua) && (navigator.maxTouchPoints||0) > 1; // iPadOS reports as Mac
+  const android = /Android/i.test(ua);
+  return iOS || iPadOS || android;
+}
+
+function exportPDF(){
+  if(!haveBlueprint()) return;
+  $("printDate").textContent = fmtDate();
+  if(!isMobileDevice()){ window.print(); return; }
+  showExportSheet();
+}
+function showExportSheet(){
+  if($("exportSheet")) return;
+  const o=document.createElement("div");
+  o.className="exportsheet"; o.id="exportSheet";
+  o.innerHTML='<div class="es-card" role="dialog" aria-label="Save as PDF">'+
+    '<h3>Save your Blueprint as a PDF</h3>'+
+    '<p>Tap <b>Open print</b>, then save instead of sending to a printer:</p>'+
+    '<ul>'+
+      '<li><b>iPhone / iPad:</b> tap <b>Print</b>, then under the Share options choose <b>Save to Files</b>.</li>'+
+      '<li><b>Android:</b> open the printer dropdown and pick <b>Save as PDF</b>.</li>'+
+    '</ul>'+
+    '<div class="es-actions"><button type="button" class="btn es-cancel">Cancel</button><button type="button" class="btn btn-primary es-go">Open print</button></div>'+
+  '</div>';
+  document.body.appendChild(o);
+  o.querySelector(".es-cancel").onclick=()=>o.remove();
+  o.addEventListener("click",e=>{ if(e.target===o) o.remove(); });
+  o.querySelector(".es-go").onclick=()=>{ o.remove(); setTimeout(()=>window.print(),60); };
+}
+window.addEventListener("beforeprint",()=>{
+  document.__t=document.title;
+  const name = lastBlueprint && lastBlueprint.initiative ? "Alora Blueprint - "+lastBlueprint.initiative : "Alora Blueprint";
+  document.title=name;
+});
+window.addEventListener("afterprint",()=>{ if(document.__t) document.title=document.__t; });
+
+/* ---- Slides: a branded PptxGenJS deck for the six sections ---- */
+function buildBlueprintDeck(pptx, d, dateStr){
+  pptx.defineLayout({name:"AL",width:13.33,height:7.5});
+  pptx.layout="AL";
+  pptx.author="Alora by Betty Jeng"; pptx.company="Betty Jeng";
+  pptx.title=(d.initiative||"Insight-to-Action Blueprint");
+
+  const W=13.33,H=7.5,M=0.7;
+  const ACCENT="FC4C02",DEEP="E04000",INK="1A1A1A",SOFT="4A4A4A",FAINT="8A8A8A",
+        CREAM="FAF7F3",LINE="E8E5E0",WHITE="FFFFFF",GOLD="9A6E1C",GOLDBG="F6E7CB";
+  const VERD={ automate:{bg:"E9F2EC",tx:"3E7A5E"}, assist:{bg:"FBE2D6",tx:"C5340A"}, human:{bg:"EBEEF2",tx:"5A6E82"} };
+  const vkey=v=>/keep human/i.test(v)?"human":/assist/i.test(v)?"assist":"automate";
+  const R=pptx.ShapeType.rect, RR=pptx.ShapeType.roundRect;
+  const DISP="Montserrat", BODY="Poppins";
+  const cap1=s=>s?s.charAt(0).toUpperCase()+s.slice(1):s;
+
+  const foot=s=>s.addText([{text:"Alora",options:{bold:true,color:ACCENT,fontFace:DISP}},
+      {text:"   ·   by Betty Jeng   ·   bettyjeng.com",options:{color:FAINT,fontFace:BODY}}],
+      {x:M,y:H-0.5,w:W-2*M,h:0.3,fontSize:9,align:"left",valign:"middle"});
+  const header=(s,title,num)=>{
+    s.addShape(RR,{x:M,y:0.66,w:0.46,h:0.46,fill:{color:GOLDBG},rectRadius:0.08});
+    s.addText(num,{x:M,y:0.66,w:0.46,h:0.46,align:"center",valign:"middle",fontFace:DISP,fontSize:14,bold:true,color:DEEP});
+    s.addText(title,{x:M+0.62,y:0.6,w:W-2*M-0.62,h:0.62,fontFace:DISP,fontSize:24,bold:true,color:INK,valign:"middle"});
+    s.addShape(R,{x:M,y:1.3,w:W-2*M,h:0.012,fill:{color:LINE}});
+  };
+  const num=arr=>arr.map((t,i)=>(i+1)+". "+t).join("\n");
+
+  /* 1. Title */
+  let s=pptx.addSlide(); s.background={color:WHITE};
+  s.addShape(R,{x:0,y:0,w:0.28,h:H,fill:{color:ACCENT}});
+  s.addText("ALORA",{x:M,y:1.5,w:W-2*M,h:0.4,fontFace:DISP,fontSize:14,bold:true,color:ACCENT,charSpacing:3});
+  s.addText(d.initiative||"Workflow Blueprint",{x:M,y:2.0,w:W-2*M-1.2,h:1.7,fontFace:DISP,fontSize:36,bold:true,color:INK,valign:"top",fit:"shrink"});
+  s.addShape(R,{x:M,y:3.85,w:0.7,h:0.06,fill:{color:ACCENT}});
+  s.addText("Insight-to-Action Blueprint",{x:M,y:4.05,w:W-2*M,h:0.5,fontFace:BODY,fontSize:20,color:SOFT});
+  s.addText(dateStr,{x:M,y:4.6,w:W-2*M,h:0.4,fontFace:BODY,fontSize:13,color:FAINT});
+  s.addText("Grounded in Hear, Trust, Co-create, Own. A human-first read on where AI fits, and where it doesn't.",
+    {x:M,y:5.15,w:W-2*M-2.2,h:1.0,fontFace:BODY,fontSize:13,color:SOFT,valign:"top"});
+  foot(s);
+
+  /* 2. Diagnosis */
+  s=pptx.addSlide(); s.background={color:WHITE}; header(s,"Diagnosis","01");
+  const dxLabel=(d.diagnosis.rootType||"Process")+" problem"+(d.diagnosis.secondaryType?("  ·  with a "+d.diagnosis.secondaryType+" thread"):"");
+  s.addShape(RR,{x:M,y:1.6,w:5.2,h:0.55,fill:{color:GOLDBG},rectRadius:0.27});
+  s.addText(dxLabel,{x:M,y:1.6,w:5.2,h:0.55,align:"center",valign:"middle",fontFace:DISP,fontSize:13,bold:true,color:GOLD});
+  s.addText(d.diagnosis.summary||"",{x:M,y:2.5,w:W-2*M,h:2.2,fontFace:BODY,fontSize:16,color:SOFT,valign:"top",fit:"shrink"});
+  if(d.assumptions && d.assumptions.length){
+    s.addText([{text:"What Alora assumed:  ",options:{bold:true,color:DEEP,fontFace:DISP}},
+      {text:d.assumptions.join("   ·   "),options:{color:SOFT,fontFace:BODY}}],
+      {x:M,y:5.4,w:W-2*M,h:1.3,fontSize:11.5,valign:"top",fit:"shrink"});
+  }
+  foot(s);
+
+  /* 3. Before and after */
+  s=pptx.addSlide(); s.background={color:WHITE}; header(s,"Before and after","02");
+  const colW=(W-2*M-0.5)/2, colY=1.65, colH=3.0;
+  s.addShape(RR,{x:M,y:colY,w:colW,h:colH,fill:{color:CREAM},line:{color:LINE,width:1},rectRadius:0.1});
+  s.addText("TODAY",{x:M+0.25,y:colY+0.18,w:colW-0.5,h:0.3,fontFace:DISP,fontSize:11,bold:true,color:FAINT,charSpacing:1});
+  s.addText(num(d.workflow.before),{x:M+0.25,y:colY+0.55,w:colW-0.5,h:colH-0.75,fontFace:BODY,fontSize:13,color:SOFT,valign:"top",fit:"shrink",paraSpaceAfter:4});
+  const rx=M+colW+0.5;
+  s.addShape(RR,{x:rx,y:colY,w:colW,h:colH,fill:{color:"FFF6F1"},line:{color:"F3C9B6",width:1},rectRadius:0.1});
+  s.addText("LEANER",{x:rx+0.25,y:colY+0.18,w:colW-0.5,h:0.3,fontFace:DISP,fontSize:11,bold:true,color:DEEP,charSpacing:1});
+  s.addText(num(d.workflow.after),{x:rx+0.25,y:colY+0.55,w:colW-0.5,h:colH-0.75,fontFace:BODY,fontSize:13,color:SOFT,valign:"top",fit:"shrink",paraSpaceAfter:4});
+  if(d.workflow.changes.length){
+    const chRuns=d.workflow.changes.map(c=>({text:(c.change?c.change+". ":"")+(c.why?c.why+".":""),options:{fontFace:BODY,fontSize:12,color:INK,bullet:{characterCode:"2192",indent:16},breakLine:true,paraSpaceAfter:4}}));
+    s.addText("Key changes",{x:M,y:colY+colH+0.25,w:W-2*M,h:0.3,fontFace:DISP,fontSize:12,bold:true,color:FAINT});
+    s.addText(chRuns,{x:M,y:colY+colH+0.6,w:W-2*M,h:1.2,valign:"top",fit:"shrink"});
+  }
+  foot(s);
+
+  /* 4. Quick wins vs bigger bets */
+  s=pptx.addSlide(); s.background={color:WHITE}; header(s,"Quick wins vs. bigger bets","03");
+  const wins=d.fixes.filter(f=>/quick/i.test(f.bucket||"")), bets=d.fixes.filter(f=>!/quick/i.test(f.bucket||""));
+  const fixRuns=list=>list.length?list.flatMap(f=>[
+      {text:f.fix||"",options:{fontFace:BODY,fontSize:13,bold:true,color:INK,breakLine:true,paraSpaceAfter:1}},
+      {text:"Effort: "+(f.effort||"–")+"   ·   Impact: "+(f.impact||"–"),options:{fontFace:DISP,fontSize:10,color:FAINT,breakLine:true,paraSpaceAfter:9}}
+    ]):[{text:"None flagged.",options:{fontFace:BODY,fontSize:12,italic:true,color:FAINT}}];
+  const fy=1.65, fh=4.6;
+  s.addText("QUICK WINS",{x:M,y:fy,w:colW,h:0.3,fontFace:DISP,fontSize:11,bold:true,color:DEEP,charSpacing:1});
+  s.addText(fixRuns(wins),{x:M,y:fy+0.4,w:colW,h:fh,valign:"top",fit:"shrink"});
+  s.addText("BIGGER BETS",{x:rx,y:fy,w:colW,h:0.3,fontFace:DISP,fontSize:11,bold:true,color:DEEP,charSpacing:1});
+  s.addText(fixRuns(bets),{x:rx,y:fy+0.4,w:colW,h:fh,valign:"top",fit:"shrink"});
+  foot(s);
+
+  /* 5. Where AI helps (manual pagination to dodge autoPage quirks) */
+  const aiHead=["Step","Verdict","Why"].map(t=>({text:t,options:{bold:true,color:WHITE,fill:{color:INK},fontFace:DISP,fontSize:11,align:"left",valign:"middle"}}));
+  const aiData=d.aiFit.length?d.aiFit:[{step:"None flagged.",verdict:"",why:""}];
+  const AICHUNK=6;
+  for(let i=0;i<aiData.length;i+=AICHUNK){
+    const s5=pptx.addSlide(); s5.background={color:WHITE};
+    header(s5, i===0?"Where AI helps, and where it doesn't":"Where AI helps (cont.)","04");
+    const rows=[aiHead].concat(aiData.slice(i,i+AICHUNK).map(a=>{
+      const vk=vkey(a.verdict||"");
+      return [
+        {text:a.step||"",options:{fontFace:DISP,fontSize:12,bold:true,color:INK,fill:{color:WHITE},valign:"middle"}},
+        {text:a.verdict||"",options:{fontFace:DISP,fontSize:11,bold:true,color:VERD[vk].tx,fill:{color:VERD[vk].bg},align:"center",valign:"middle"}},
+        {text:a.why||"",options:{fontFace:BODY,fontSize:11.5,color:SOFT,fill:{color:WHITE},valign:"middle"}}
+      ];
+    }));
+    s5.addTable(rows,{x:M,y:1.65,w:W-2*M,colW:[4.2,2.4,W-2*M-6.6],border:{type:"solid",color:LINE,pt:0.5},valign:"middle",margin:5});
+    foot(s5);
+  }
+
+  /* 6. The human angle (2 cards per slide) */
+  const groups=d.humanAngle;
+  for(let i=0;i<groups.length || i===0;i+=2){
+    const sl=pptx.addSlide(); sl.background={color:WHITE};
+    header(sl, i===0?"The human angle":"The human angle (cont.)","05");
+    const slice=groups.slice(i,i+2);
+    if(!slice.length){ sl.addText("No groups flagged.",{x:M,y:2,w:W-2*M,h:0.5,fontFace:BODY,fontSize:14,italic:true,color:FAINT}); foot(sl); break; }
+    slice.forEach((g,j)=>{
+      const cy=1.7+j*2.55, ch=2.35;
+      sl.addShape(RR,{x:M,y:cy,w:W-2*M,h:ch,fill:{color:CREAM},line:{color:LINE,width:1},rectRadius:0.1});
+      sl.addText(g.group||"Group",{x:M+0.3,y:cy+0.18,w:W-2*M-0.6,h:0.4,fontFace:DISP,fontSize:15,bold:true,color:INK});
+      const row=(lab,val)=>[{text:lab+"   ",options:{fontFace:DISP,fontSize:10,bold:true,color:DEEP,charSpacing:1}},
+                            {text:(val||"")+".",options:{fontFace:BODY,fontSize:12,color:SOFT,breakLine:true,paraSpaceAfter:4}}];
+      sl.addText([].concat(row("WORRY",g.worry),row("IN IT FOR THEM",g.wiifm),row("THE MOVE",g.move)),
+        {x:M+0.3,y:cy+0.65,w:W-2*M-0.6,h:ch-0.8,valign:"top",fit:"shrink"});
+    });
+    foot(sl);
+    if(i+2>=groups.length) break;
+  }
+
+  /* 7. Action checklist (manual pagination) */
+  const ckHead=["Action","Who","When"].map(t=>({text:t,options:{bold:true,color:WHITE,fill:{color:INK},fontFace:DISP,fontSize:11,valign:"middle"}}));
+  const ckData=d.checklist.length?d.checklist:[{action:"None yet.",owner:"",when:""}];
+  const CKCHUNK=8;
+  for(let i=0;i<ckData.length;i+=CKCHUNK){
+    const s7=pptx.addSlide(); s7.background={color:WHITE};
+    header(s7, i===0?"Action checklist":"Action checklist (cont.)","06");
+    const rows=[ckHead].concat(ckData.slice(i,i+CKCHUNK).map(c=>[
+      {text:c.action||"",options:{fontFace:BODY,fontSize:12.5,color:INK,fill:{color:WHITE},valign:"middle"}},
+      {text:c.owner||"–",options:{fontFace:DISP,fontSize:11,bold:true,color:SOFT,fill:{color:WHITE},align:"center",valign:"middle"}},
+      {text:c.when||"–",options:{fontFace:DISP,fontSize:11,bold:true,color:DEEP,fill:{color:WHITE},align:"center",valign:"middle"}}
+    ]));
+    s7.addTable(rows,{x:M,y:1.65,w:W-2*M,colW:[W-2*M-4.4,2.2,2.2],border:{type:"solid",color:LINE,pt:0.5},valign:"middle",margin:5});
+    foot(s7);
+  }
+
+  /* 8. Closing */
+  s=pptx.addSlide(); s.background={color:WHITE};
+  s.addShape(R,{x:0,y:0,w:W,h:0.28,fill:{color:ACCENT}});
+  s.addText("Created with Alora",{x:M,y:2.4,w:W-2*M,h:0.7,fontFace:DISP,fontSize:30,bold:true,color:INK,align:"center"});
+  s.addShape(R,{x:W/2-0.35,y:3.2,w:0.7,h:0.06,fill:{color:ACCENT}});
+  s.addText("A starting point for the conversation, not a substitute for it. Validate with the people the change touches, then plan the reinforcement that makes it stick.",
+    {x:W/2-4.6,y:3.45,w:9.2,h:1.2,fontFace:BODY,fontSize:14,color:SOFT,align:"center",valign:"top"});
+  s.addText([{text:"Betty Jeng",options:{bold:true,color:ACCENT,fontFace:DISP}},
+    {text:"     ·     human-first AI-adoption tools     ·     bettyjeng.com",options:{color:SOFT,fontFace:BODY}}],
+    {x:M,y:5.05,w:W-2*M,h:0.4,fontSize:14,align:"center"});
+  return pptx;
+}
+
+function exportDeck(){
+  if(!haveBlueprint()) return;
+  if(typeof PptxGenJS==="undefined"){ toast("Slide export is still loading. Give it a second and try again."); return; }
+  const btn=$("deckBtn"); setLoading(btn,true,"Export slides");
+  setTimeout(()=>{
+    try{
+      const pptx=new PptxGenJS();
+      buildBlueprintDeck(pptx, lastBlueprint, fmtDate());
+      pptx.writeFile({fileName:"Alora-"+safeName(lastBlueprint.initiative)+".pptx"})
+        .then(()=>{ setLoading(btn,false,"Export slides"); toast("Slides downloaded"); })
+        .catch(()=>{ setLoading(btn,false,"Export slides"); toast("The slide export hit a snag. Please try again."); });
+    }catch(e){ setLoading(btn,false,"Export slides"); toast("The slide export hit a snag. Please try again."); }
+  }, 30);
+}
+
+$("pdfBtn").onclick = exportPDF;
+$("deckBtn").onclick = exportDeck;
+
+/* wire counters */
+function updateCounts(){ ["pain","flow","who","constraints"].forEach(k=>{ const el=$(k); el.dispatchEvent(new Event("input")); }); }
+wireCounter("pain","painCount",1500);
+wireCounter("flow","flowCount",4000);
+wireCounter("who","whoCount",600);
+wireCounter("constraints","constraintsCount",1200);
+</script>
+</body>
+</html>

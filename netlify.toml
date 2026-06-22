@@ -1,0 +1,7 @@
+# Netlify configuration for bettyjeng-website
+# Minimal on purpose: this only tells Netlify where the serverless functions
+# live. It does not touch your publish directory or build settings, so your
+# existing static site keeps deploying exactly as it does now.
+
+[functions]
+  directory = "netlify/functions"

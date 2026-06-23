@@ -484,6 +484,24 @@ const $ = (id) => document.getElementById(id);
 const esc = (s) => String(s == null ? "" : s).replace(/[&<>"]/g, c => ({ "&":"&amp;","<":"&lt;",">":"&gt;","\"":"&quot;" }[c]));
 function toast(msg){ const t=$("toast"); t.textContent=msg; t.classList.add("show"); clearTimeout(t._t); t._t=setTimeout(()=>t.classList.remove("show"),2600); }
 
+/* Persistent error dialog. Unlike a toast, it stays on screen until the user
+   dismisses or retries, so it can be read, screenshotted, and acted on. */
+function showError(message, onRetry){
+  const old=$("errSheet"); if(old) old.remove();
+  const o=document.createElement("div");
+  o.className="exportsheet"; o.id="errSheet";
+  o.innerHTML='<div class="es-card" role="alertdialog" aria-label="Alora hit a snag">'+
+    '<h3>Alora hit a snag</h3>'+
+    '<p>'+esc(message)+'</p>'+
+    '<div class="es-actions"><button type="button" class="btn es-dismiss">Dismiss</button>'+
+    (onRetry?'<button type="button" class="btn btn-primary es-retry">Try again</button>':'')+
+    '</div></div>';
+  document.body.appendChild(o);
+  o.querySelector(".es-dismiss").onclick=()=>o.remove();
+  o.addEventListener("click",e=>{ if(e.target===o) o.remove(); });
+  const r=o.querySelector(".es-retry"); if(r) r.onclick=()=>{ o.remove(); onRetry(); };
+}
+
 let deployValue = "";
 function setDeploy(btn){
   document.querySelectorAll(".seg-btn").forEach(b=>b.setAttribute("aria-pressed","false"));
@@ -681,7 +699,7 @@ async function runGenerate(qa, btn){
     showResult(data.blueprint);
     toast("Blueprint ready");
   } catch(err){
-    toast(err.message);
+    showError(err.message, ()=> runGenerate(qa, btn));
   } finally {
     setLoading(btn, false);
   }
@@ -737,7 +755,7 @@ $("genBtn").onclick = async ()=>{
       await runGenerate([], btn);
     }
   } catch(err){
-    toast(err.message);
+    showError(err.message, ()=> $("genBtn").click());
   } finally {
     setLoading(btn, false);
   }

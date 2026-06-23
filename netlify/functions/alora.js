@@ -192,8 +192,9 @@ Return ONLY valid JSON, no prose, no code fences, in EXACTLY this shape:
   "checklist": [{ "action": "a next step", "owner": "a role", "when": "This week|Week 2|etc." }]
 }
 
-Aim for: 1 to 2 assumptions only when needed, 3 to 5 fixes, 3 to 4 aiFit rows,
-2 to 3 humanAngle groups, 4 to 6 checklist items, quick wins first.`;
+Aim for: 1 to 2 assumptions only when needed, 3 to 4 fixes, 3 aiFit rows,
+2 to 3 humanAngle groups, 4 to 5 checklist items, quick wins first.
+Keep every string to one or two sentences. Be sharp and concrete, not wordy. This keeps the Blueprint skimmable and fast to produce.`;
 
   return [
     { role: "system", content: sys },
@@ -202,26 +203,43 @@ Aim for: 1 to 2 assumptions only when needed, 3 to 5 fixes, 3 to 4 aiFit rows,
 }
 
 /* ------------------------------------------------------- OpenRouter call */
-async function callModel(messages, maxTokens, retryHint, model) {
+/* Netlify's free tier kills a function at 10 seconds. We self-limit to a budget
+   under that so Alora always returns a clean, friendly error instead of a silent
+   platform timeout (which gives the user a generic message and logs nothing). */
+const TOTAL_BUDGET_MS = 9000;
+
+async function callModel(messages, maxTokens, retryHint, model, timeoutMs) {
   const msgs = retryHint
     ? messages.concat({ role: "user", content: "Your last reply was not valid JSON. Return ONLY the JSON object, nothing else." })
     : messages;
 
-  const res = await fetch(OPENROUTER_URL, {
-    method: "POST",
-    headers: {
-      "Authorization": "Bearer " + process.env.OPENROUTER_API_KEY,
-      "Content-Type": "application/json",
-      "HTTP-Referer": "https://bettyjeng.com",
-      "X-Title": "Alora"
-    },
-    body: JSON.stringify({
-      model: model,
-      messages: msgs,
-      temperature: 0.45,
-      max_tokens: maxTokens
-    })
-  });
+  const ctrl = new AbortController();
+  const timer = setTimeout(() => ctrl.abort(), Math.max(1000, timeoutMs || 8500));
+  let res;
+  try {
+    res = await fetch(OPENROUTER_URL, {
+      method: "POST",
+      signal: ctrl.signal,
+      headers: {
+        "Authorization": "Bearer " + process.env.OPENROUTER_API_KEY,
+        "Content-Type": "application/json",
+        "HTTP-Referer": "https://bettyjeng.com",
+        "X-Title": "Alora"
+      },
+      body: JSON.stringify({
+        model: model,
+        messages: msgs,
+        temperature: 0.45,
+        max_tokens: maxTokens
+      })
+    });
+  } catch (e) {
+    const err = new Error(e.name === "AbortError" ? "model timeout" : "network error");
+    err.timeout = e.name === "AbortError";
+    throw err;
+  } finally {
+    clearTimeout(timer);
+  }
 
   if (!res.ok) {
     const detail = await res.text().catch(() => "");
@@ -234,29 +252,40 @@ async function callModel(messages, maxTokens, retryHint, model) {
   return data?.choices?.[0]?.message?.content || "";
 }
 
-/* Call one model, parse, and retry once if the JSON doesn't come back clean. */
-async function callForJson(messages, maxTokens, model) {
-  let raw = await callModel(messages, maxTokens, false, model);
-  let parsed = extractJson(raw);
-  if (!parsed) {
-    raw = await callModel(messages, maxTokens, true, model);
-    parsed = extractJson(raw);
-  }
-  return parsed;
-}
-
-/* Try the configured model first. If it errors (credits dry, provider down) or
-   returns nothing usable, fall back to the free router so Alora keeps working. */
+/* Orchestrate within the time budget. One primary attempt; a JSON-retry or a
+   free-router fallback only if there is still time, so two slow calls can never
+   stack up and blow past Netlify's hard limit. */
 async function generateJson(messages, maxTokens) {
+  const start = Date.now();
+  const left = () => TOTAL_BUDGET_MS - (Date.now() - start);
+
   try {
-    const out = await callForJson(messages, maxTokens, MODEL);
-    if (out) return out;
-    if (MODEL !== FREE_MODEL) return await callForJson(messages, maxTokens, FREE_MODEL);
-    return out;
+    let raw = await callModel(messages, maxTokens, false, MODEL, left());
+    let parsed = extractJson(raw);
+    if (parsed) return parsed;
+
+    // Bad JSON: one strict retry on the same model, only if time allows.
+    if (left() > 3500) {
+      raw = await callModel(messages, maxTokens, true, MODEL, left());
+      parsed = extractJson(raw);
+      if (parsed) return parsed;
+    }
+    // Still bad: try the free router once if it is a different model and time allows.
+    if (MODEL !== FREE_MODEL && left() > 3500) {
+      raw = await callModel(messages, maxTokens, false, FREE_MODEL, left());
+      parsed = extractJson(raw);
+      if (parsed) return parsed;
+    }
+    return null;
   } catch (err) {
-    if (MODEL !== FREE_MODEL) {
-      console.error("alora primary model failed, falling back to free:", err.status || "", err.message || "");
-      return await callForJson(messages, maxTokens, FREE_MODEL);
+    // Primary failed fast (credits, auth, provider down). Fall back to free only
+    // if it was NOT a timeout and there is real budget left for a full call.
+    if (!err.timeout && MODEL !== FREE_MODEL && left() > 4000) {
+      console.error("alora primary failed, trying free:", err.status || "", err.message || "");
+      try {
+        const raw = await callModel(messages, maxTokens, false, FREE_MODEL, left());
+        return extractJson(raw);
+      } catch (e2) { throw e2; }
     }
     throw err;
   }
@@ -297,7 +326,7 @@ exports.handler = async (event) => {
     }
 
     if (stage === "generate") {
-      const out = await generateJson(generateMessages(brief, goalMode, body.qa), 2200);
+      const out = await generateJson(generateMessages(brief, goalMode, body.qa), 1800);
       if (!out || !out.diagnosis) {
         return reply(502, { error: "Alora couldn't shape a clean Blueprint that time. Please try again." }, origin);
       }
@@ -307,9 +336,11 @@ exports.handler = async (event) => {
     return reply(400, { error: "Unknown stage." }, origin);
   } catch (err) {
     // Never log the key or the user's raw input. Log only a terse marker.
-    console.error("alora stage=" + stage + " failed:", err.status || "", err.message || "");
-    const msg = err.status === 429
-      ? "The free model is busy right now. Try again in a moment."
+    console.error("alora stage=" + stage + " failed:", err.timeout ? "timeout" : (err.status || ""), err.message || "");
+    const msg = err.timeout
+      ? "Alora took longer than expected to think this through. Please try again, and shorter answers help."
+      : err.status === 429
+      ? "The model is busy right now. Try again in a moment."
       : "Something hiccuped reaching the model. Please try again.";
     return reply(502, { error: msg }, origin);
   }

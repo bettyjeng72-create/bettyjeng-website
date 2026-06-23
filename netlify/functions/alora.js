@@ -58,14 +58,54 @@ function clamp(s, max) {
   return String(s == null ? "" : s).slice(0, max).trim();
 }
 
-/* Pull JSON out of a model response even if it wraps it in prose or code fences. */
+/* Pull JSON out of a model response even if it wraps it in prose or code fences,
+   has trailing commas, or got cut off before it finished (truncation repair). */
 function extractJson(text) {
   if (!text) return null;
   let t = String(text).trim().replace(/^```(?:json)?/i, "").replace(/```$/i, "").trim();
-  try { return JSON.parse(t); } catch (_) { /* fall through */ }
+
+  const tryParse = (s) => { try { return JSON.parse(s); } catch (_) { return undefined; } };
+  const declutter = (s) => s.replace(/,(\s*[}\]])/g, "$1"); // drop trailing commas
+
+  let v = tryParse(t); if (v !== undefined) return v;
+
   const first = t.indexOf("{"), last = t.lastIndexOf("}");
   if (first !== -1 && last > first) {
-    try { return JSON.parse(t.slice(first, last + 1)); } catch (_) { /* give up */ }
+    const sliced = t.slice(first, last + 1);
+    v = tryParse(sliced); if (v !== undefined) return v;
+    v = tryParse(declutter(sliced)); if (v !== undefined) return v;
+  }
+
+  // Truncation repair: model got cut off, so trim any dangling tail, then close
+  // open strings, arrays, and objects. Better a partial Blueprint than none.
+  if (first !== -1) {
+    let body = t.slice(first);
+    const closeAndParse = (s) => {
+      let inStr = false, esc = false; const stack = [];
+      for (let i = 0; i < s.length; i++) {
+        const c = s[i];
+        if (inStr) { if (esc) esc = false; else if (c === "\\") esc = true; else if (c === '"') inStr = false; }
+        else { if (c === '"') inStr = true; else if (c === "{" || c === "[") stack.push(c); else if (c === "}" || c === "]") stack.pop(); }
+      }
+      let r = s;
+      if (inStr) r += '"';
+      for (let i = stack.length - 1; i >= 0; i--) r += stack[i] === "{" ? "}" : "]";
+      return tryParse(declutter(r));
+    };
+
+    for (let attempt = 0; attempt < 6; attempt++) {
+      const v2 = closeAndParse(body);
+      if (v2 !== undefined) return v2;
+      // Strip the broken tail and try again: a trailing comma, a dangling
+      // "key": with no value, or a half-written final key.
+      const trimmed = body
+        .replace(/\s+$/, "")
+        .replace(/,\s*$/, "")
+        .replace(/,?\s*"[^"]*"\s*:\s*$/, "")
+        .replace(/,?\s*"[^"]*$/, "");
+      if (trimmed === body) break;
+      body = trimmed;
+    }
   }
   return null;
 }
@@ -192,9 +232,13 @@ Return ONLY valid JSON, no prose, no code fences, in EXACTLY this shape:
   "checklist": [{ "action": "a next step", "owner": "a role", "when": "This week|Week 2|etc." }]
 }
 
-Aim for: 1 to 2 assumptions only when needed, 3 to 4 fixes, 3 aiFit rows,
-2 to 3 humanAngle groups, 4 to 5 checklist items, quick wins first.
-Keep every string to one or two sentences. Be sharp and concrete, not wordy. This keeps the Blueprint skimmable and fast to produce.`;
+Aim for: 0 to 2 assumptions, exactly 3 fixes, exactly 3 aiFit rows, exactly 2
+humanAngle groups, 4 checklist items, before and after at most 6 steps each,
+changes at most 3, quick wins first.
+Keep every string to ONE short sentence. Be sharp and concrete, never wordy.
+Critical: you have limited space. A complete, concise Blueprint that closes its
+JSON cleanly is far better than a detailed one that gets cut off. Finish every
+section and close the JSON.`;
 
   return [
     { role: "system", content: sys },
@@ -326,8 +370,13 @@ exports.handler = async (event) => {
     }
 
     if (stage === "generate") {
-      const out = await generateJson(generateMessages(brief, goalMode, body.qa), 1800);
+      let out = await generateJson(generateMessages(brief, goalMode, body.qa), 2048);
+      // Some models wrap the object; unwrap if the blueprint is nested.
+      if (out && !out.diagnosis && typeof out === "object") {
+        out = out.blueprint || out.Blueprint || out.result || out;
+      }
       if (!out || !out.diagnosis) {
+        console.error("alora generate: no usable blueprint", out ? "parsed-but-no-diagnosis" : "unparseable");
         return reply(502, { error: "Alora couldn't shape a clean Blueprint that time. Please try again." }, origin);
       }
       return reply(200, { blueprint: out }, origin);

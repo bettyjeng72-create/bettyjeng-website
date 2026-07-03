@@ -248,7 +248,7 @@
         <div class="fhead"><span class="fnum">01</span><label class="flabel" for="pain">What's the pain point?</label></div>
         <p class="fhint">What's slow, frustrating, or not working, and what is it costing you? A line on what "good" would look like helps too.</p>
         <div class="fbody">
-          <textarea id="pain" maxlength="1500" placeholder="e.g. We rolled out an AI assistant to cut handle time, but six months in, leadership wants ROI we can't show and adoption has stalled."></textarea>
+          <textarea id="pain" maxlength="1500" placeholder="e.g. Our sales team got an AI call-notetaker three months ago, but reps still write their own summaries and the AI notes mostly sit unused."></textarea>
           <div class="counter" id="painCount">0 / 1500</div>
         </div>
       </div>
@@ -261,7 +261,7 @@
           <label for="noFlow">I have a goal but no workflow yet. Interview me from my goal instead.</label>
         </div>
         <div class="fbody">
-          <textarea id="flow" maxlength="4000" style="min-height:120px" placeholder="Ticket arrives in the queue&#10;Agent researches and writes a reply from scratch (slow, lots of tab-switching)&#10;Agent sends the reply&#10;Agent tags and logs the ticket manually (tedious, often skipped)"></textarea>
+          <textarea id="flow" maxlength="4000" style="min-height:120px" placeholder="Rep begins customer call&#10;Optional: Rep clicks the Start AI-Call Notetaker button&#10;Rep finishes call&#10;Rep writes summary from memory into CRM"></textarea>
           <div class="counter" id="flowCount">0 / 4000</div>
         </div>
       </div>
@@ -270,7 +270,7 @@
         <div class="fhead"><span class="fnum">03</span><label class="flabel" for="who">Who's involved?<span class="opt">optional</span></label></div>
         <p class="fhint">Who does the work, who's affected, who else interacts with the process, and is any group a bottleneck?</p>
         <div class="fbody">
-          <textarea id="who" maxlength="600" placeholder="e.g. Frontline agents (do the work), team leads (oversee and sign off), QA (review), customers (affected)."></textarea>
+          <textarea id="who" maxlength="600" placeholder="e.g. Sales reps, account managers, customer success managers, sales managers, partners, customers."></textarea>
           <div class="counter" id="whoCount">0 / 600</div>
         </div>
       </div>
@@ -279,7 +279,7 @@
         <div class="fhead"><span class="fnum">04</span><label class="flabel" for="constraints">Any constraints?<span class="opt">optional</span></label></div>
         <p class="fhint">What's blocking progress or limiting your options? For example: tight budget, AI licensing costs, approvals from legal, union, or other teams, or pressure to show ROI. Are any steps outside your control (like a legal review) inflating your metrics?</p>
         <div class="fbody">
-          <textarea id="constraints" maxlength="1200" placeholder="e.g. Tight budget, no baseline metrics captured, external comms need union review which adds wait time."></textarea>
+          <textarea id="constraints" maxlength="1200" placeholder="e.g. Reps are measured on call volume, not note quality, no baseline on time saved, and AI notes only exist if someone clicks the button."></textarea>
           <div class="counter" id="constraintsCount">0 / 1200</div>
         </div>
       </div>
@@ -291,11 +291,11 @@
           <div class="ctx-grid">
             <div class="ctx-field">
               <label for="ctxTeam">Team / group</label>
-              <input type="text" id="ctxTeam" placeholder="e.g. Customer Support" />
+              <input type="text" id="ctxTeam" placeholder="e.g. Sales Representatives" />
             </div>
             <div class="ctx-field">
               <label for="ctxRole">Role / persona</label>
-              <input type="text" id="ctxRole" maxlength="200" placeholder="What do they do?" />
+              <input type="text" id="ctxRole" maxlength="200" placeholder="e.g. Engage, sell, and follow up with customers" />
             </div>
             <div class="ctx-field full">
               <label>Deployment level</label>
@@ -307,7 +307,7 @@
             </div>
             <div class="ctx-field">
               <label for="ctxUsers"># of users impacted</label>
-              <input type="text" id="ctxUsers" placeholder="e.g. 250 (if known)" />
+              <input type="text" id="ctxUsers" placeholder="e.g. 450 (if known)" />
             </div>
             <div class="ctx-field">
               <label for="ctxIndustry">Industry</label>
@@ -606,7 +606,7 @@ function renderBlueprint(d){
 
   $("blueprint").innerHTML = html;
   $("resultTitle").textContent = d.initiative ? `Insight-to-Action Blueprint: ${d.initiative}` : "Insight-to-Action Blueprint";
-  $("resultSub").textContent = "Six parts, grounded in Hear, Trust, Co-create, Own.";
+  $("resultSub").textContent = "A human-first strategy on where AI fits and where it doesn't.";
 }
 
 /* ---------- live wiring (Phase 2) ---------- */
@@ -864,7 +864,7 @@ function buildBlueprintDeck(pptx, d, dateStr){
   const header=(s,title,num)=>{
     s.addShape(RR,{x:M,y:0.66,w:0.46,h:0.46,fill:{color:GOLDBG},rectRadius:0.08});
     s.addText(num,{x:M,y:0.66,w:0.46,h:0.46,align:"center",valign:"middle",fontFace:DISP,fontSize:14,bold:true,color:DEEP});
-    s.addText(title,{x:M+0.62,y:0.56,w:W-2*M-0.62,h:0.68,fontFace:DISP,fontSize:23,bold:true,color:INK,valign:"middle",fit:"shrink",wrap:false});
+    s.addText(title,{x:M+0.62,y:0.56,w:W-2*M-0.62,h:0.68,fontFace:DISP,fontSize:21,bold:true,color:INK,valign:"middle",align:"left"});
     s.addShape(R,{x:M,y:1.3,w:W-2*M,h:0.012,fill:{color:LINE}});
   };
   const num=arr=>arr.map((t,i)=>(i+1)+". "+t).join("\n");
@@ -877,7 +877,7 @@ function buildBlueprintDeck(pptx, d, dateStr){
   s.addShape(R,{x:M,y:3.85,w:0.7,h:0.06,fill:{color:ACCENT}});
   s.addText("Insight-to-Action Blueprint",{x:M,y:4.05,w:W-2*M,h:0.5,fontFace:BODY,fontSize:20,color:SOFT});
   s.addText(dateStr,{x:M,y:4.6,w:W-2*M,h:0.4,fontFace:BODY,fontSize:13,color:FAINT});
-  s.addText("A human-first strategy on where AI fits, and where it doesn't.",
+  s.addText("A human-first strategy on where AI fits and where it doesn't.",
     {x:M,y:5.15,w:W-2*M-2.2,h:0.9,fontFace:BODY,fontSize:13,color:SOFT,valign:"top"});
   s.addText("AI can make mistakes. Review and edit this Blueprint before you share or present it.",
     {x:M,y:6.35,w:W-2*M-2.2,h:0.5,fontFace:BODY,fontSize:10.5,italic:true,color:FAINT,valign:"top"});

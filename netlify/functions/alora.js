@@ -212,6 +212,12 @@ SHOWS the AI step rather than describing only the old manual process. Decide hon
 where AI should automate, where it should assist a human, and where to keep it fully human.
 ${goalMode ? "There is no existing workflow, so propose a sensible starting workflow as the 'before', then the leaner version as the 'after'." : ""}
 
+Fidelity rule for the "before" steps: stay faithful to what the user actually wrote.
+Keep their meaning and their own words where you can, lightly cleaned up. Do not
+reinterpret or guess a step's purpose. For example, if they say a tool is opened "to
+help with research," do not restate it as "to check work"; those mean different things.
+When unsure what a step is for, describe it plainly rather than inventing intent.
+
 Transparency rule: when an answer is missing, do not pretend to know. Make a reasonable,
 clearly-labeled assumption and list it in "assumptions". If nothing material is missing,
 return an empty assumptions array.

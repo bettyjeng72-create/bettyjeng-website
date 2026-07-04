@@ -117,6 +117,30 @@
   .recap .ra::before{content:"↳ ";color:var(--accent)}
   .ai-note{font-size:12.5px;color:var(--ink-faint);margin:16px 2px 0;font-style:italic}
 
+  /* Go deeper: success metrics */
+  .godeeper{display:none;align-items:center;justify-content:space-between;gap:16px;flex-wrap:wrap;background:var(--tint);border:1px dashed var(--accent);border-radius:14px;padding:18px 20px;margin:4px 0 16px}
+  .godeeper.show{display:flex}
+  .godeeper .gd-title{font-family:var(--disp);font-weight:800;font-size:16px;color:var(--ink)}
+  .godeeper .gd-sub{font-size:13px;color:var(--ink-soft);margin-top:3px;max-width:60ch}
+  .metrics-framing{font-family:var(--disp);font-weight:600;font-size:15px;color:var(--accent-deep);margin:0 0 14px;line-height:1.45}
+  .metric-cards{display:grid;grid-template-columns:1fr 1fr;gap:12px}
+  .metric-card{border:1px solid var(--line);border-radius:12px;padding:15px 16px;background:var(--white)}
+  .metric-chips{display:flex;gap:6px;flex-wrap:wrap;margin-bottom:8px}
+  .mchip{font-family:var(--disp);font-weight:700;font-size:10.5px;letter-spacing:.02em;padding:3px 9px;border-radius:999px;white-space:nowrap}
+  .mchip.name{background:var(--ink);color:#fff}
+  .mchip.signal{background:var(--tint);color:var(--ink-soft);border:1px solid var(--line)}
+  .mchip.lens-Efficiency{background:#EAF1FB;color:#2E5E9E}
+  .mchip.lens-Quality{background:var(--auto-bg);color:var(--auto)}
+  .mchip.lens-Human{background:var(--assist-bg);color:var(--assist)}
+  .mchip.lens-Adoption{background:#F3ECFA;color:#7A4FA3}
+  .mchip.lens-Business{background:var(--gold-bg);color:var(--gold)}
+  .metric-title{font-family:var(--disp);font-weight:700;font-size:14.5px;color:var(--ink);margin-bottom:9px;line-height:1.3}
+  .mrow{font-size:13px;color:var(--ink-soft);margin-bottom:6px;line-height:1.45}
+  .mrow:last-child{margin-bottom:0}
+  .mrow .mlab{display:block;font-family:var(--disp);font-weight:600;font-size:10.5px;letter-spacing:.04em;text-transform:uppercase;color:var(--accent-deep);margin-bottom:1px}
+  .mrow.val .mlab{color:var(--gold)}
+  @media (max-width:680px){ .metric-cards{grid-template-columns:1fr} }
+
   /* result */
   #result{display:none;margin-top:30px}
   #result.show{display:block}
@@ -215,7 +239,7 @@
   @media print{
     @page{margin:14mm}
     body{background:#fff}
-    .app-header,.intake,#clarifyCard,footer,.preview-banner,.toast,.exports,.exportsheet{display:none !important}
+    .app-header,.intake,#clarifyCard,footer,.preview-banner,.toast,.exports,.exportsheet,.godeeper{display:none !important}
     main.wrap{max-width:none;padding:0;margin:0}
     #result{display:block !important;margin:0}
     .result-head{display:block;margin-bottom:14px}
@@ -379,6 +403,16 @@
         </div>
       </div>
       <div class="blueprint" id="blueprint"></div>
+
+      <div class="godeeper" id="metricsCta">
+        <div>
+          <div class="gd-title">Want to know if it's working?</div>
+          <div class="gd-sub">Add a 360 view of success, capability and quality and trust, not just speed. About a penny, a few seconds.</div>
+        </div>
+        <button class="btn btn-primary" id="metricsBtn">Add success metrics</button>
+      </div>
+      <div id="metrics"></div>
+
       <p class="ai-note">✨ AI can make mistakes. Please review the content and edit as needed before you share or present it.</p>
       <div class="print-foot print-only">
         AI can make mistakes. Review and edit before sharing. A starting point for the conversation, not a substitute for it. Validate with the people the change touches, then plan the reinforcement that makes it stick.<br>
@@ -490,6 +524,26 @@ const EXAMPLE_QUESTIONS = [
     answer: "It depends on whether the rep remembered to click the AI Call Notetaker button. If the rep never clicks it, the manager never sees or comments on the AI notes."
   }
 ];
+
+/* Canned success metrics for the offline example, so the sample shows the
+   Beyond-ROI "go deeper" layer without a live call. */
+const EXAMPLE_METRICS = {
+  framing: "Real success here is not just faster notes. It is time reclaimed, records you can trust, and reps freed for higher-value work.",
+  metrics: [
+    { metric: "Rep hours redirected from admin to live selling and follow-up.", shortName: "Selling Time Reclaimed", lens: "Human", signal: "Leading",
+      definition: "How much of the time reps used to spend writing summaries now goes to selling instead.", why: "The point was to hand reps their pipeline and their evenings back, not to thin the team.", value: "Every hour moved from admin to selling is pipeline that compounds into revenue and quota, with no added headcount.", good: "Within a month, reps report noticeably less after-call writing and more time on customer calls." },
+    { metric: "Accuracy of the AI summary versus a rep's own handwritten notes.", shortName: "Summary Accuracy", lens: "Quality", signal: "Leading",
+      definition: "How closely the AI summary matches the facts, needs, and next steps a careful rep would capture.", why: "Reps will not trust the tool until someone shows them it is at least as good as their own notes.", value: "Trust is the foundation for every other gain, and accurate records prevent costly errors slipping downstream.", good: "Side-by-side checks show the AI summary matching or beating rep notes on the facts that matter." },
+    { metric: "Completeness of handoff notes when a deal moves between people.", shortName: "Handoff Quality", lens: "Quality", signal: "Lagging",
+      definition: "Whether the next person has what they need without chasing the previous rep.", why: "Thin handoffs drop balls and sour the customer experience at exactly the wrong moment.", value: "Cleaner handoffs mean fewer dropped deals and better retention across the customer's whole journey.", good: "Fewer 'can you catch me up' pings, and smoother transitions between reps and managers." },
+    { metric: "Share of reps who use the AI summary as their draft rather than skipping it.", shortName: "AI Draft Adoption", lens: "Adoption", signal: "Leading",
+      definition: "How often reps actually start from the AI draft instead of writing from scratch.", why: "Voluntary use is the real proof the tool earned its place in the workflow.", value: "Adoption is what unlocks every other benefit; an unused tool returns nothing on its cost.", good: "Most reps open the AI draft by default and edit from there, not around it." },
+    { metric: "After-call admin time per rep, per call.", shortName: "Admin Time Saved", lens: "Efficiency", signal: "Leading",
+      definition: "The minutes each rep spends on notes and logging after a call ends.", why: "This is the headline number leadership asked for, and it is real, it just should not stand alone.", value: "Time saved converts directly to capacity, dollars, and reps who can reach more customers a day.", good: "Post-call admin drops meaningfully without a dip in note quality." },
+    { metric: "Rep confidence that the AI notetaker helps rather than exposes them.", shortName: "Tool Confidence", lens: "Human", signal: "Leading",
+      definition: "How safe and supported reps feel using the tool, in their own words.", why: "The quiet opt-out you have now is a confidence problem, not a features problem.", value: "Confidence sustains voluntary use and protects retention, so the investment keeps paying off.", good: "Reps describe the tool as a help they rely on, not a risk they route around." }
+  ]
+};
 const $ = (id) => document.getElementById(id);
 const esc = (s) => String(s == null ? "" : s).replace(/[&<>"]/g, c => ({ "&":"&amp;","<":"&lt;",">":"&gt;","\"":"&quot;" }[c]));
 /* Exactly one terminal period, so model text that already ends in "." doesn't double up. */
@@ -615,6 +669,7 @@ let currentQuestions = [];   // questions the agent asked this round
 let exampleMode = false;     // true while the offline sample is being walked
 let lastBlueprint = null;    // the Blueprint currently on screen, for exports
 let lastQA = [];             // the clarifying Q&A that fed the current Blueprint
+let lastMetrics = null;      // the Beyond-ROI metrics, once the user adds them
 let lastIntake = null;       // the intake we sent, reused at generate time
 
 /* Defensive normalize so a slightly-off model response still renders cleanly. */
@@ -676,6 +731,9 @@ async function postStage(payload){
 /* Show a finished Blueprint. keepPreview leaves the sample banner up (offline demo). */
 function showResult(blueprint, keepPreview){
   renderBlueprint(blueprint);
+  lastMetrics = null;
+  $("metrics").innerHTML = "";
+  $("metricsCta").classList.add("show");
   if(!keepPreview) $("previewBanner").classList.remove("show");
   $("clarifyCard").classList.remove("show");
   $("result").classList.add("show");
@@ -787,7 +845,8 @@ $("resetBtn").onclick = ()=>{
   ["pain","flow","who","constraints","ctxTeam","ctxRole","ctxUsers","ctxIndustry"].forEach(id=>$(id).value="");
   $("noFlow").checked = false;
   document.querySelectorAll(".seg-btn").forEach(b=>b.setAttribute("aria-pressed","false")); deployValue="";
-  currentQuestions = []; lastIntake = null; exampleMode = false; lastQA = [];
+  currentQuestions = []; lastIntake = null; exampleMode = false; lastQA = []; lastMetrics = null;
+  $("metrics").innerHTML = ""; $("metricsCta").classList.remove("show");
   updateCounts();
   $("result").classList.remove("show");
   $("previewBanner").classList.remove("show");
@@ -843,7 +902,7 @@ window.addEventListener("beforeprint",()=>{
 window.addEventListener("afterprint",()=>{ if(document.__t) document.title=document.__t; });
 
 /* ---- Slides: a branded PptxGenJS deck for the six sections ---- */
-function buildBlueprintDeck(pptx, d, dateStr){
+function buildBlueprintDeck(pptx, d, dateStr, beyondRoi){
   pptx.defineLayout({name:"AL",width:13.33,height:7.5});
   pptx.layout="AL";
   pptx.author="Alora by Betty Jeng"; pptx.company="Betty Jeng";
@@ -853,6 +912,7 @@ function buildBlueprintDeck(pptx, d, dateStr){
   const ACCENT="FC4C02",DEEP="E04000",INK="1A1A1A",SOFT="4A4A4A",FAINT="8A8A8A",
         CREAM="FAF7F3",LINE="E8E5E0",WHITE="FFFFFF",GOLD="9A6E1C",GOLDBG="F6E7CB";
   const VERD={ automate:{bg:"E9F2EC",tx:"3E7A5E"}, assist:{bg:"FBE2D6",tx:"C5340A"}, human:{bg:"EBEEF2",tx:"5A6E82"} };
+  const LENS={ Efficiency:{bg:"EAF1FB",tx:"2E5E9E"}, Quality:{bg:"E9F2EC",tx:"3E7A5E"}, Human:{bg:"FBE2D6",tx:"C5340A"}, Adoption:{bg:"F3ECFA",tx:"7A4FA3"}, Business:{bg:"F6E7CB",tx:"9A6E1C"} };
   const vkey=v=>/keep human/i.test(v)?"human":/assist/i.test(v)?"assist":"automate";
   const R=pptx.ShapeType.rect, RR=pptx.ShapeType.roundRect;
   const DISP="Montserrat", BODY="Poppins";
@@ -982,6 +1042,34 @@ function buildBlueprintDeck(pptx, d, dateStr){
     foot(s7);
   }
 
+  /* 7b. Beyond ROI metrics (only if the user added them), 2 cards per slide */
+  if(beyondRoi && Array.isArray(beyondRoi.metrics) && beyondRoi.metrics.length){
+    const ms=beyondRoi.metrics;
+    for(let i=0;i<ms.length;i+=2){
+      const sm=pptx.addSlide(); sm.background={color:WHITE};
+      header(sm, i===0?"Beyond ROI":"Beyond ROI (cont.)","07");
+      if(i===0 && beyondRoi.framing){
+        sm.addText(beyondRoi.framing,{x:M+0.62,y:1.18,w:W-2*M-0.62,h:0.35,fontFace:BODY,fontSize:11,italic:true,color:GOLD,valign:"middle"});
+      }
+      ms.slice(i,i+2).forEach((m,j)=>{
+        const cy=1.65+j*2.55, ch=2.4, cw=W-2*M;
+        const lensC=LENS[(m.lens||"").replace(/[^A-Za-z]/g,"")]||{bg:CREAM,tx:SOFT};
+        sm.addShape(RR,{x:M,y:cy,w:cw,h:ch,fill:{color:CREAM},line:{color:LINE,width:1},rectRadius:0.1});
+        sm.addText(m.shortName||m.metric||"",{x:M+0.3,y:cy+0.16,w:cw-3.2,h:0.35,fontFace:DISP,fontSize:14,bold:true,color:DEEP,valign:"middle"});
+        // lens + signal pill area, top right
+        sm.addShape(RR,{x:M+cw-2.7,y:cy+0.18,w:1.5,h:0.32,fill:{color:lensC.bg},rectRadius:0.16});
+        sm.addText(m.lens||"",{x:M+cw-2.7,y:cy+0.18,w:1.5,h:0.32,align:"center",valign:"middle",fontFace:DISP,fontSize:9,bold:true,color:lensC.tx});
+        sm.addText(m.signal||"",{x:M+cw-1.1,y:cy+0.18,w:0.9,h:0.32,align:"center",valign:"middle",fontFace:DISP,fontSize:9,bold:true,color:FAINT});
+        sm.addText(m.metric||"",{x:M+0.3,y:cy+0.52,w:cw-0.6,h:0.32,fontFace:BODY,fontSize:11,italic:true,color:INK,valign:"middle"});
+        const row=(lab,val)=> val?[{text:lab+"  ",options:{fontFace:DISP,fontSize:9,bold:true,color:lab==="LONG-TERM VALUE"?GOLD:DEEP,charSpacing:.5}},
+                                    {text:dot(val),options:{fontFace:BODY,fontSize:10.5,color:SOFT,breakLine:true,paraSpaceAfter:2}}]:[];
+        const runs=[].concat(row("WHAT IT IS",m.definition),row("WHY IT MATTERS",m.why),row("LONG-TERM VALUE",m.value),row("WHAT GOOD LOOKS LIKE",m.good));
+        sm.addText(runs,{x:M+0.3,y:cy+0.92,w:cw-0.6,h:ch-1.05,valign:"top",fit:"shrink"});
+      });
+      foot(sm);
+    }
+  }
+
   /* 8. Closing */
   s=pptx.addSlide(); s.background={color:WHITE};
   s.addShape(R,{x:0,y:0,w:W,h:0.28,fill:{color:ACCENT}});
@@ -1004,7 +1092,7 @@ function exportDeck(){
   setTimeout(()=>{
     try{
       const pptx=new PptxGenJS();
-      buildBlueprintDeck(pptx, lastBlueprint, fmtDate());
+      buildBlueprintDeck(pptx, lastBlueprint, fmtDate(), lastMetrics);
       pptx.writeFile({fileName:"Alora-"+safeName(lastBlueprint.initiative)+".pptx"})
         .then(()=>{ setLoading(btn,false,"Export slides"); toast("Slides downloaded"); })
         .catch(()=>{ setLoading(btn,false,"Export slides"); toast("The slide export hit a snag. Please try again."); });
@@ -1014,6 +1102,62 @@ function exportDeck(){
 
 $("pdfBtn").onclick = exportPDF;
 $("deckBtn").onclick = exportDeck;
+
+/* ---------- Go deeper: success metrics (second call) ---------- */
+function buildBpSummary(){
+  const d = lastBlueprint || {};
+  const dx = d.diagnosis || {};
+  const fit = (d.aiFit||[]).map(a=>`- ${a.step} [${a.verdict}]`).join("\n");
+  return `Initiative: ${d.initiative||""}\nRoot: ${dx.rootType||""}${dx.secondaryType?(" + "+dx.secondaryType):""}\nDiagnosis: ${dx.summary||""}\nAI fit:\n${fit}`;
+}
+
+function renderMetrics(b){
+  const framing = b.framing ? `<p class="metrics-framing">${esc(b.framing)}</p>` : "";
+  const cards = (b.metrics||[]).map(m=>{
+    const lens = (m.lens||"").replace(/[^A-Za-z]/g,"");
+    return `<div class="metric-card">
+      <div class="metric-chips">
+        ${m.shortName?`<span class="mchip name">${esc(m.shortName)}</span>`:""}
+        ${m.lens?`<span class="mchip lens-${lens}">${esc(m.lens)}</span>`:""}
+        ${m.signal?`<span class="mchip signal">${esc(m.signal)}</span>`:""}
+      </div>
+      <div class="metric-title">${esc(m.metric||"")}</div>
+      ${m.definition?`<div class="mrow"><span class="mlab">What it is</span>${esc(dot(m.definition))}</div>`:""}
+      ${m.why?`<div class="mrow"><span class="mlab">Why it matters here</span>${esc(dot(m.why))}</div>`:""}
+      ${m.value?`<div class="mrow val"><span class="mlab">Long-term value</span>${esc(dot(m.value))}</div>`:""}
+      ${m.good?`<div class="mrow"><span class="mlab">What good looks like</span>${esc(dot(m.good))}</div>`:""}
+    </div>`;
+  }).join("");
+  $("metrics").innerHTML = section("07","Beyond ROI","A 360 view of success, not just speed",
+    framing + `<div class="metric-cards">${cards}</div>`);
+  $("metricsCta").classList.remove("show");
+}
+
+async function runMetrics(btn){
+  setLoading(btn, true, "Add success metrics");
+  try{
+    const data = await postStage({ stage:"metrics", intake:lastIntake, bpSummary:buildBpSummary(), website:$("website").value });
+    lastMetrics = data.beyondRoi;
+    renderMetrics(lastMetrics);
+    toast("Success metrics added");
+    $("metrics").scrollIntoView({behavior:"smooth",block:"start"});
+  }catch(err){
+    showError(err.message, ()=> runMetrics(btn));
+  }finally{
+    setLoading(btn, false, "Add success metrics");
+  }
+}
+
+/* Offline example: show the canned metrics so the sample demos the full feature. */
+$("metricsBtn").onclick = ()=>{
+  if(exampleMode){
+    const b=$("metricsBtn"); setLoading(b,true,"Add success metrics");
+    setTimeout(()=>{ lastMetrics=EXAMPLE_METRICS; renderMetrics(EXAMPLE_METRICS); setLoading(b,false,"Add success metrics"); toast("Sample metrics added"); $("metrics").scrollIntoView({behavior:"smooth",block:"start"}); }, 450);
+    return;
+  }
+  if(!lastIntake){ toast("Generate a Blueprint first."); return; }
+  runMetrics($("metricsBtn"));
+};
 
 /* wire counters */
 function updateCounts(){ ["pain","flow","who","constraints"].forEach(k=>{ const el=$(k); el.dispatchEvent(new Event("input")); }); }

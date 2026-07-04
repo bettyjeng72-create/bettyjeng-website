@@ -261,7 +261,7 @@
           <label for="noFlow">I have a goal but no workflow yet. Interview me from my goal instead.</label>
         </div>
         <div class="fbody">
-          <textarea id="flow" maxlength="4000" style="min-height:120px" placeholder="Rep begins customer call&#10;Optional: Rep clicks the Start AI-Call Notetaker button&#10;Rep finishes call&#10;Rep writes summary from memory into CRM"></textarea>
+          <textarea id="flow" maxlength="4000" style="min-height:120px" placeholder="1. Rep begins customer call&#10;2. Optional: Rep clicks the Start AI-Call Notetaker button&#10;3. Rep finishes call&#10;4. Rep writes summary from memory into CRM"></textarea>
           <div class="counter" id="flowCount">0 / 4000</div>
         </div>
       </div>
@@ -863,7 +863,7 @@ function buildBlueprintDeck(pptx, d, dateStr){
       {x:M,y:H-0.5,w:W-2*M,h:0.3,fontSize:9,align:"left",valign:"middle"});
   const header=(s,title,num)=>{
     s.addShape(RR,{x:M,y:0.66,w:0.46,h:0.46,fill:{color:GOLDBG},rectRadius:0.08});
-    s.addText(num,{x:M,y:0.66,w:0.46,h:0.46,align:"center",valign:"middle",fontFace:DISP,fontSize:14,bold:true,color:DEEP});
+    s.addText(num,{x:M,y:0.66,w:0.46,h:0.46,align:"center",valign:"middle",fontFace:DISP,fontSize:14,bold:true,color:DEEP,wrap:false,margin:0});
     s.addText(title,{x:M+0.62,y:0.56,w:W-2*M-0.62,h:0.68,fontFace:DISP,fontSize:21,bold:true,color:INK,valign:"middle",align:"left"});
     s.addShape(R,{x:M,y:1.3,w:W-2*M,h:0.012,fill:{color:LINE}});
   };

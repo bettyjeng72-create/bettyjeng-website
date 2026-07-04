@@ -252,6 +252,57 @@ section and close the JSON.`;
   ];
 }
 
+/* ------------------------------------------------- stage: METRICS (go deeper) */
+function metricsMessages(brief, bpSummary) {
+  const sys = `You are Alora, adding a success-measurement layer to a Blueprint you already produced.
+${BRAND}
+
+The user is under pressure to prove ROI, and the danger is that "ROI" shrinks to speed
+alone. Efficiency-only scorekeeping is the exact logic that turns AI adoption into
+layoffs. Your job is a fuller, honest 360 view of success so the human gains stay visible.
+
+Think it through internally first: for THIS workflow and these roles, what would real
+success look like beyond time saved? Cover more than one lens, and always include at
+least one Human-capability metric and one Quality metric, so success is never measured
+on speed alone.
+
+The five lenses:
+- Efficiency: time, throughput, effort saved.
+- Quality: accuracy, rework, consistency, customer outcomes.
+- Human: capability built, confidence, higher-value work, engagement, retention.
+- Adoption: real usage, voluntary use, trust in the output.
+- Business: downstream customer, revenue-relevant, or risk signals.
+
+For every metric, connect it to durable value in concrete terms: money saved or earned,
+customer experience, new customers or retention, risk reduced, or capability built. Do
+not leave value abstract. Say what it is worth over time and to whom.
+
+Return ONLY valid JSON, no prose, no code fences, in exactly this shape:
+{
+  "framing": "one plain sentence reframing success as more than speed",
+  "metrics": [
+    { "metric": "fuller descriptive line for the card",
+      "shortName": "2 to 4 words, Title Case, dashboard-ready label, under ~24 characters",
+      "lens": "Efficiency|Quality|Human|Adoption|Business",
+      "definition": "one plain sentence: what this metric is and how to read it, no formula",
+      "why": "one line on why it matters for THIS workflow",
+      "value": "the long-term value it drives, concretely: money saved or earned, customer experience, new customers or retention, risk reduced, or capability built",
+      "good": "what a good result looks like, in plain words, no formula",
+      "signal": "Leading|Lagging" }
+  ]
+}
+
+Give 4 to 6 metrics spread across at least three lenses, with Human and Quality both
+represented. shortName is a crisp chip label (e.g. "Selling Time Reclaimed"); metric is
+the fuller line. Keep every string to one short sentence. Ground each metric in the
+specific workflow, not generic KPIs. Do not include cadence, formulas, or baselines.`;
+
+  return [
+    { role: "system", content: sys },
+    { role: "user", content: brief + "\n\nBLUEPRINT SO FAR:\n" + bpSummary }
+  ];
+}
+
 /* ------------------------------------------------------- OpenRouter call */
 /* Netlify's free tier kills a function at 10 seconds. We self-limit to a budget
    under that so Alora always returns a clean, friendly error instead of a silent
@@ -386,6 +437,20 @@ exports.handler = async (event) => {
         return reply(502, { error: "Alora couldn't shape a clean Blueprint that time. Please try again." }, origin);
       }
       return reply(200, { blueprint: out }, origin);
+    }
+
+    if (stage === "metrics") {
+      const bpSummary = clamp(body.bpSummary, 1500);
+      let out = await generateJson(metricsMessages(brief, bpSummary), 1600);
+      if (out && !Array.isArray(out.metrics) && typeof out === "object") {
+        out = out.beyondRoi || out.result || out;
+      }
+      if (!out || !Array.isArray(out.metrics) || !out.metrics.length) {
+        console.error("alora metrics: no usable metrics", out ? "parsed-but-empty" : "unparseable");
+        return reply(502, { error: "Alora couldn't shape the success metrics that time. Please try again." }, origin);
+      }
+      out.metrics = out.metrics.slice(0, 6);
+      return reply(200, { beyondRoi: out }, origin);
     }
 
     return reply(400, { error: "Unknown stage." }, origin);

@@ -348,6 +348,70 @@ KPIs or stock advice.`;
     { role: "user", content: brief + "\n\nBLUEPRINT SO FAR:\n" + bpSummary }
   ];
 }
+
+/* ----------------------------------------------- stage: REINFORCE (go deeper) */
+function reinforceMessages(brief, bpSummary) {
+  const sys = `You are Alora, adding a Reinforcement and Incentivizing layer to a Blueprint you already produced.
+${BRAND}
+
+Reinforcement is the step most change efforts skip, and then they wonder why adoption
+fades after launch. Your job is the moves that make this change stick and the incentives
+that make people want to adopt it, framed so a sponsor could fund them.
+
+Two kinds of move, and label each:
+- Reinforcement: rituals, feedback loops, and habits that keep the new way alive after launch.
+- Incentive: recognition, rewards, or motivators that make people want to adopt, not just comply.
+
+Motivation stance, this matters most: bias every incentive toward intrinsic motivators
+over external pressure. Reach for mastery (people getting visibly better at something),
+autonomy (people choosing how they work), progress (people seeing their own momentum),
+and belonging (people feeling part of something), rather than compliance, surveillance,
+or "do this or else." Never frame an incentive as a threat to someone's job or standing.
+If a move could read as fear-based, reframe it around what the person gains.
+
+Vehicles you can use, and you are encouraged to invent others that fit this specific
+workflow: light gamification (streaks, progress markers, friendly team visibility),
+bite-sized micro-trainings that build confidence in minutes, peer recognition,
+early-adopter or mentor roles, small autonomy grants, visible progress dashboards people
+actually want to check. Pick or design what genuinely fits these roles; do not force a
+tactic that would feel gimmicky here.
+
+Think it through internally first: for THIS workflow and these roles, what would actually
+keep the change alive past week three, and what would make people choose the new way.
+Ground everything in the specific workflow, never generic "celebrate wins" filler.
+
+On cost: you do NOT know their salaries or vendor prices, so NEVER invent a dollar figure.
+Give a relative investment level, name the cost drivers in plain words, and hand them the
+math to size it with their own numbers. Everything is an estimate, say so.
+
+Return ONLY valid JSON, no prose, no code fences, in exactly this shape:
+{
+  "framing": "one plain sentence on why reinforcement is the step that is skipped and paid for later",
+  "moves": [
+    {
+      "move": "the concrete ritual or mechanism",
+      "type": "Reinforcement|Incentive",
+      "motivator": "the intrinsic driver this taps: Mastery|Autonomy|Progress|Belonging|Recognition",
+      "locksIn": "the specific habit or behavior from the Blueprint it protects",
+      "cadence": "One-time|Weekly|Monthly|Ongoing",
+      "owner": "the role who runs it",
+      "investment": "Low|Medium|High",
+      "whatItTakes": "plain-language cost drivers, e.g. a few hours of manager time weekly plus a one-time CRM config, never a dollar figure",
+      "howToSize": "a short do-this-math line so they can ballpark it with their own numbers"
+    }
+  ],
+  "estimateNote": "one sentence reminding the reader these are directional estimates, not quotes, and to plug in their own rates and vendor prices"
+}
+
+Give 4 to 6 moves, a mix of Reinforcement and Incentive, at least two of each. Keep every
+string to one clear sentence. Make investment levels relative to each other so a sponsor
+can triage at a glance. Every motivator must be intrinsic, never fear or compliance.`;
+
+  return [
+    { role: "system", content: sys },
+    { role: "user", content: brief + "\n\nBLUEPRINT SO FAR:\n" + bpSummary }
+  ];
+}
 /* Netlify's free tier kills a function at 10 seconds. We self-limit to a budget
    under that so Alora always returns a clean, friendly error instead of a silent
    platform timeout (which gives the user a generic message and logs nothing). */
@@ -509,6 +573,20 @@ exports.handler = async (event) => {
       }
       out.groups = out.groups.slice(0, 3);
       return reply(200, { augment: out }, origin);
+    }
+
+    if (stage === "reinforce") {
+      const bpSummary = clamp(body.bpSummary, 1800);
+      let out = await generateJson(reinforceMessages(brief, bpSummary), 2000);
+      if (out && !Array.isArray(out.moves) && typeof out === "object") {
+        out = out.reinforcement || out.result || out;
+      }
+      if (!out || !Array.isArray(out.moves) || !out.moves.length) {
+        console.error("alora reinforce: no usable moves", out ? "parsed-but-empty" : "unparseable");
+        return reply(502, { error: "Alora couldn't shape the reinforcement plan that time. Please try again." }, origin);
+      }
+      out.moves = out.moves.slice(0, 6);
+      return reply(200, { reinforce: out }, origin);
     }
 
     return reply(400, { error: "Unknown stage." }, origin);

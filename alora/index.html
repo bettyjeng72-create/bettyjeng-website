@@ -146,6 +146,31 @@
   .mrow.val .mlab{color:var(--gold)}
   @media (max-width:680px){ .metric-cards{grid-template-columns:1fr} }
 
+  /* Augmentation map */
+  .aug-cards{display:flex;flex-direction:column;gap:14px}
+  .aug-card{border:1px solid var(--line);border-radius:12px;padding:16px 18px;background:var(--white)}
+  .aug-group{font-family:var(--disp);font-weight:800;font-size:16px;color:var(--ink);margin-bottom:10px}
+  .mrow .mlab.fear{color:var(--assist)}
+  .mrow .mlab.moves{color:var(--auto)}
+  .ladder{margin:12px 0 10px;padding:12px 14px;background:var(--tint);border:1px solid var(--line);border-radius:10px}
+  .ladder-lab{font-family:var(--disp);font-weight:600;font-size:11px;letter-spacing:.04em;text-transform:uppercase;color:var(--accent-deep);margin-bottom:9px}
+  .rung{display:flex;gap:10px;align-items:flex-start;margin-bottom:9px}
+  .rung:last-child{margin-bottom:0}
+  .rung-lv{flex:0 0 auto;font-family:var(--disp);font-weight:700;font-size:10px;letter-spacing:.02em;padding:3px 8px;border-radius:999px;white-space:nowrap;margin-top:1px}
+  .rung-lv.lv-Foundational{background:#EAF1FB;color:#2E5E9E}
+  .rung-lv.lv-Growing{background:var(--gold-bg);color:var(--gold)}
+  .rung-lv.lv-Advanced{background:var(--auto-bg);color:var(--auto)}
+  .rung-body{font-size:13px;color:var(--ink-soft);line-height:1.4}
+  .rung-cap{font-family:var(--disp);font-weight:600;color:var(--ink);margin-right:5px}
+  .rung-why::before{content:"";}
+  .firststep{margin-top:4px;font-size:13px;color:var(--ink-soft)}
+  .firststep .mlab{color:var(--accent)}
+
+  /* single bottom export bar */
+  .bottomexports{display:none;align-items:center;gap:10px;flex-wrap:wrap;margin-top:18px;padding-top:14px;border-top:1px solid var(--line)}
+  .bottomexports.show{display:flex}
+  .bottomexports .be-label{font-family:var(--disp);font-weight:600;font-size:12.5px;color:var(--ink-faint);margin-right:2px}
+
   /* result */
   #result{display:none;margin-top:30px}
   #result.show{display:block}
@@ -244,7 +269,7 @@
   @media print{
     @page{margin:14mm}
     body{background:#fff}
-    .app-header,.intake,#clarifyCard,footer,.preview-banner,.toast,.exports,.exportsheet,.godeeper{display:none !important}
+    .app-header,.intake,#clarifyCard,footer,.preview-banner,.toast,.exports,.exportsheet,.godeeper,.bottomexports{display:none !important}
     main.wrap{max-width:none;padding:0;margin:0}
     #result{display:block !important;margin:0}
     .result-head{display:block;margin-bottom:14px}
@@ -418,6 +443,21 @@
       </div>
       <div id="metrics"></div>
 
+      <div class="godeeper" id="augmentCta">
+        <div>
+          <div class="gd-title">Map the augmentation path</div>
+          <div class="gd-sub">For each group the change touches: the fear named, what AI takes off their plate, the higher-value work they move toward, and a capability ladder to get there.</div>
+        </div>
+        <button class="btn btn-primary" id="augmentBtn">Add augmentation map</button>
+      </div>
+      <div id="augment"></div>
+
+      <div class="bottomexports" id="bottomExports">
+        <span class="be-label">Ready to share?</span>
+        <button class="btn btn-sm" id="pdfBtn2">Export PDF</button>
+        <button class="btn btn-sm" id="deckBtn2">Export slides</button>
+      </div>
+
       <p class="ai-note">✨ AI can make mistakes. Please review the content and edit as needed before you share or present it.</p>
       <div class="print-foot print-only">
         AI can make mistakes. Review and edit before sharing. A starting point for the conversation, not a substitute for it. Validate with the people the change touches, then plan the reinforcement that makes it stick.<br>
@@ -574,6 +614,40 @@ const EXAMPLE_METRICS = {
   ]
 };
 
+/* Canned Augmentation Map for the offline example, so the sample shows the
+   fear-to-path layer without a live call. */
+const EXAMPLE_AUGMENT = {
+  framing: "Augmentation is a path, not a promise. Here is what changes for each group and how they grow into the new version of their role.",
+  groups: [
+    {
+      group: "Sales reps",
+      fearNamed: "If the AI writes my call notes, what is left that only I can do, and am I next?",
+      aiTakes: "The after-call transcription and first-draft summary, the tab-switching and the write-from-memory grind.",
+      movesToward: "More live selling and follow-up, and becoming the person who reads the customer rather than the person who types up the call.",
+      ladder: [
+        { capability: "Reviewing and correcting an AI summary quickly and confidently.", level: "Foundational", why: "The new core skill is judging AI output, not producing it from scratch." },
+        { capability: "Prompting the notetaker for the deal details that matter most.", level: "Growing", why: "Reps who shape the AI get summaries that actually fit their pipeline." },
+        { capability: "Using AI notes in deal prep and handoffs to move faster.", level: "Growing", why: "Turns a record into a selling advantage, not just a compliance step." },
+        { capability: "Spotting patterns across calls to coach themselves and lift close rates.", level: "Advanced", why: "The higher-value work is insight, and AI hands reps the raw material for it." }
+      ],
+      firstStep: "Learn to review and approve an AI summary in under two minutes, so the tool saves time instead of adding a step."
+    },
+    {
+      group: "Sales managers",
+      fearNamed: "If reps stop writing their own notes, do I lose visibility into whether they are really engaged on calls?",
+      aiTakes: "Reading long, rambling manual summaries and reconstructing what happened on a deal.",
+      movesToward: "Coaching on the deal and the relationship, using AI notes as a consistent baseline to see where reps need help.",
+      ladder: [
+        { capability: "Reading an AI summary and confidence signal to gauge call quality fast.", level: "Foundational", why: "Frees a manager's attention for coaching instead of note-reading." },
+        { capability: "Giving reps quick, specific feedback on AI note quality.", level: "Growing", why: "Closing the trust loop is what makes reps actually adopt the tool." },
+        { capability: "Running a light feedback protocol that scales across the team.", level: "Growing", why: "Turns a chore into a repeatable coaching rhythm." },
+        { capability: "Reading team-wide patterns in AI notes to target coaching where it moves revenue.", level: "Advanced", why: "Managing by signal, not by anecdote, is the upgraded manager role." }
+      ],
+      firstStep: "Pick one routine call a week per rep and send a one-line 'AI notes looked good,' so reps see you are reading and that it is safe to rely on the tool."
+    }
+  ]
+};
+
 const $ = (id) => document.getElementById(id);
 const esc = (s) => String(s == null ? "" : s).replace(/[&<>"]/g, c => ({ "&":"&amp;","<":"&lt;",">":"&gt;","\"":"&quot;" }[c]));
 /* Exactly one terminal period, so model text that already ends in "." doesn't double up. */
@@ -700,6 +774,7 @@ let exampleMode = false;     // true while the offline sample is being walked
 let lastBlueprint = null;    // the Blueprint currently on screen, for exports
 let lastQA = [];             // the clarifying Q&A that fed the current Blueprint
 let lastMetrics = null;      // the Beyond-ROI metrics, once the user adds them
+let lastAugment = null;      // the Augmentation Map, once the user adds it
 let lastIntake = null;       // the intake we sent, reused at generate time
 
 /* Defensive normalize so a slightly-off model response still renders cleanly. */
@@ -761,9 +836,11 @@ async function postStage(payload){
 /* Show a finished Blueprint. keepPreview leaves the sample banner up (offline demo). */
 function showResult(blueprint, keepPreview){
   renderBlueprint(blueprint);
-  lastMetrics = null;
-  $("metrics").innerHTML = "";
+  lastMetrics = null; lastAugment = null;
+  $("metrics").innerHTML = ""; $("augment").innerHTML = "";
   $("metricsCta").classList.add("show");
+  $("augmentCta").classList.add("show");
+  $("bottomExports").classList.add("show");
   if(!keepPreview) $("previewBanner").classList.remove("show");
   $("clarifyCard").classList.remove("show");
   $("result").classList.add("show");
@@ -875,8 +952,9 @@ $("resetBtn").onclick = ()=>{
   ["pain","flow","who","constraints","ctxTeam","ctxRole","ctxUsers","ctxIndustry"].forEach(id=>$(id).value="");
   $("noFlow").checked = false;
   document.querySelectorAll(".seg-btn").forEach(b=>b.setAttribute("aria-pressed","false")); deployValue="";
-  currentQuestions = []; lastIntake = null; exampleMode = false; lastQA = []; lastMetrics = null;
+  currentQuestions = []; lastIntake = null; exampleMode = false; lastQA = []; lastMetrics = null; lastAugment = null;
   $("metrics").innerHTML = ""; $("metricsCta").classList.remove("show");
+  $("augment").innerHTML = ""; $("augmentCta").classList.remove("show"); $("bottomExports").classList.remove("show");
   updateCounts();
   $("result").classList.remove("show");
   $("previewBanner").classList.remove("show");
@@ -932,7 +1010,7 @@ window.addEventListener("beforeprint",()=>{
 window.addEventListener("afterprint",()=>{ if(document.__t) document.title=document.__t; });
 
 /* ---- Slides: a branded PptxGenJS deck for the six sections ---- */
-function buildBlueprintDeck(pptx, d, dateStr, beyondRoi){
+function buildBlueprintDeck(pptx, d, dateStr, beyondRoi, augment){
   pptx.defineLayout({name:"AL",width:13.33,height:7.5});
   pptx.layout="AL";
   pptx.author="Alora by Betty Jeng"; pptx.company="Betty Jeng";
@@ -1102,6 +1180,41 @@ function buildBlueprintDeck(pptx, d, dateStr, beyondRoi){
     }
   }
 
+  /* 7c. Augmentation map (only if the user added it), one group per slide */
+  if(augment && Array.isArray(augment.groups) && augment.groups.length){
+    const LVC={ Foundational:{tx:"2E5E9E"}, Growing:{tx:"9A6E1C"}, Advanced:{tx:"3E7A5E"} };
+    augment.groups.forEach((g,i)=>{
+      const sa=pptx.addSlide(); sa.background={color:WHITE};
+      header(sa, i===0?"Augmentation map":"Augmentation map (cont.)","08");
+      const hasFraming = i===0 && augment.framing;
+      if(hasFraming){
+        sa.addText(augment.framing,{x:M,y:1.42,w:W-2*M,h:0.4,fontFace:BODY,fontSize:11,italic:true,color:GOLD,valign:"top",fit:"shrink"});
+      }
+      const top = hasFraming ? 1.95 : 1.55;
+      sa.addText(g.group||"",{x:M,y:top,w:W-2*M,h:0.4,fontFace:DISP,fontSize:18,bold:true,color:INK,valign:"middle"});
+      const row=(lab,val,col)=> val?[{text:lab+"   ",options:{fontFace:DISP,fontSize:10,bold:true,color:col,charSpacing:.4}},
+                                     {text:dot(val),options:{fontFace:BODY,fontSize:11.5,color:SOFT,breakLine:true,paraSpaceAfter:5}}]:[];
+      const rows=[].concat(row("THE FEAR",g.fearNamed,"C5340A"),row("AI TAKES OFF THEIR PLATE",g.aiTakes,DEEP),row("THEY MOVE TOWARD",g.movesToward,"3E7A5E"));
+      sa.addText(rows,{x:M,y:top+0.48,w:W-2*M,h:1.45,valign:"top",fit:"shrink"});
+      // ladder box
+      sa.addShape(RR,{x:M,y:top+2.0,w:W-2*M,h:2.15,fill:{color:CREAM},line:{color:LINE,width:1},rectRadius:0.1});
+      sa.addText("CAPABILITY LADDER, A STARTING CURRICULUM",{x:M+0.25,y:top+2.13,w:W-2*M-0.5,h:0.28,fontFace:DISP,fontSize:10,bold:true,color:DEEP,charSpacing:.5});
+      const rungs=(g.ladder||[]).flatMap(r=>{
+        const c=(LVC[(r.level||"").replace(/[^A-Za-z]/g,"")]||{tx:SOFT}).tx;
+        return [{text:(r.level?"["+r.level+"] ":""),options:{fontFace:DISP,fontSize:10.5,bold:true,color:c}},
+                {text:(r.capability||""),options:{fontFace:DISP,fontSize:11,bold:true,color:INK}},
+                {text:(r.why?"  "+dot(r.why):""),options:{fontFace:BODY,fontSize:10.5,color:SOFT,breakLine:true,paraSpaceAfter:4}}];
+      });
+      sa.addText(rungs,{x:M+0.25,y:top+2.45,w:W-2*M-0.5,h:1.6,valign:"top",fit:"shrink"});
+      if(g.firstStep){
+        sa.addText([{text:"START HERE   ",options:{fontFace:DISP,fontSize:10,bold:true,color:ACCENT,charSpacing:.4}},
+                    {text:dot(g.firstStep),options:{fontFace:BODY,fontSize:11,color:INK}}],
+          {x:M,y:top+4.3,w:W-2*M,h:0.5,valign:"top",fit:"shrink"});
+      }
+      foot(sa);
+    });
+  }
+
   /* 8. Closing */
   s=pptx.addSlide(); s.background={color:WHITE};
   s.addShape(R,{x:0,y:0,w:W,h:0.28,fill:{color:ACCENT}});
@@ -1124,7 +1237,7 @@ function exportDeck(){
   setTimeout(()=>{
     try{
       const pptx=new PptxGenJS();
-      buildBlueprintDeck(pptx, lastBlueprint, fmtDate(), lastMetrics);
+      buildBlueprintDeck(pptx, lastBlueprint, fmtDate(), lastMetrics, lastAugment);
       pptx.writeFile({fileName:"Alora-"+safeName(lastBlueprint.initiative)+".pptx"})
         .then(()=>{ setLoading(btn,false,"Export slides"); toast("Slides downloaded"); })
         .catch(()=>{ setLoading(btn,false,"Export slides"); toast("The slide export hit a snag. Please try again."); });
@@ -1140,7 +1253,8 @@ function buildBpSummary(){
   const d = lastBlueprint || {};
   const dx = d.diagnosis || {};
   const fit = (d.aiFit||[]).map(a=>`- ${a.step} [${a.verdict}]`).join("\n");
-  return `Initiative: ${d.initiative||""}\nRoot: ${dx.rootType||""}${dx.secondaryType?(" + "+dx.secondaryType):""}\nDiagnosis: ${dx.summary||""}\nAI fit:\n${fit}`;
+  const groups = (d.humanAngle||[]).map(g=>`- ${g.group}: worried "${g.worry}"`).join("\n");
+  return `Initiative: ${d.initiative||""}\nRoot: ${dx.rootType||""}${dx.secondaryType?(" + "+dx.secondaryType):""}\nDiagnosis: ${dx.summary||""}\nAI fit:\n${fit}\nGroups affected:\n${groups}`;
 }
 
 function renderMetrics(b){
@@ -1165,15 +1279,8 @@ function renderMetrics(b){
       ${m.good?`<div class="mrow"><span class="mlab">What good looks like</span>${esc(dot(m.good))}</div>`:""}
     </div>`;
   }).join("");
-  const actions = `<div class="metrics-actions">
-      <span class="ma-label">Ready to share?</span>
-      <button class="btn btn-sm" id="pdfBtn2">Export PDF</button>
-      <button class="btn btn-sm" id="deckBtn2">Export slides</button>
-    </div>`;
   $("metrics").innerHTML = section("07","Beyond ROI","A 360 view of success, not just speed",
-    ground + framing + legend + `<div class="metric-cards">${cards}</div>` + actions);
-  $("pdfBtn2").onclick = exportPDF;
-  $("deckBtn2").onclick = exportDeck;
+    ground + framing + legend + `<div class="metric-cards">${cards}</div>`);
   $("metricsCta").classList.remove("show");
 }
 
@@ -1202,6 +1309,59 @@ $("metricsBtn").onclick = ()=>{
   if(!lastIntake){ toast("Generate a Blueprint first."); return; }
   runMetrics($("metricsBtn"));
 };
+
+/* ---------- Go deeper: Augmentation Map (second call) ---------- */
+function renderAugment(a){
+  const framing = a.framing ? `<p class="metrics-framing">${esc(a.framing)}</p>` : "";
+  const cards = (a.groups||[]).map(g=>{
+    const rungs = (g.ladder||[]).map(r=>{
+      const lv=(r.level||"").replace(/[^A-Za-z]/g,"");
+      return `<div class="rung">
+        <span class="rung-lv lv-${lv}">${esc(r.level||"")}</span>
+        <div class="rung-body"><span class="rung-cap">${esc(r.capability||"")}</span>${r.why?`<span class="rung-why">${esc(dot(r.why))}</span>`:""}</div>
+      </div>`;
+    }).join("");
+    return `<div class="aug-card">
+      <div class="aug-group">${esc(g.group||"")}</div>
+      ${g.fearNamed?`<div class="mrow"><span class="mlab fear">The fear</span>${esc(dot(g.fearNamed))}</div>`:""}
+      ${g.aiTakes?`<div class="mrow"><span class="mlab">AI takes off their plate</span>${esc(dot(g.aiTakes))}</div>`:""}
+      ${g.movesToward?`<div class="mrow"><span class="mlab moves">They move toward</span>${esc(dot(g.movesToward))}</div>`:""}
+      ${rungs?`<div class="ladder"><div class="ladder-lab">Capability ladder, a starting curriculum</div>${rungs}</div>`:""}
+      ${g.firstStep?`<div class="firststep"><span class="mlab">Start here</span>${esc(dot(g.firstStep))}</div>`:""}
+    </div>`;
+  }).join("");
+  $("augment").innerHTML = section("08","Augmentation map","From fear to a walkable path forward",
+    framing + `<div class="aug-cards">${cards}</div>`);
+  $("augmentCta").classList.remove("show");
+}
+
+async function runAugment(btn){
+  setLoading(btn, true, "Add augmentation map");
+  try{
+    const data = await postStage({ stage:"augment", intake:lastIntake, bpSummary:buildBpSummary(), website:$("website").value });
+    lastAugment = data.augment;
+    renderAugment(lastAugment);
+    toast("Augmentation map added");
+    $("augment").scrollIntoView({behavior:"smooth",block:"start"});
+  }catch(err){
+    showError(err.message, ()=> runAugment(btn));
+  }finally{
+    setLoading(btn, false, "Add augmentation map");
+  }
+}
+
+$("augmentBtn").onclick = ()=>{
+  if(exampleMode){
+    const b=$("augmentBtn"); setLoading(b,true,"Add augmentation map");
+    setTimeout(()=>{ lastAugment=EXAMPLE_AUGMENT; renderAugment(EXAMPLE_AUGMENT); setLoading(b,false,"Add augmentation map"); toast("Sample map added"); $("augment").scrollIntoView({behavior:"smooth",block:"start"}); }, 450);
+    return;
+  }
+  if(!lastIntake){ toast("Generate a Blueprint first."); return; }
+  runAugment($("augmentBtn"));
+};
+
+$("pdfBtn2").onclick = exportPDF;
+$("deckBtn2").onclick = exportDeck;
 
 /* wire counters */
 function updateCounts(){ ["pain","flow","who","constraints"].forEach(k=>{ const el=$(k); el.dispatchEvent(new Event("input")); }); }

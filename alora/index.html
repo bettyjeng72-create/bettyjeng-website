@@ -166,8 +166,26 @@
   .firststep{margin-top:4px;font-size:13px;color:var(--ink-soft)}
   .firststep .mlab{color:var(--accent);font-family:var(--disp);font-weight:600;margin-right:6px}
 
-  /* single bottom export bar */
-  .bottomexports{display:none;align-items:center;gap:10px;flex-wrap:wrap;margin-top:18px;padding-top:14px;border-top:1px solid var(--line)}
+  /* Reinforcement and incentives */
+  .rf-cards{display:grid;grid-template-columns:1fr 1fr;gap:12px}
+  .rf-card{border:1px solid var(--line);border-radius:12px;padding:15px 16px;background:var(--white)}
+  .rf-chips{display:flex;gap:6px;flex-wrap:wrap;margin-bottom:9px}
+  .rf-type,.rf-mot,.rf-cad{font-family:var(--disp);font-weight:700;font-size:10.5px;letter-spacing:.02em;padding:3px 9px;border-radius:999px;white-space:nowrap}
+  .rf-type.rf-reinforcement{background:var(--auto-bg);color:var(--auto)}
+  .rf-type.rf-incentive{background:#F3ECFA;color:#7A4FA3}
+  .rf-mot{background:var(--assist-bg);color:var(--assist)}
+  .rf-cad{background:var(--tint);color:var(--ink-soft);border:1px solid var(--line)}
+  .rf-move{font-family:var(--disp);font-weight:700;font-size:14.5px;color:var(--ink);margin-bottom:9px;line-height:1.3}
+  .rf-cost{margin-top:10px;padding:11px 13px;background:var(--tint);border:1px solid var(--line);border-radius:10px}
+  .rf-cost-head{display:flex;align-items:center;gap:8px;margin-bottom:6px}
+  .rf-inv{font-family:var(--disp);font-weight:700;font-size:10.5px;padding:2px 9px;border-radius:999px}
+  .rf-inv.inv-Low{background:#EAF1FB;color:#2E5E9E}
+  .rf-inv.inv-Medium{background:var(--gold-bg);color:var(--gold)}
+  .rf-inv.inv-High{background:var(--assist-bg);color:var(--assist)}
+  .rf-cost-lab{font-family:var(--disp);font-weight:600;font-size:9.5px;letter-spacing:.08em;text-transform:uppercase;color:var(--ink-faint)}
+  @media (max-width:680px){ .rf-cards{grid-template-columns:1fr} }
+
+  /* single bottom export bar */  .bottomexports{display:none;align-items:center;gap:10px;flex-wrap:wrap;margin-top:18px;padding-top:14px;border-top:1px solid var(--line)}
   .bottomexports.show{display:flex}
   .bottomexports .be-label{font-family:var(--disp);font-weight:600;font-size:12.5px;color:var(--ink-faint);margin-right:2px}
 
@@ -452,6 +470,15 @@
       </div>
       <div id="augment"></div>
 
+      <div class="godeeper" id="reinforceCta">
+        <div>
+          <div class="gd-title">Make it stick: reinforcement and incentives</div>
+          <div class="gd-sub">The moves that keep the change alive and make people want to adopt it, each with a rough cost signal and how to size it, ready for a funding conversation.</div>
+        </div>
+        <button class="btn btn-primary" id="reinforceBtn">Add reinforcement plan</button>
+      </div>
+      <div id="reinforce"></div>
+
       <div class="bottomexports" id="bottomExports">
         <span class="be-label">Ready to share?</span>
         <button class="btn btn-sm" id="pdfBtn2">Export PDF</button>
@@ -648,7 +675,20 @@ const EXAMPLE_AUGMENT = {
   ]
 };
 
-const $ = (id) => document.getElementById(id);
+/* Canned Reinforcement plan for the offline example, so the sample shows the
+   make-it-stick layer, with intrinsic motivators and estimate-only cost tags. */
+const EXAMPLE_REINFORCE = {
+  framing: "Reinforcement is the step most change efforts skip, and then adoption quietly fades after launch. These moves keep the change alive and make people want it, not just tolerate it.",
+  estimateNote: "These investment levels are directional estimates, not quotes. Plug in your own team size, blended rates, and any vendor prices to get real numbers for a funding conversation.",
+  moves: [
+    { move: "Two-minute micro-trainings that show how to review and approve an AI summary well, released weekly for the first month.", type: "Reinforcement", motivator: "Mastery", locksIn: "The review-and-submit-in-one-step habit, so reps trust their own judgment on AI output.", cadence: "Weekly", owner: "Sales enablement or change lead", investment: "Low", whatItTakes: "A few hours to record short clips once, plus a couple of minutes of rep time each week to watch.", howToSize: "One-time: recording hours times the creator's rate. Ongoing: 2 minutes times reps times their blended rate per week." },
+    { move: "A friendly streak marker in the CRM showing how many calls in a row a rep let the AI draft, with a small team-visible milestone at ten.", type: "Incentive", motivator: "Progress", locksIn: "Reps choosing the AI draft by default instead of writing from scratch.", cadence: "Ongoing", owner: "Sales ops", investment: "Medium", whatItTakes: "A one-time CRM or dashboard config to show a streak counter, then it runs itself.", howToSize: "Get a one-time build estimate from your CRM admin or vendor; after that, ongoing cost is near zero." },
+    { move: "A weekly manager ritual of one specific, positive note per rep on AI note quality, framed as coaching, not compliance.", type: "Reinforcement", motivator: "Recognition", locksIn: "Closing the trust loop so reps rely on AI notes rather than rewriting out of habit.", cadence: "Weekly", owner: "Sales managers", investment: "Low", whatItTakes: "About 10 to 15 minutes of manager time per week, using data the CRM already tracks, no new tools.", howToSize: "Multiply the weekly minutes by your number of managers by their blended hourly rate." },
+    { move: "An 'AI notes champion' role for two or three respected reps per team who help peers and help shape the notetaker prompts.", type: "Incentive", motivator: "Autonomy", locksIn: "Voluntary reuse and peer-to-peer trust in the AI notes.", cadence: "One-time", owner: "Sales leadership", investment: "Low", whatItTakes: "Mostly recognition and a little of the champions' time; no direct spend unless you add an optional perk.", howToSize: "If you add a perk or stipend, multiply it by the number of champions; otherwise the cost is their time." },
+    { move: "A simple progress dashboard showing time reclaimed and adoption trending up, at both team and personal level.", type: "Reinforcement", motivator: "Progress", locksIn: "Sustained adoption, because reps see their own momentum and want to keep it.", cadence: "Ongoing", owner: "Sales ops or analytics", investment: "Medium", whatItTakes: "A one-time dashboard build on data you already capture, then it updates automatically.", howToSize: "Get a one-time analyst or vendor build estimate; ongoing maintenance is minimal." },
+    { move: "Quarterly recognition for reps who grew most in AI-note quality or helped peers, celebrated in a team setting, never a bottom-ranking leaderboard.", type: "Incentive", motivator: "Belonging", locksIn: "Continued growth and a sense that the team is in this together.", cadence: "Monthly", owner: "Sales leadership", investment: "Low", whatItTakes: "Manager time to select, plus a small optional reward; no tooling required.", howToSize: "Add any reward value times the number of reps recognized per quarter." }
+  ]
+};
 const esc = (s) => String(s == null ? "" : s).replace(/[&<>"]/g, c => ({ "&":"&amp;","<":"&lt;",">":"&gt;","\"":"&quot;" }[c]));
 /* Exactly one terminal period, so model text that already ends in "." doesn't double up. */
 const dot = (s) => { s = String(s == null ? "" : s).trim(); return s ? s.replace(/[.!?]+$/, "") + "." : ""; };
@@ -775,6 +815,7 @@ let lastBlueprint = null;    // the Blueprint currently on screen, for exports
 let lastQA = [];             // the clarifying Q&A that fed the current Blueprint
 let lastMetrics = null;      // the Beyond-ROI metrics, once the user adds them
 let lastAugment = null;      // the Augmentation Map, once the user adds it
+let lastReinforce = null;    // the Reinforcement plan, once the user adds it
 let lastIntake = null;       // the intake we sent, reused at generate time
 
 /* Defensive normalize so a slightly-off model response still renders cleanly. */
@@ -836,10 +877,11 @@ async function postStage(payload){
 /* Show a finished Blueprint. keepPreview leaves the sample banner up (offline demo). */
 function showResult(blueprint, keepPreview){
   renderBlueprint(blueprint);
-  lastMetrics = null; lastAugment = null;
-  $("metrics").innerHTML = ""; $("augment").innerHTML = "";
+  lastMetrics = null; lastAugment = null; lastReinforce = null;
+  $("metrics").innerHTML = ""; $("augment").innerHTML = ""; $("reinforce").innerHTML = "";
   $("metricsCta").classList.add("show");
   $("augmentCta").classList.add("show");
+  $("reinforceCta").classList.add("show");
   $("bottomExports").classList.add("show");
   if(!keepPreview) $("previewBanner").classList.remove("show");
   $("clarifyCard").classList.remove("show");
@@ -952,9 +994,10 @@ $("resetBtn").onclick = ()=>{
   ["pain","flow","who","constraints","ctxTeam","ctxRole","ctxUsers","ctxIndustry"].forEach(id=>$(id).value="");
   $("noFlow").checked = false;
   document.querySelectorAll(".seg-btn").forEach(b=>b.setAttribute("aria-pressed","false")); deployValue="";
-  currentQuestions = []; lastIntake = null; exampleMode = false; lastQA = []; lastMetrics = null; lastAugment = null;
+  currentQuestions = []; lastIntake = null; exampleMode = false; lastQA = []; lastMetrics = null; lastAugment = null; lastReinforce = null;
   $("metrics").innerHTML = ""; $("metricsCta").classList.remove("show");
   $("augment").innerHTML = ""; $("augmentCta").classList.remove("show"); $("bottomExports").classList.remove("show");
+  $("reinforce").innerHTML = ""; $("reinforceCta").classList.remove("show");
   updateCounts();
   $("result").classList.remove("show");
   $("previewBanner").classList.remove("show");
@@ -1010,7 +1053,7 @@ window.addEventListener("beforeprint",()=>{
 window.addEventListener("afterprint",()=>{ if(document.__t) document.title=document.__t; });
 
 /* ---- Slides: a branded PptxGenJS deck for the six sections ---- */
-function buildBlueprintDeck(pptx, d, dateStr, beyondRoi, augment){
+function buildBlueprintDeck(pptx, d, dateStr, beyondRoi, augment, reinforce){
   pptx.defineLayout({name:"AL",width:13.33,height:7.5});
   pptx.layout="AL";
   pptx.author="Alora by Betty Jeng"; pptx.company="Betty Jeng";
@@ -1215,6 +1258,42 @@ function buildBlueprintDeck(pptx, d, dateStr, beyondRoi, augment){
     });
   }
 
+  /* 7d. Reinforcement and incentives (only if added), 2 cards per slide */
+  if(reinforce && Array.isArray(reinforce.moves) && reinforce.moves.length){
+    const mv=reinforce.moves;
+    const INV={ Low:{bg:"EAF1FB",tx:"2E5E9E"}, Medium:{bg:"F6E7CB",tx:"9A6E1C"}, High:{bg:"FBE2D6",tx:"C5340A"} };
+    for(let i=0;i<mv.length;i+=2){
+      const sr=pptx.addSlide(); sr.background={color:WHITE};
+      header(sr, i===0?"Reinforcement and incentives":"Reinforcement (cont.)","09");
+      const hasFraming = i===0 && reinforce.framing;
+      if(hasFraming){
+        sr.addText(reinforce.framing,{x:M,y:1.42,w:W-2*M,h:0.4,fontFace:BODY,fontSize:11,italic:true,color:GOLD,valign:"top",fit:"shrink"});
+      }
+      const top = hasFraming ? 1.98 : 1.6;
+      mv.slice(i,i+2).forEach((m,j)=>{
+        const cy=top+j*2.5, ch=2.35, cw=W-2*M;
+        const isInc=(m.type||"").toLowerCase().indexOf("incentive")>=0;
+        const invC=INV[(m.investment||"").replace(/[^A-Za-z]/g,"")]||{bg:CREAM,tx:SOFT};
+        sr.addShape(RR,{x:M,y:cy,w:cw,h:ch,fill:{color:CREAM},line:{color:LINE,width:1},rectRadius:0.1});
+        // chips row: type + motivator + cadence, top-right
+        sr.addText((m.type||"")+(m.motivator?("   ·   "+m.motivator):"")+(m.cadence?("   ·   "+m.cadence):""),
+          {x:M+cw-5.4,y:cy+0.16,w:5.1,h:0.3,align:"right",valign:"middle",fontFace:DISP,fontSize:9,bold:true,color:isInc?"7A4FA3":"3E7A5E"});
+        sr.addText(m.move||"",{x:M+0.3,y:cy+0.16,w:cw-5.7,h:0.5,fontFace:DISP,fontSize:12.5,bold:true,color:INK,valign:"top",fit:"shrink"});
+        const row=(lab,val,col)=> val?[{text:lab+"   ",options:{fontFace:DISP,fontSize:9,bold:true,color:col||DEEP,charSpacing:.4}},
+                                       {text:dot(val),options:{fontFace:BODY,fontSize:10.5,color:SOFT,breakLine:true,paraSpaceAfter:3}}]:[];
+        const runs=[].concat(
+          row("LOCKS IN",m.locksIn),
+          row("OWNER",m.owner),
+          [{text:(m.investment?m.investment.toUpperCase()+" INVESTMENT (ESTIMATE)   ":""),options:{fontFace:DISP,fontSize:9,bold:true,color:invC.tx,charSpacing:.4,breakLine:true,paraSpaceAfter:2}}],
+          row("WHAT IT TAKES",m.whatItTakes),
+          row("HOW TO SIZE",m.howToSize,GOLD)
+        );
+        sr.addText(runs,{x:M+0.3,y:cy+0.72,w:cw-0.6,h:ch-0.85,valign:"top",fit:"shrink"});
+      });
+      foot(sr);
+    }
+  }
+
   /* 8. Closing */
   s=pptx.addSlide(); s.background={color:WHITE};
   s.addShape(R,{x:0,y:0,w:W,h:0.28,fill:{color:ACCENT}});
@@ -1237,7 +1316,7 @@ function exportDeck(){
   setTimeout(()=>{
     try{
       const pptx=new PptxGenJS();
-      buildBlueprintDeck(pptx, lastBlueprint, fmtDate(), lastMetrics, lastAugment);
+      buildBlueprintDeck(pptx, lastBlueprint, fmtDate(), lastMetrics, lastAugment, lastReinforce);
       pptx.writeFile({fileName:"Alora-"+safeName(lastBlueprint.initiative)+".pptx"})
         .then(()=>{ setLoading(btn,false,"Export slides"); toast("Slides downloaded"); })
         .catch(()=>{ setLoading(btn,false,"Export slides"); toast("The slide export hit a snag. Please try again."); });
@@ -1362,6 +1441,59 @@ $("augmentBtn").onclick = ()=>{
 
 $("pdfBtn2").onclick = exportPDF;
 $("deckBtn2").onclick = exportDeck;
+
+/* ---------- Go deeper: Reinforcement and Incentivizing (second call) ---------- */
+function renderReinforce(r){
+  const framing = r.framing ? `<p class="metrics-framing">${esc(r.framing)}</p>` : "";
+  const note = r.estimateNote ? `<p class="metrics-ground">📊 ${esc(dot(r.estimateNote))}</p>` : "";
+  const cards = (r.moves||[]).map(m=>{
+    const typ = (m.type||"").toLowerCase().indexOf("incentive")>=0 ? "incentive" : "reinforcement";
+    const inv = (m.investment||"").replace(/[^A-Za-z]/g,"");
+    return `<div class="rf-card">
+      <div class="rf-chips">
+        <span class="rf-type rf-${typ}">${esc(m.type||"")}</span>
+        ${m.motivator?`<span class="rf-mot">${esc(m.motivator)}</span>`:""}
+        ${m.cadence?`<span class="rf-cad">${esc(m.cadence)}</span>`:""}
+      </div>
+      <div class="rf-move">${esc(m.move||"")}</div>
+      ${m.locksIn?`<div class="mrow"><span class="mlab">Locks in</span>${esc(dot(m.locksIn))}</div>`:""}
+      ${m.owner?`<div class="mrow"><span class="mlab">Owner</span>${esc(m.owner)}</div>`:""}
+      <div class="rf-cost">
+        <div class="rf-cost-head">${m.investment?`<span class="rf-inv inv-${inv}">${esc(m.investment)} investment</span>`:""}<span class="rf-cost-lab">estimate</span></div>
+        ${m.whatItTakes?`<div class="mrow"><span class="mlab">What it takes</span>${esc(dot(m.whatItTakes))}</div>`:""}
+        ${m.howToSize?`<div class="mrow val"><span class="mlab">How to size it</span>${esc(dot(m.howToSize))}</div>`:""}
+      </div>
+    </div>`;
+  }).join("");
+  $("reinforce").innerHTML = section("09","Reinforcement and incentives","Make it stick, and make people want it",
+    framing + note + `<div class="rf-cards">${cards}</div>`);
+  $("reinforceCta").classList.remove("show");
+}
+
+async function runReinforce(btn){
+  setLoading(btn, true, "Add reinforcement plan");
+  try{
+    const data = await postStage({ stage:"reinforce", intake:lastIntake, bpSummary:buildBpSummary(), website:$("website").value });
+    lastReinforce = data.reinforce;
+    renderReinforce(lastReinforce);
+    toast("Reinforcement plan added");
+    $("reinforce").scrollIntoView({behavior:"smooth",block:"start"});
+  }catch(err){
+    showError(err.message, ()=> runReinforce(btn));
+  }finally{
+    setLoading(btn, false, "Add reinforcement plan");
+  }
+}
+
+$("reinforceBtn").onclick = ()=>{
+  if(exampleMode){
+    const b=$("reinforceBtn"); setLoading(b,true,"Add reinforcement plan");
+    setTimeout(()=>{ lastReinforce=EXAMPLE_REINFORCE; renderReinforce(EXAMPLE_REINFORCE); setLoading(b,false,"Add reinforcement plan"); toast("Sample plan added"); $("reinforce").scrollIntoView({behavior:"smooth",block:"start"}); }, 450);
+    return;
+  }
+  if(!lastIntake){ toast("Generate a Blueprint first."); return; }
+  runReinforce($("reinforceBtn"));
+};
 
 /* wire counters */
 function updateCounts(){ ["pain","flow","who","constraints"].forEach(k=>{ const el=$(k); el.dispatchEvent(new Event("input")); }); }

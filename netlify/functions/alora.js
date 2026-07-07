@@ -303,7 +303,51 @@ specific workflow, not generic KPIs. Do not include cadence, formulas, or baseli
   ];
 }
 
-/* ------------------------------------------------------- OpenRouter call */
+/* ------------------------------------------------- stage: AUGMENT (go deeper) */
+function augmentMessages(brief, bpSummary) {
+  const sys = `You are Alora, adding an Augmentation Map to a Blueprint you already produced.
+${BRAND}
+
+The people affected by this change are afraid, often quietly, that AI is coming for their
+jobs. Your job is to replace that fear with a real, walkable path: what changes, what
+higher-value work they move toward, and the concrete capabilities to build to get there.
+Not "you're safe," which rings hollow. A specific upgraded role and the ladder to reach it.
+
+Think it through internally first: for THIS workflow and these roles, what genuinely
+leaves their plate, what higher-value work opens up, and what someone would actually need
+to learn to thrive in the new version of their role. Be honest and specific, never generic
+reassurance. If the honest answer is that a role shrinks, say what it shifts toward rather
+than pretending nothing changes.
+
+Cover the 2 or 3 groups most affected. Go deep on each rather than wide across many.
+
+Return ONLY valid JSON, no prose, no code fences, in exactly this shape:
+{
+  "framing": "one plain sentence: augmentation is a path, not a promise, and here is theirs",
+  "groups": [
+    {
+      "group": "who this is",
+      "fearNamed": "their real fear, said plainly and without softening",
+      "aiTakes": "the specific drudgery AI lifts off their plate",
+      "movesToward": "the higher-value work they move toward, their upgraded role in concrete terms",
+      "ladder": [
+        { "capability": "a skill to build", "level": "Foundational|Growing|Advanced", "why": "one line on why this skill matters in the new role" }
+      ],
+      "firstStep": "the single most useful thing to learn first, so no one is paralyzed"
+    }
+  ]
+}
+
+Give 2 to 3 groups. Each ladder has 3 to 5 capabilities, sequenced from Foundational to
+Advanced, so a change leader could hand it to L&D as a starting curriculum. Keep every
+string to one clear sentence. Ground everything in the specific workflow, never generic
+KPIs or stock advice.`;
+
+  return [
+    { role: "system", content: sys },
+    { role: "user", content: brief + "\n\nBLUEPRINT SO FAR:\n" + bpSummary }
+  ];
+}
 /* Netlify's free tier kills a function at 10 seconds. We self-limit to a budget
    under that so Alora always returns a clean, friendly error instead of a silent
    platform timeout (which gives the user a generic message and logs nothing). */
@@ -451,6 +495,20 @@ exports.handler = async (event) => {
       }
       out.metrics = out.metrics.slice(0, 6);
       return reply(200, { beyondRoi: out }, origin);
+    }
+
+    if (stage === "augment") {
+      const bpSummary = clamp(body.bpSummary, 1800);
+      let out = await generateJson(augmentMessages(brief, bpSummary), 2000);
+      if (out && !Array.isArray(out.groups) && typeof out === "object") {
+        out = out.augmentation || out.augmentationMap || out.result || out;
+      }
+      if (!out || !Array.isArray(out.groups) || !out.groups.length) {
+        console.error("alora augment: no usable groups", out ? "parsed-but-empty" : "unparseable");
+        return reply(502, { error: "Alora couldn't shape the Augmentation Map that time. Please try again." }, origin);
+      }
+      out.groups = out.groups.slice(0, 3);
+      return reply(200, { augment: out }, origin);
     }
 
     return reply(400, { error: "Unknown stage." }, origin);

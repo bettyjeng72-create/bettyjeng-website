@@ -689,6 +689,7 @@ const EXAMPLE_REINFORCE = {
     { move: "Quarterly recognition for reps who grew most in AI-note quality or helped peers, celebrated in a team setting, never a bottom-ranking leaderboard.", type: "Incentive", motivator: "Belonging", locksIn: "Continued growth and a sense that the team is in this together.", cadence: "Monthly", owner: "Sales leadership", investment: "Low", whatItTakes: "Manager time to select, plus a small optional reward; no tooling required.", howToSize: "Add any reward value times the number of reps recognized per quarter." }
   ]
 };
+const $ = (id) => document.getElementById(id);
 const esc = (s) => String(s == null ? "" : s).replace(/[&<>"]/g, c => ({ "&":"&amp;","<":"&lt;",">":"&gt;","\"":"&quot;" }[c]));
 /* Exactly one terminal period, so model text that already ends in "." doesn't double up. */
 const dot = (s) => { s = String(s == null ? "" : s).trim(); return s ? s.replace(/[.!?]+$/, "") + "." : ""; };

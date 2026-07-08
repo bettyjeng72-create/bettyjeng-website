@@ -1276,20 +1276,21 @@ function buildBlueprintDeck(pptx, d, dateStr, beyondRoi, augment, reinforce){
         const isInc=(m.type||"").toLowerCase().indexOf("incentive")>=0;
         const invC=INV[(m.investment||"").replace(/[^A-Za-z]/g,"")]||{bg:CREAM,tx:SOFT};
         sr.addShape(RR,{x:M,y:cy,w:cw,h:ch,fill:{color:CREAM},line:{color:LINE,width:1},rectRadius:0.1});
-        // chips row: type + motivator + cadence, top-right
+        // chips on their own line so a long move title gets full width
         sr.addText((m.type||"")+(m.motivator?("   ·   "+m.motivator):"")+(m.cadence?("   ·   "+m.cadence):""),
-          {x:M+cw-5.4,y:cy+0.16,w:5.1,h:0.3,align:"right",valign:"middle",fontFace:DISP,fontSize:9,bold:true,color:isInc?"7A4FA3":"3E7A5E"});
-        sr.addText(m.move||"",{x:M+0.3,y:cy+0.16,w:cw-5.7,h:0.5,fontFace:DISP,fontSize:12.5,bold:true,color:INK,valign:"top",fit:"shrink"});
+          {x:M+0.3,y:cy+0.15,w:cw-0.6,h:0.26,valign:"middle",fontFace:DISP,fontSize:9,bold:true,color:isInc?"7A4FA3":"3E7A5E",charSpacing:.3});
+        // title + body as ONE flowing block, so the gap after the heading is a
+        // consistent paragraph space no matter how many lines the title wraps
         const row=(lab,val,col)=> val?[{text:lab+"   ",options:{fontFace:DISP,fontSize:9,bold:true,color:col||DEEP,charSpacing:.4}},
                                        {text:dot(val),options:{fontFace:BODY,fontSize:10.5,color:SOFT,breakLine:true,paraSpaceAfter:3}}]:[];
-        const runs=[].concat(
+        const block=[{text:m.move||"",options:{fontFace:DISP,fontSize:12.5,bold:true,color:INK,breakLine:true,paraSpaceAfter:9}}].concat(
           row("LOCKS IN",m.locksIn),
           row("OWNER",m.owner),
           [{text:(m.investment?m.investment.toUpperCase()+" INVESTMENT (ESTIMATE)   ":""),options:{fontFace:DISP,fontSize:9,bold:true,color:invC.tx,charSpacing:.4,breakLine:true,paraSpaceAfter:2}}],
           row("WHAT IT TAKES",m.whatItTakes),
           row("HOW TO SIZE",m.howToSize,GOLD)
         );
-        sr.addText(runs,{x:M+0.3,y:cy+0.72,w:cw-0.6,h:ch-0.85,valign:"top",fit:"shrink"});
+        sr.addText(block,{x:M+0.3,y:cy+0.44,w:cw-0.6,h:ch-0.58,valign:"top",fit:"shrink"});
       });
       foot(sr);
     }

@@ -180,7 +180,13 @@ ${goalMode ? "- Since there is no workflow yet, ask what the current manual proc
 Rules:
 - Pick only the questions that matter for THIS intake. Skip what is already answered.
 - Each question must be answerable by a non-specialist in a sentence or two. No jargon.
-- Warm and curious, never an interrogation.
+- Ask about concrete facts and specifics, not feelings or hypotheticals. Do not ask
+  "does it feel slower" or "does anything break." Ask plainly, for example "does the AI
+  summary save into the CRM automatically, or does a rep have to submit it manually."
+- Never presuppose a problem the user did not describe. If you are probing a possible
+  cause, ask about the fact, not the imagined symptom.
+- Keep each question to one clear sentence. Warm and curious, never an interrogation.
+- The industry or context should sharpen your questions, never make them vaguer or odder.
 
 Return ONLY valid JSON, no prose, no code fences, in exactly this shape:
 {"questions":[{"id":"q1","question":"...","why":"one short line on why you're asking"}]}`;
@@ -292,10 +298,12 @@ Return ONLY valid JSON, no prose, no code fences, in exactly this shape:
   ]
 }
 
-Give 4 to 6 metrics spread across at least three lenses, with Human and Quality both
+Give 4 to 5 metrics spread across at least three lenses, with Human and Quality both
 represented. shortName is a crisp chip label (e.g. "Selling Time Reclaimed"); metric is
-the fuller line. Keep every string to one short sentence. Ground each metric in the
-specific workflow, not generic KPIs. Do not include cadence, formulas, or baselines.`;
+the fuller line. Keep every string to one sentence. Keep "value" concrete but under about
+35 words so nothing gets cut off. Ground each metric in the specific workflow, not generic
+KPIs. Do not include cadence, formulas, or baselines. Finish and close the JSON cleanly;
+a complete, concise set beats a longer one that gets truncated.`;
 
   return [
     { role: "system", content: sys },
@@ -338,10 +346,10 @@ Return ONLY valid JSON, no prose, no code fences, in exactly this shape:
   ]
 }
 
-Give 2 to 3 groups. Each ladder has 3 to 5 capabilities, sequenced from Foundational to
+Give 2 to 3 groups. Each ladder has 3 to 4 capabilities, sequenced from Foundational to
 Advanced, so a change leader could hand it to L&D as a starting curriculum. Keep every
-string to one clear sentence. Ground everything in the specific workflow, never generic
-KPIs or stock advice.`;
+string to one short sentence, and keep each "why" to a brief phrase. Ground everything in
+the specific workflow, never generic KPIs or stock advice.`;
 
   return [
     { role: "system", content: sys },
@@ -549,7 +557,7 @@ exports.handler = async (event) => {
 
     if (stage === "metrics") {
       const bpSummary = clamp(body.bpSummary, 1500);
-      let out = await generateJson(metricsMessages(brief, bpSummary), 1600);
+      let out = await generateJson(metricsMessages(brief, bpSummary), 1900);
       if (out && !Array.isArray(out.metrics) && typeof out === "object") {
         out = out.beyondRoi || out.result || out;
       }
@@ -557,7 +565,7 @@ exports.handler = async (event) => {
         console.error("alora metrics: no usable metrics", out ? "parsed-but-empty" : "unparseable");
         return reply(502, { error: "Alora couldn't shape the success metrics that time. Please try again." }, origin);
       }
-      out.metrics = out.metrics.slice(0, 6);
+      out.metrics = out.metrics.slice(0, 5);
       return reply(200, { beyondRoi: out }, origin);
     }
 

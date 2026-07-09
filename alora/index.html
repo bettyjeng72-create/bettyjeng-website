@@ -1209,16 +1209,17 @@ function buildBlueprintDeck(pptx, d, dateStr, beyondRoi, augment, reinforce){
         const cy=cardTop+j*2.5, ch=2.35, cw=W-2*M;
         const lensC=LENS[(m.lens||"").replace(/[^A-Za-z]/g,"")]||{bg:CREAM,tx:SOFT};
         sm.addShape(RR,{x:M,y:cy,w:cw,h:ch,fill:{color:CREAM},line:{color:LINE,width:1},rectRadius:0.1});
-        sm.addText(m.shortName||m.metric||"",{x:M+0.3,y:cy+0.16,w:cw-3.2,h:0.35,fontFace:DISP,fontSize:14,bold:true,color:DEEP,valign:"middle"});
-        // lens + signal pill area, top right
-        sm.addShape(RR,{x:M+cw-2.7,y:cy+0.18,w:1.5,h:0.32,fill:{color:lensC.bg},rectRadius:0.16});
-        sm.addText(m.lens||"",{x:M+cw-2.7,y:cy+0.18,w:1.5,h:0.32,align:"center",valign:"middle",fontFace:DISP,fontSize:9,bold:true,color:lensC.tx});
-        sm.addText(m.signal||"",{x:M+cw-1.1,y:cy+0.18,w:0.9,h:0.32,align:"center",valign:"middle",fontFace:DISP,fontSize:9,bold:true,color:FAINT});
-        sm.addText(m.metric||"",{x:M+0.3,y:cy+0.52,w:cw-0.6,h:0.32,fontFace:BODY,fontSize:11,italic:true,color:INK,valign:"middle"});
-        const row=(lab,val)=> val?[{text:lab+"  ",options:{fontFace:DISP,fontSize:9,bold:true,color:lab==="LONG-TERM VALUE"?GOLD:DEEP,charSpacing:.5}},
-                                    {text:dot(val),options:{fontFace:BODY,fontSize:10.5,color:SOFT,breakLine:true,paraSpaceAfter:2}}]:[];
-        const runs=[].concat(row("WHAT IT IS",m.definition),row("WHY IT MATTERS",m.why),row("LONG-TERM VALUE",m.value),row("WHAT GOOD LOOKS LIKE",m.good));
-        sm.addText(runs,{x:M+0.3,y:cy+0.92,w:cw-0.6,h:ch-1.05,valign:"top",fit:"shrink"});
+        sm.addText(m.shortName||m.metric||"",{x:M+0.3,y:cy+0.18,w:cw-3.4,h:0.34,fontFace:DISP,fontSize:13.5,bold:true,color:DEEP,valign:"middle",fit:"shrink"});
+        // lens + signal pill, top right
+        sm.addShape(RR,{x:M+cw-2.7,y:cy+0.2,w:1.5,h:0.3,fill:{color:lensC.bg},rectRadius:0.15});
+        sm.addText(m.lens||"",{x:M+cw-2.7,y:cy+0.2,w:1.5,h:0.3,align:"center",valign:"middle",fontFace:DISP,fontSize:9,bold:true,color:lensC.tx});
+        sm.addText(m.signal||"",{x:M+cw-1.1,y:cy+0.2,w:0.9,h:0.3,align:"center",valign:"middle",fontFace:DISP,fontSize:9,bold:true,color:FAINT});
+        // metric line + rows as ONE flowing block, so long text has room and even spacing
+        const row=(lab,val)=> val?[{text:lab+"   ",options:{fontFace:DISP,fontSize:9,bold:true,color:lab==="LONG-TERM VALUE"?GOLD:DEEP,charSpacing:.4}},
+                                    {text:dot(val),options:{fontFace:BODY,fontSize:10,color:SOFT,breakLine:true,paraSpaceAfter:3}}]:[];
+        const block=[{text:m.metric||"",options:{fontFace:BODY,fontSize:10.5,italic:true,color:INK,breakLine:true,paraSpaceAfter:7}}].concat(
+          row("WHAT IT IS",m.definition),row("WHY IT MATTERS",m.why),row("LONG-TERM VALUE",m.value),row("WHAT GOOD LOOKS LIKE",m.good));
+        sm.addText(block,{x:M+0.3,y:cy+0.62,w:cw-0.6,h:ch-0.76,valign:"top",fit:"shrink"});
       });
       foot(sm);
     }
@@ -1237,23 +1238,23 @@ function buildBlueprintDeck(pptx, d, dateStr, beyondRoi, augment, reinforce){
       const top = hasFraming ? 1.95 : 1.55;
       sa.addText(g.group||"",{x:M,y:top,w:W-2*M,h:0.4,fontFace:DISP,fontSize:18,bold:true,color:INK,valign:"middle"});
       const row=(lab,val,col)=> val?[{text:lab+"   ",options:{fontFace:DISP,fontSize:10,bold:true,color:col,charSpacing:.4}},
-                                     {text:dot(val),options:{fontFace:BODY,fontSize:11.5,color:SOFT,breakLine:true,paraSpaceAfter:5}}]:[];
+                                     {text:dot(val),options:{fontFace:BODY,fontSize:11,color:SOFT,breakLine:true,paraSpaceAfter:4}}]:[];
       const rows=[].concat(row("THE FEAR",g.fearNamed,"C5340A"),row("AI TAKES OFF THEIR PLATE",g.aiTakes,DEEP),row("THEY MOVE TOWARD",g.movesToward,"3E7A5E"));
-      sa.addText(rows,{x:M,y:top+0.48,w:W-2*M,h:1.45,valign:"top",fit:"shrink"});
+      sa.addText(rows,{x:M,y:top+0.46,w:W-2*M,h:1.3,valign:"top",fit:"shrink"});
       // ladder box
-      sa.addShape(RR,{x:M,y:top+2.0,w:W-2*M,h:2.15,fill:{color:CREAM},line:{color:LINE,width:1},rectRadius:0.1});
-      sa.addText("CAPABILITY LADDER, A STARTING CURRICULUM",{x:M+0.25,y:top+2.13,w:W-2*M-0.5,h:0.28,fontFace:DISP,fontSize:10,bold:true,color:DEEP,charSpacing:.5});
+      sa.addShape(RR,{x:M,y:top+1.85,w:W-2*M,h:2.25,fill:{color:CREAM},line:{color:LINE,width:1},rectRadius:0.1});
+      sa.addText("CAPABILITY LADDER, A STARTING CURRICULUM",{x:M+0.25,y:top+1.97,w:W-2*M-0.5,h:0.28,fontFace:DISP,fontSize:10,bold:true,color:DEEP,charSpacing:.5});
       const rungs=(g.ladder||[]).flatMap(r=>{
         const c=(LVC[(r.level||"").replace(/[^A-Za-z]/g,"")]||{tx:SOFT}).tx;
         return [{text:(r.level?"["+r.level+"] ":""),options:{fontFace:DISP,fontSize:10.5,bold:true,color:c}},
-                {text:(r.capability||""),options:{fontFace:DISP,fontSize:11,bold:true,color:INK}},
+                {text:dot(r.capability),options:{fontFace:DISP,fontSize:11,bold:true,color:INK}},
                 {text:(r.why?"  "+dot(r.why):""),options:{fontFace:BODY,fontSize:10.5,color:SOFT,breakLine:true,paraSpaceAfter:4}}];
       });
-      sa.addText(rungs,{x:M+0.25,y:top+2.45,w:W-2*M-0.5,h:1.6,valign:"top",fit:"shrink"});
+      sa.addText(rungs,{x:M+0.25,y:top+2.27,w:W-2*M-0.5,h:1.7,valign:"top",fit:"shrink"});
       if(g.firstStep){
         sa.addText([{text:"START HERE   ",options:{fontFace:DISP,fontSize:10,bold:true,color:ACCENT,charSpacing:.4}},
                     {text:dot(g.firstStep),options:{fontFace:BODY,fontSize:11,color:INK}}],
-          {x:M,y:top+4.3,w:W-2*M,h:0.5,valign:"top",fit:"shrink"});
+          {x:M,y:top+4.2,w:W-2*M,h:0.5,valign:"top",fit:"shrink"});
       }
       foot(sa);
     });
@@ -1286,7 +1287,7 @@ function buildBlueprintDeck(pptx, d, dateStr, beyondRoi, augment, reinforce){
         const block=[{text:m.move||"",options:{fontFace:DISP,fontSize:12.5,bold:true,color:INK,breakLine:true,paraSpaceAfter:9}}].concat(
           row("LOCKS IN",m.locksIn),
           row("OWNER",m.owner),
-          [{text:(m.investment?m.investment.toUpperCase()+" INVESTMENT (ESTIMATE)   ":""),options:{fontFace:DISP,fontSize:9,bold:true,color:invC.tx,charSpacing:.4,breakLine:true,paraSpaceAfter:2}}],
+          [{text:(m.investment?m.investment.toUpperCase()+" INVESTMENT (ESTIMATE)   ":""),options:{fontFace:DISP,fontSize:9,bold:true,color:invC.tx,charSpacing:.4,breakLine:true,paraSpaceBefore:7,paraSpaceAfter:4}}],
           row("WHAT IT TAKES",m.whatItTakes),
           row("HOW TO SIZE",m.howToSize,GOLD)
         );
@@ -1399,7 +1400,7 @@ function renderAugment(a){
       const lv=(r.level||"").replace(/[^A-Za-z]/g,"");
       return `<div class="rung">
         <span class="rung-lv lv-${lv}">${esc(r.level||"")}</span>
-        <div class="rung-body"><span class="rung-cap">${esc(r.capability||"")}</span>${r.why?`<span class="rung-why">${esc(dot(r.why))}</span>`:""}</div>
+        <div class="rung-body"><span class="rung-cap">${esc(dot(r.capability))}</span>${r.why?`<span class="rung-why">${esc(dot(r.why))}</span>`:""}</div>
       </div>`;
     }).join("");
     return `<div class="aug-card">

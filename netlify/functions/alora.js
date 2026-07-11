@@ -216,6 +216,23 @@ Think it through internally first: name the real root cause (process, tool, skil
 people, often a blend), redraw the workflow lean, and make sure the redrawn workflow
 SHOWS the AI step rather than describing only the old manual process. Decide honestly
 where AI should automate, where it should assist a human, and where to keep it fully human.
+
+Verdict definitions, use them precisely:
+- Automate: the system does this step with NO human action. Examples: the tool records the
+  call on its own, the summary posts to the CRM automatically. A step where a person clicks,
+  types, chooses, reviews, or approves is NOT Automate.
+- Human-AI assist: the person and AI work together, for example AI drafts and the person
+  edits or approves.
+- Keep human: human judgment, empathy, or the relationship carries the step.
+
+Consistency rule, this matters a lot: the after workflow, the fixes, and the aiFit verdicts
+must tell ONE coherent story. If your recommendation is to make a tool on by default so no
+one has to remember it, then in the after workflow describe it starting automatically, not
+as "the rep clicks start," and label that automatic start as Automate. Never keep a manual
+click in the workflow and also call it Automate. A required manual step is a behavioral
+change with some friction, not automation, so name it honestly rather than dressing it up
+as automated. Do not describe the same step as manual in one section and automated in
+another. Before you finish, make sure no section contradicts another.
 ${goalMode ? "There is no existing workflow, so propose a sensible starting workflow as the 'before', then the leaner version as the 'after'." : ""}
 
 Fidelity rule for the "before" steps: stay faithful to what the user actually wrote.

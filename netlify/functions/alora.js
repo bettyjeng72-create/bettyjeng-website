@@ -232,7 +232,22 @@ as "the rep clicks start," and label that automatic start as Automate. Never kee
 click in the workflow and also call it Automate. A required manual step is a behavioral
 change with some friction, not automation, so name it honestly rather than dressing it up
 as automated. Do not describe the same step as manual in one section and automated in
-another. Before you finish, make sure no section contradicts another.
+another.
+
+FINAL CONSISTENCY AUDIT, run this on your draft before you return it, and fix anything
+that fails:
+1. Does every assumption survive a re-read of the intake? Delete any that the intake or
+   answers already answer.
+2. Does the after workflow contradict any fix, verdict, or assumption? If a step is
+   automatic in one place, it must be automatic everywhere.
+3. Is any step labeled Automate that still requires a person to click, type, choose,
+   review, or approve? If so, relabel it honestly.
+4. Does any fix, move, or checklist item depend on an artifact the new workflow no longer
+   produces (for example a manual summary that no longer gets written)? If so, either stage
+   it explicitly (a short pilot, or a comparison against historical data) or replace it.
+5. Does any move tell people to do something the new workflow already does for them?
+   If so, cut it.
+Return only the corrected Blueprint. Silent, internal audit; do not mention it in output.
 ${goalMode ? "There is no existing workflow, so propose a sensible starting workflow as the 'before', then the leaner version as the 'after'." : ""}
 
 Fidelity rule for the "before" steps: stay faithful to what the user actually wrote.
@@ -244,6 +259,31 @@ When unsure what a step is for, describe it plainly rather than inventing intent
 Transparency rule: when an answer is missing, do not pretend to know. Make a reasonable,
 clearly-labeled assumption and list it in "assumptions". If nothing material is missing,
 return an empty assumptions array.
+
+Assumption discipline, this is where most errors start:
+- NEVER "assume" something the intake or the answers already state. If the workflow says
+  the rep clicks a button, that is a stated fact, not an assumption. Re-check the intake
+  before you write any assumption, and delete any that is already answered.
+- Assume only what you genuinely need and cannot know, and keep it to what changes the advice.
+- Once you state an assumption, every later section must obey it. Do not contradict your
+  own assumptions.
+
+Availability rule, do not invent data or artifacts that will not exist:
+- Only recommend comparing, measuring, or reviewing things that the new workflow actually
+  produces. If AI summaries become the default, then reps will no longer be writing manual
+  summaries, so a "compare the AI summary to the rep's manual summary on the same call"
+  move is impossible unless you explicitly stage it (for example, a short pilot where a few
+  reps intentionally write both, or a comparison against historical summaries from before
+  the change). If a move needs a baseline that does not exist, say how to create it.
+- Never suggest a habit-change nudge for a behavior the new workflow has already removed.
+  If the AI summary is the default starting point, do not advise reps to "start from the AI
+  summary," because that is already how it works.
+
+Context discipline: the industry, team, and role are light context. Use them to choose
+plain, relevant examples and language, never to invent facts, constraints, or workflow
+steps the user did not describe. The workflow logic must come from what the user actually
+wrote, not from what you assume is typical for that industry. A change in industry should
+never change the underlying diagnosis of the same workflow.
 
 Return ONLY valid JSON, no prose, no code fences, in EXACTLY this shape:
 {

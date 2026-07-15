@@ -144,6 +144,9 @@
   .mrow:last-child{margin-bottom:0}
   .mrow .mlab{display:block;font-family:var(--disp);font-weight:600;font-size:10.5px;letter-spacing:.04em;text-transform:uppercase;color:var(--accent-deep);margin-bottom:1px}
   .mrow.val .mlab{color:var(--gold)}
+  .mrow.sizing{background:var(--tint);border:1px solid var(--line);border-radius:8px;padding:8px 10px;margin-top:7px}
+  .mrow.sizing .mlab{color:var(--accent-deep)}
+  .est-tag{display:inline-block;margin-left:5px;font-size:8.5px;letter-spacing:.08em;padding:1px 6px;border-radius:999px;background:var(--gold-bg);color:var(--gold);vertical-align:middle}
   @media (max-width:680px){ .metric-cards{grid-template-columns:1fr} }
 
   /* Augmentation map */
@@ -601,42 +604,42 @@ const EXAMPLE_QUESTIONS = [
    Beyond-ROI "go deeper" layer without a live call. */
 const EXAMPLE_METRICS = {
   framing: "Success means reps trust and use AI notes enough to reclaim selling time, while quality and accountability stay visible to managers and customers.",
+  estimateNote: "These are directional estimates, not quotes. Plug in your own rep count, working weeks, and blended rates to size the value for a funding conversation.",
   metrics: [
     { shortName: "AI Notes Adopted", lens: "Adoption", signal: "Leading",
       metric: "Percentage of calls where the AI summary is submitted to the CRM without a manual rewrite.",
-      definition: "The share of calls with an AI note that the rep submits directly or edits lightly (under 3 minutes) rather than discarding and writing from scratch.",
+      definition: "The share of calls with an AI note that the rep submits directly or edits lightly rather than discarding and writing from scratch.",
       why: "This is the leading signal that reps actually trust the AI output; without it, the tool stays dead weight and selling time stays locked in admin.",
-      value: "Each rep reclaims 2 to 4 hours per week of selling time; at 500 reps, that is 1,000 to 2,000 hours per week of capacity freed for pipeline, worth roughly 2 to 4 million dollars a year in recovered selling capacity.",
+      value: "Reclaims roughly 2 to 3 hours per rep per week that currently goes to writing summaries, and that time moves to selling.",
+      howToSize: "Multiply the hours reclaimed per rep per week by your rep count, by your working weeks, by your blended hourly rate.",
       good: "Above 60 percent within 60 days; trending toward 75 percent by month four as trust builds and habit shifts." },
     { shortName: "Voluntary Reuse", lens: "Human", signal: "Leading",
       metric: "Percentage of reps who voluntarily use AI notes in deal prep or handoff to account managers.",
-      definition: "The share of reps who reference an AI summary when prepping a follow-up, or who share it with an account manager or partner, measured via survey or CRM activity.",
-      why: "Voluntary reuse is the truest sign reps see AI notes as a capability multiplier, not a compliance burden; it also builds institutional memory and speeds onboarding.",
-      value: "Reps who reuse notes close deals faster and lose fewer to miscommunication, and new hires ramp 20 to 30 percent faster; over a year this compounds into higher win rates and faster average close.",
+      definition: "The share of reps who reference an AI summary when prepping a follow-up or sharing context with an account manager, measured by survey or CRM activity.",
+      why: "Voluntary reuse is the truest sign reps see AI notes as a capability multiplier, not a compliance burden.",
+      value: "Builds institutional memory, speeds new-hire ramp, and reduces deals lost to miscommunication.",
+      howToSize: "Compare ramp time for new hires before and after, and multiply the days saved by their fully loaded daily cost.",
       good: "Above 40 percent of reps actively reusing notes within 90 days; trending toward 60 percent by six months." },
     { shortName: "Summary Speed", lens: "Efficiency", signal: "Lagging",
       metric: "Average time from call end to CRM summary completion per rep.",
       definition: "The median minutes between call disconnect and summary posted to the CRM, measured per rep and in aggregate.",
-      why: "Faster summaries mean reps move to the next deal sooner and managers see context sooner; it also signals whether the workflow is genuinely easier.",
-      value: "If average time drops from 12 to 3 minutes and reps average 8 calls a day, each rep gains 72 minutes a week of selling time; at 500 reps that is 30,000 hours a year, worth 1 to 1.5 million dollars in recovered capacity.",
+      why: "Faster summaries mean reps move to the next deal sooner and managers see context sooner.",
+      value: "Cuts roughly 8 to 12 minutes of admin per call, which converts directly into selling capacity.",
+      howToSize: "Multiply minutes saved per call by calls per rep per week, by your rep count, by your blended hourly rate.",
       good: "Median time under 5 minutes per rep; no rep averaging longer than 15 minutes." },
     { shortName: "AI Summary Quality", lens: "Quality", signal: "Lagging",
       metric: "Manager-flagged accuracy or completeness issues per 100 AI summaries reviewed.",
       definition: "The count of summaries where a manager notes missing deal details, wrong next steps, or misheard customer intent, per 100 reviewed.",
-      why: "If AI notes are inaccurate, reps keep writing their own and customers lose context; this catches quality drift before it kills adoption.",
-      value: "High-quality summaries cut rework and customer confusion and lower the risk of missed upsell or churn signals; each prevented miscommunication saves 30 to 90 minutes of rework and protects deal momentum.",
+      why: "If AI notes are inaccurate, reps keep writing their own and customers lose context.",
+      value: "Fewer errors slipping downstream, less rework, and lower risk of missed upsell or churn signals.",
+      howToSize: "Estimate the rework hours per flagged issue, then multiply by issues avoided and your blended hourly rate.",
       good: "Fewer than 5 issues per 100 summaries; trend stable or improving over time." },
-    { shortName: "Escalation Readiness", lens: "Business", signal: "Lagging",
-      metric: "Escalation resolution time and first-contact close rate when managers step in.",
-      definition: "The average time from escalation flag to manager resolution, and the share of escalations resolved in one conversation without looping back to the rep.",
-      why: "When managers have rich, accurate AI context, they step in faster and solve customer issues without delay, which protects revenue and relationships.",
-      value: "Faster resolution reduces churn risk and frees reps to sell instead of firefight; each prevented delay saves 1 to 2 days of deal risk and improves net retention by 1 to 2 points.",
-      good: "Escalation resolution drops from 4 hours to under 1 hour; first-contact close rate above 70 percent." },
     { shortName: "Rep Retention", lens: "Human", signal: "Lagging",
       metric: "Voluntary turnover and tool-satisfaction scores across the sales team.",
-      definition: "The annual voluntary turnover rate for reps plus their self-reported satisfaction with the tool and time reclaimed, from a pulse survey.",
-      why: "If reps feel the AI gives them time back and cuts drudgery, they stay longer and perform better; sales turnover is expensive and erodes institutional knowledge.",
-      value: "Each rep retained saves 50 to 80 thousand dollars in replacement and ramp; at 500 reps, a 2 to 3 point drop in turnover saves 500 thousand to 1.2 million dollars a year and preserves pipeline continuity.",
+      definition: "The voluntary turnover rate for reps plus their self-reported satisfaction with the tool and the time it gives back.",
+      why: "If reps feel the AI gives them time back and cuts drudgery, they stay longer and perform better.",
+      value: "Protects retention and preserves institutional knowledge, avoiding the cost of replacing and re-ramping reps.",
+      howToSize: "Multiply the reps retained by your own replacement-and-ramp cost per rep.",
       good: "Voluntary turnover stable or declining; tool-satisfaction scores above 7 out of 10." }
   ]
 };
@@ -1215,10 +1218,11 @@ function buildBlueprintDeck(pptx, d, dateStr, beyondRoi, augment, reinforce){
         sm.addText(m.lens||"",{x:M+cw-2.7,y:cy+0.2,w:1.5,h:0.3,align:"center",valign:"middle",fontFace:DISP,fontSize:9,bold:true,color:lensC.tx});
         sm.addText(m.signal||"",{x:M+cw-1.1,y:cy+0.2,w:0.9,h:0.3,align:"center",valign:"middle",fontFace:DISP,fontSize:9,bold:true,color:FAINT});
         // metric line + rows as ONE flowing block, so long text has room and even spacing
-        const row=(lab,val)=> val?[{text:lab+"   ",options:{fontFace:DISP,fontSize:9,bold:true,color:lab==="LONG-TERM VALUE"?GOLD:DEEP,charSpacing:.4}},
+        const row=(lab,val)=> val?[{text:lab+"   ",options:{fontFace:DISP,fontSize:9,bold:true,color:(lab==="VALUE IT DRIVES"?GOLD:(lab==="HOW TO SIZE (ESTIMATE)"?"2E5E9E":DEEP)),charSpacing:.4}},
                                     {text:dot(val),options:{fontFace:BODY,fontSize:10,color:SOFT,breakLine:true,paraSpaceAfter:3}}]:[];
         const block=[{text:m.metric||"",options:{fontFace:BODY,fontSize:10.5,italic:true,color:INK,breakLine:true,paraSpaceAfter:7}}].concat(
-          row("WHAT IT IS",m.definition),row("WHY IT MATTERS",m.why),row("LONG-TERM VALUE",m.value),row("WHAT GOOD LOOKS LIKE",m.good));
+          row("WHAT IT IS",m.definition),row("WHY IT MATTERS",m.why),row("VALUE IT DRIVES",m.value),
+          row("HOW TO SIZE (ESTIMATE)",m.howToSize),row("WHAT GOOD LOOKS LIKE",m.good));
         sm.addText(block,{x:M+0.3,y:cy+0.62,w:cw-0.6,h:ch-0.76,valign:"top",fit:"shrink"});
       });
       foot(sm);
@@ -1346,6 +1350,7 @@ function renderMetrics(b){
       <span><b>Leading</b> = an early signal you can steer by now.</span>
       <span><b>Lagging</b> = an outcome that confirms results after the fact.</span>
     </div>`;
+  const note = b.estimateNote ? `<p class="metrics-ground">📊 ${esc(dot(b.estimateNote))}</p>` : "";
   const cards = (b.metrics||[]).map(m=>{
     const lens = (m.lens||"").replace(/[^A-Za-z]/g,"");
     return `<div class="metric-card">
@@ -1357,12 +1362,13 @@ function renderMetrics(b){
       <div class="metric-title">${esc(m.metric||"")}</div>
       ${m.definition?`<div class="mrow"><span class="mlab">What it is</span>${esc(dot(m.definition))}</div>`:""}
       ${m.why?`<div class="mrow"><span class="mlab">Why it matters here</span>${esc(dot(m.why))}</div>`:""}
-      ${m.value?`<div class="mrow val"><span class="mlab">Long-term value</span>${esc(dot(m.value))}</div>`:""}
+      ${m.value?`<div class="mrow val"><span class="mlab">Value it drives</span>${esc(dot(m.value))}</div>`:""}
+      ${m.howToSize?`<div class="mrow sizing"><span class="mlab">How to size it <span class="est-tag">estimate</span></span>${esc(dot(m.howToSize))}</div>`:""}
       ${m.good?`<div class="mrow"><span class="mlab">What good looks like</span>${esc(dot(m.good))}</div>`:""}
     </div>`;
   }).join("");
   $("metrics").innerHTML = section("07","Beyond ROI","A 360 view of success, not just speed",
-    ground + framing + legend + `<div class="metric-cards">${cards}</div>`);
+    ground + framing + legend + `<div class="metric-cards">${cards}</div>` + note);
   $("metricsCta").classList.remove("show");
 }
 

@@ -336,9 +336,19 @@ The five lenses:
 - Adoption: real usage, voluntary use, trust in the output.
 - Business: downstream customer, revenue-relevant, or risk signals.
 
-For every metric, connect it to durable value in concrete terms: money saved or earned,
-customer experience, new customers or retention, risk reduced, or capability built. Do
-not leave value abstract. Say what it is worth over time and to whom.
+On value and numbers, this is a hard rule. You are NOT a calculator, and a wrong number in
+a leadership deck destroys the user's credibility. So:
+- NEVER assert a computed total: no total dollars saved, no team-wide hours per year, no
+  annual figures. Do not multiply out across a team. Do not invent a labor rate.
+- DO give the per-unit saving or gain you can honestly ground in the workflow, for example
+  "8 to 12 minutes per call" or "2 to 3 hours per rep per week". Per-unit is safe; totals
+  are not.
+- Then hand the reader the multiplication in "howToSize" so they can size it with their own
+  numbers, for example "multiply the hours reclaimed per rep per week by your rep count, by
+  your working weeks, by your blended hourly rate".
+- For non-time metrics, express value qualitatively and directionally (retention, customer
+  experience, risk reduced, capability built), still with no fabricated figures.
+- Every value line is directional, not a quote.
 
 Return ONLY valid JSON, no prose, no code fences, in exactly this shape:
 {
@@ -349,18 +359,21 @@ Return ONLY valid JSON, no prose, no code fences, in exactly this shape:
       "lens": "Efficiency|Quality|Human|Adoption|Business",
       "definition": "one plain sentence: what this metric is and how to read it, no formula",
       "why": "one line on why it matters for THIS workflow",
-      "value": "the long-term value it drives, concretely: money saved or earned, customer experience, new customers or retention, risk reduced, or capability built",
+      "value": "the durable value this drives, stated per unit or qualitatively, NEVER as a computed total or dollar figure",
+      "howToSize": "the do-this-math line, naming the inputs the reader plugs in, so they can ballpark it themselves",
       "good": "what a good result looks like, in plain words, no formula",
       "signal": "Leading|Lagging" }
-  ]
+  ],
+  "estimateNote": "one sentence reminding the reader these are directional estimates, not quotes, and that they should plug in their own rates and volumes"
 }
 
 Give 4 to 5 metrics spread across at least three lenses, with Human and Quality both
 represented. shortName is a crisp chip label (e.g. "Selling Time Reclaimed"); metric is
-the fuller line. Keep every string to one sentence. Keep "value" concrete but under about
-35 words so nothing gets cut off. Ground each metric in the specific workflow, not generic
-KPIs. Do not include cadence, formulas, or baselines. Finish and close the JSON cleanly;
-a complete, concise set beats a longer one that gets truncated.`;
+the fuller line. Keep every string to one sentence. Keep "value" under about 30 words, and
+remember: per-unit or qualitative only, never a computed total or dollar figure. Ground
+each metric in the specific workflow, not generic KPIs. Do not include cadence or
+baselines. Finish and close the JSON cleanly; a complete, concise set beats a longer one
+that gets truncated.`;
 
   return [
     { role: "system", content: sys },

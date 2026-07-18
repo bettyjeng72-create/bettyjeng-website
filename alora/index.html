@@ -1207,23 +1207,24 @@ function buildBlueprintDeck(pptx, d, dateStr, beyondRoi, augment, reinforce){
       if(hasFraming){
         sm.addText(beyondRoi.framing,{x:M,y:1.42,w:W-2*M,h:0.4,fontFace:BODY,fontSize:11,italic:true,color:GOLD,valign:"top",fit:"shrink"});
       }
-      const cardTop = hasFraming ? 1.98 : 1.6;
+      const cardTop = hasFraming ? 1.94 : 1.58;
       ms.slice(i,i+2).forEach((m,j)=>{
-        const cy=cardTop+j*2.5, ch=2.35, cw=W-2*M;
+        const cy=cardTop+j*2.52, ch=2.42, cw=W-2*M;
         const lensC=LENS[(m.lens||"").replace(/[^A-Za-z]/g,"")]||{bg:CREAM,tx:SOFT};
         sm.addShape(RR,{x:M,y:cy,w:cw,h:ch,fill:{color:CREAM},line:{color:LINE,width:1},rectRadius:0.1});
-        sm.addText(m.shortName||m.metric||"",{x:M+0.3,y:cy+0.18,w:cw-3.4,h:0.34,fontFace:DISP,fontSize:13.5,bold:true,color:DEEP,valign:"middle",fit:"shrink"});
+        sm.addText(m.shortName||m.metric||"",{x:M+0.3,y:cy+0.16,w:cw-3.4,h:0.32,fontFace:DISP,fontSize:13,bold:true,color:DEEP,valign:"middle",fit:"shrink"});
         // lens + signal pill, top right
-        sm.addShape(RR,{x:M+cw-2.7,y:cy+0.2,w:1.5,h:0.3,fill:{color:lensC.bg},rectRadius:0.15});
-        sm.addText(m.lens||"",{x:M+cw-2.7,y:cy+0.2,w:1.5,h:0.3,align:"center",valign:"middle",fontFace:DISP,fontSize:9,bold:true,color:lensC.tx});
-        sm.addText(m.signal||"",{x:M+cw-1.1,y:cy+0.2,w:0.9,h:0.3,align:"center",valign:"middle",fontFace:DISP,fontSize:9,bold:true,color:FAINT});
-        // metric line + rows as ONE flowing block, so long text has room and even spacing
-        const row=(lab,val)=> val?[{text:lab+"   ",options:{fontFace:DISP,fontSize:9,bold:true,color:(lab==="VALUE IT DRIVES"?GOLD:(lab==="HOW TO SIZE (ESTIMATE)"?"2E5E9E":DEEP)),charSpacing:.4}},
-                                    {text:dot(val),options:{fontFace:BODY,fontSize:10,color:SOFT,breakLine:true,paraSpaceAfter:3}}]:[];
-        const block=[{text:m.metric||"",options:{fontFace:BODY,fontSize:10.5,italic:true,color:INK,breakLine:true,paraSpaceAfter:7}}].concat(
+        sm.addShape(RR,{x:M+cw-2.7,y:cy+0.18,w:1.5,h:0.3,fill:{color:lensC.bg},rectRadius:0.15});
+        sm.addText(m.lens||"",{x:M+cw-2.7,y:cy+0.18,w:1.5,h:0.3,align:"center",valign:"middle",fontFace:DISP,fontSize:9,bold:true,color:lensC.tx});
+        sm.addText(m.signal||"",{x:M+cw-1.1,y:cy+0.18,w:0.9,h:0.3,align:"center",valign:"middle",fontFace:DISP,fontSize:9,bold:true,color:FAINT});
+        // One flowing block at FIXED sizes so every card reads the same. Content caps in
+        // the prompt keep this inside the box, so autofit almost never has to kick in.
+        const row=(lab,val)=> val?[{text:lab+"   ",options:{fontFace:DISP,fontSize:8.5,bold:true,color:(lab==="VALUE IT DRIVES"?GOLD:(lab==="HOW TO SIZE (ESTIMATE)"?"2E5E9E":DEEP)),charSpacing:.4}},
+                                    {text:dot(val),options:{fontFace:BODY,fontSize:9.5,color:SOFT,breakLine:true,paraSpaceAfter:2}}]:[];
+        const block=[{text:m.metric||"",options:{fontFace:BODY,fontSize:10,italic:true,color:INK,breakLine:true,paraSpaceAfter:5}}].concat(
           row("WHAT IT IS",m.definition),row("WHY IT MATTERS",m.why),row("VALUE IT DRIVES",m.value),
           row("HOW TO SIZE (ESTIMATE)",m.howToSize),row("WHAT GOOD LOOKS LIKE",m.good));
-        sm.addText(block,{x:M+0.3,y:cy+0.62,w:cw-0.6,h:ch-0.76,valign:"top",fit:"shrink"});
+        sm.addText(block,{x:M+0.3,y:cy+0.58,w:cw-0.6,h:ch-0.72,valign:"top",fit:"shrink"});
       });
       foot(sm);
     }
@@ -1347,8 +1348,8 @@ function renderMetrics(b){
   const framing = b.framing ? `<p class="metrics-framing">${esc(b.framing)}</p>` : "";
   const ground = `<p class="metrics-ground">Based on your current workflow and the changes above, here is how to tell the shift is actually working.</p>`;
   const legend = `<div class="metrics-legend">
-      <span><b>Leading</b> = an early signal you can steer by now.</span>
-      <span><b>Lagging</b> = an outcome that confirms results after the fact.</span>
+      <span><b>Leading</b> = an early signal you can steer now.</span>
+      <span><b>Lagging</b> = an outcome that confirms results after the change.</span>
     </div>`;
   const note = b.estimateNote ? `<p class="metrics-ground">📊 ${esc(dot(b.estimateNote))}</p>` : "";
   const cards = (b.metrics||[]).map(m=>{

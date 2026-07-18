@@ -247,6 +247,8 @@ that fails:
    it explicitly (a short pilot, or a comparison against historical data) or replace it.
 5. Does any move tell people to do something the new workflow already does for them?
    If so, cut it.
+6. Would any move require two versions of something the workflow only produces once, or
+   two people where there is only one? If so, rewrite it so it is possible in real life.
 Return only the corrected Blueprint. Silent, internal audit; do not mention it in output.
 ${goalMode ? "There is no existing workflow, so propose a sensible starting workflow as the 'before', then the leaner version as the 'after'." : ""}
 
@@ -267,6 +269,18 @@ Assumption discipline, this is where most errors start:
 - Assume only what you genuinely need and cannot know, and keep it to what changes the advice.
 - Once you state an assumption, every later section must obey it. Do not contradict your
   own assumptions.
+
+Role realism, check every move against how the job actually works:
+- Picture the real person doing the real task before you recommend anything. One rep runs
+  one call and produces ONE record of it, so they either use the AI summary or write their
+  own, never both for the same call. Do not propose comparing two versions of the same
+  event that only one person could have produced.
+- The same applies generally: never suggest a comparison, demo, or exercise that would
+  require two people, two systems, or two outputs where the workflow only ever creates one.
+  If a comparison is genuinely useful, ground it in something real, for example a rep's
+  earlier manual summaries from before the change, a deliberate side-by-side during a short
+  pilot, or one rep's AI summary next to a different rep's manual one.
+- Respect the rhythm of the role. Do not add steps a busy person plausibly would not do.
 
 Availability rule, do not invent data or artifacts that will not exist:
 - Only recommend comparing, measuring, or reviewing things that the new workflow actually
@@ -369,11 +383,12 @@ Return ONLY valid JSON, no prose, no code fences, in exactly this shape:
 
 Give 4 to 5 metrics spread across at least three lenses, with Human and Quality both
 represented. shortName is a crisp chip label (e.g. "Selling Time Reclaimed"); metric is
-the fuller line. Keep every string to one sentence. Keep "value" under about 30 words, and
-remember: per-unit or qualitative only, never a computed total or dollar figure. Ground
-each metric in the specific workflow, not generic KPIs. Do not include cadence or
-baselines. Finish and close the JSON cleanly; a complete, concise set beats a longer one
-that gets truncated.`;
+the fuller line. Length caps, keep to these so every card renders at the same size:
+metric under 15 words, definition under 25 words, why under 22 words, value under 22 words,
+howToSize under 28 words, good under 22 words. One sentence each. Remember: value is
+per-unit or qualitative only, never a computed total or dollar figure. Ground each metric
+in the specific workflow, not generic KPIs. Do not include cadence or baselines. Finish and
+close the JSON cleanly; a complete, concise set beats a longer one that gets truncated.`;
 
   return [
     { role: "system", content: sys },

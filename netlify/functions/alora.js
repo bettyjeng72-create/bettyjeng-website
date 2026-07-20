@@ -160,6 +160,35 @@ Method: grounded in Adaptive Engagement Change Management (Hear, Trust, Co-creat
 but agnostic and multidisciplinary, pulling from behavioral science, psychology, and
 negotiation as useful. Never name-drop frameworks at the user.`;
 
+/* Shared role-classification rule. Used wherever we group affected people, so the
+   Human Angle and the Augmentation Map treat roles the same way. */
+const ROLES = `
+Role logic, be precise about how each role actually relates to this workflow:
+- Doers: the people who perform the workflow day to day. They carry the biggest change.
+- Direct leaders: the people who manage, coach, or review the doers daily. They own
+  standards, performance, and coaching.
+- Downstream internal: colleagues who receive the output later, for example account
+  managers or customer success. They care about quality and handoffs, but they do NOT
+  manage or coach the doers.
+- External: partners, customers, vendors. They are influenced by the outcome, usually
+  have no access to internal systems, and have no role in performance or coaching.
+
+Rules:
+- NEVER merge roles from different categories into one group. A direct manager and a
+  downstream colleague have different fears, different stakes, and different moves, so
+  they never share a card or a heading.
+- Do not attribute an action to a role that could not do it. Only doers and direct leaders
+  take part in daily coaching, performance reviews, or quality audits of the doers'
+  work. External parties do not see internal records, do not attend internal reviews,
+  and do not coach staff.
+- Name each group as the specific role, not a bundle. Prefer "Account managers" over
+  "downstream users (CSMs, partners)". If two roles genuinely share the same relationship,
+  stake, and moves, you may name them together, otherwise pick the one that fits.
+- Focus on the roles most directly affected by this workflow. Leave out roles whose
+  involvement is incidental, rather than inventing a stake for them.
+- If the user lists roles without saying what each does, infer their relationship from the
+  workflow itself, and do not treat an external party as an internal one.`;
+
 /* ------------------------------------------------------- stage: CLARIFY */
 function clarifyMessages(brief, goalMode) {
   const sys = `You are Alora, diagnosing a workflow before prescribing a fix.
@@ -211,6 +240,7 @@ function generateMessages(brief, goalMode, qa) {
 
   const sys = `You are Alora. Turn the intake (and any answers) into an Insight-to-Action Blueprint.
 ${BRAND}
+${ROLES}
 
 Think it through internally first: name the real root cause (process, tool, skill, or
 people, often a blend), redraw the workflow lean, and make sure the redrawn workflow
@@ -249,6 +279,11 @@ that fails:
    If so, cut it.
 6. Would any move require two versions of something the workflow only produces once, or
    two people where there is only one? If so, rewrite it so it is possible in real life.
+7. Is any group a bundle of roles with different relationships to the workflow (for example
+   a direct manager lumped with downstream colleagues or external partners)? If so, split
+   it and keep only the roles that genuinely share that stake.
+8. Does any group get assigned an action it could not perform, such as an external partner
+   coaching staff or reviewing internal records? If so, fix or remove it.
 Return only the corrected Blueprint. Silent, internal audit; do not mention it in output.
 ${goalMode ? "There is no existing workflow, so propose a sensible starting workflow as the 'before', then the leaner version as the 'after'." : ""}
 
@@ -400,6 +435,13 @@ close the JSON cleanly; a complete, concise set beats a longer one that gets tru
 function augmentMessages(brief, bpSummary) {
   const sys = `You are Alora, adding an Augmentation Map to a Blueprint you already produced.
 ${BRAND}
+${ROLES}
+
+Consistency with the new workflow: the leaner workflow below is already decided. Everything
+you write must assume it is in place. Never tell someone to do a step the new workflow
+removed or automated. For example, if the notetaker now starts automatically, do not say
+"start the notetaker," because that click no longer exists. Write every instruction as it
+would happen AFTER the change, not before it.
 
 The people affected by this change are afraid, often quietly, that AI is coming for their
 jobs. Your job is to replace that fear with a real, walkable path: what changes, what

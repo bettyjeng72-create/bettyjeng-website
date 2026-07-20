@@ -343,9 +343,9 @@
 
       <div class="field">
         <div class="fhead"><span class="fnum">03</span><label class="flabel" for="who">Who's involved?<span class="opt">optional</span></label></div>
-        <p class="fhint">Who does the work, who's affected, who else interacts with the process, and is any group a bottleneck?</p>
+        <p class="fhint">Who does the work, who's affected, who else interacts with the process, and is any group a bottleneck? A quick note on each role's relationship helps, for example who manages the team, who receives the work downstream, and who is external.</p>
         <div class="fbody">
-          <textarea id="who" maxlength="600" placeholder="e.g. Sales reps, account managers, customer success managers, sales managers, partners, customers."></textarea>
+          <textarea id="who" maxlength="600" placeholder="e.g. Sales reps (do the work), sales managers (coach them daily), account managers and customer success (receive the handoff), customers (affected)."></textarea>
           <div class="counter" id="whoCount">0 / 600</div>
         </div>
       </div>
@@ -509,7 +509,7 @@
 const EXAMPLE_INTAKE = {
   pain: "Our sales team got an AI call-notetaker three months ago, but reps still write their own summaries afterward and the AI notes mostly sit unused.",
   flow: "1. Rep begins customer call\n2. Rep optionally clicks Start AI-Call Notetaker button\n3. Rep finishes call\n4. Rep writes summary from memory into CRM\n5. Manager reviews summary if there are escalations, questions, or issues\n6. Summary sits in CRM for next rep or manager reference",
-  who: "Sales reps, account managers, customer success managers, sales managers, partners, customers.",
+  who: "Sales reps (do the work), sales managers (coach and review them daily), account managers and customer success managers (receive the handoff downstream), partners and customers (external, affected by follow-up quality).",
   constraints: "",
   ctxTeam: "Sales Representatives",
   ctxRole: "Engage, sell, and follow up with end-customers and partners",
@@ -1341,7 +1341,14 @@ function buildBpSummary(){
   const dx = d.diagnosis || {};
   const fit = (d.aiFit||[]).map(a=>`- ${a.step} [${a.verdict}]`).join("\n");
   const groups = (d.humanAngle||[]).map(g=>`- ${g.group}: worried "${g.worry}"`).join("\n");
-  return `Initiative: ${d.initiative||""}\nRoot: ${dx.rootType||""}${dx.secondaryType?(" + "+dx.secondaryType):""}\nDiagnosis: ${dx.summary||""}\nAI fit:\n${fit}\nGroups affected:\n${groups}`;
+  const after = ((d.workflow||{}).after||[]).map((s,i)=>`${i+1}. ${s}`).join("\n");
+  const changes = ((d.workflow||{}).changes||[]).map(c=>`- ${c.change}`).join("\n");
+  return `Initiative: ${d.initiative||""}\nRoot: ${dx.rootType||""}${dx.secondaryType?(" + "+dx.secondaryType):""}\nDiagnosis: ${dx.summary||""}
+THE NEW (LEANER) WORKFLOW, already decided, everything you write must be consistent with it:
+${after}
+KEY CHANGES ALREADY MADE:
+${changes}
+AI fit:\n${fit}\nGroups affected:\n${groups}`;
 }
 
 function renderMetrics(b){

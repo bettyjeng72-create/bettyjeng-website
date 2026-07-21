@@ -189,6 +189,27 @@ Rules:
 - If the user lists roles without saying what each does, infer their relationship from the
   workflow itself, and do not treat an external party as an internal one.`;
 
+/* Shared rule: the leaner workflow is already decided, so every go-deeper module must
+   write as if it is live. Prevents advice that undoes the redesign. */
+const AFTER_STATE = `
+Consistency with the new workflow: the leaner workflow in the summary below is already
+decided. Write everything as it happens AFTER that change is live. Never tell someone to
+do a step the new workflow removed or automated, and never rely on an artifact it no
+longer produces. For example, if a tool now starts automatically, do not say "start the
+tool," because that click no longer exists.`;
+
+/* Shared self-audit for the go-deeper modules. Kept short on purpose. */
+const GD_AUDIT = `
+FINAL AUDIT, run silently on your draft before returning it, and fix what fails:
+1. Does anything contradict the new workflow, or tell someone to do what it already does?
+2. Is any group a bundle of roles with different relationships (a direct manager mixed with
+   downstream colleagues or external partners)? Split it, and keep only roles that share
+   that stake.
+3. Is any role assigned an action it could not perform, such as an external partner
+   coaching staff or reading internal records?
+4. Does anything depend on an artifact or comparison the workflow does not actually create?
+Return only the corrected JSON. Never mention this audit.`;
+
 /* ------------------------------------------------------- stage: CLARIFY */
 function clarifyMessages(brief, goalMode) {
   const sys = `You are Alora, diagnosing a workflow before prescribing a fix.
@@ -368,6 +389,8 @@ section and close the JSON.`;
 function metricsMessages(brief, bpSummary) {
   const sys = `You are Alora, adding a success-measurement layer to a Blueprint you already produced.
 ${BRAND}
+${ROLES}
+${AFTER_STATE}
 
 The user is under pressure to prove ROI, and the danger is that "ROI" shrinks to speed
 alone. Efficiency-only scorekeeping is the exact logic that turns AI adoption into
@@ -423,7 +446,8 @@ metric under 15 words, definition under 25 words, why under 22 words, value unde
 howToSize under 28 words, good under 22 words. One sentence each. Remember: value is
 per-unit or qualitative only, never a computed total or dollar figure. Ground each metric
 in the specific workflow, not generic KPIs. Do not include cadence or baselines. Finish and
-close the JSON cleanly; a complete, concise set beats a longer one that gets truncated.`;
+close the JSON cleanly; a complete, concise set beats a longer one that gets truncated.
+${GD_AUDIT}`;
 
   return [
     { role: "system", content: sys },
@@ -436,12 +460,7 @@ function augmentMessages(brief, bpSummary) {
   const sys = `You are Alora, adding an Augmentation Map to a Blueprint you already produced.
 ${BRAND}
 ${ROLES}
-
-Consistency with the new workflow: the leaner workflow below is already decided. Everything
-you write must assume it is in place. Never tell someone to do a step the new workflow
-removed or automated. For example, if the notetaker now starts automatically, do not say
-"start the notetaker," because that click no longer exists. Write every instruction as it
-would happen AFTER the change, not before it.
+${AFTER_STATE}
 
 The people affected by this change are afraid, often quietly, that AI is coming for their
 jobs. Your job is to replace that fear with a real, walkable path: what changes, what
@@ -476,7 +495,8 @@ Return ONLY valid JSON, no prose, no code fences, in exactly this shape:
 Give 2 to 3 groups. Each ladder has 3 to 4 capabilities, sequenced from Foundational to
 Advanced, so a change leader could hand it to L&D as a starting curriculum. Keep every
 string to one short sentence, and keep each "why" to a brief phrase. Ground everything in
-the specific workflow, never generic KPIs or stock advice.`;
+the specific workflow, never generic KPIs or stock advice.
+${GD_AUDIT}`;
 
   return [
     { role: "system", content: sys },
@@ -488,6 +508,8 @@ the specific workflow, never generic KPIs or stock advice.`;
 function reinforceMessages(brief, bpSummary) {
   const sys = `You are Alora, adding a Reinforcement and Incentivizing layer to a Blueprint you already produced.
 ${BRAND}
+${ROLES}
+${AFTER_STATE}
 
 Reinforcement is the step most change efforts skip, and then they wonder why adoption
 fades after launch. Your job is the moves that make this change stick and the incentives
@@ -519,6 +541,22 @@ On cost: you do NOT know their salaries or vendor prices, so NEVER invent a doll
 Give a relative investment level, name the cost drivers in plain words, and hand them the
 math to size it with their own numbers. Everything is an estimate, say so.
 
+On time realism, this matters as much as cost. People routinely underestimate how long a
+change ritual takes, and a number that looks confidently wrong destroys trust:
+- Any time you mention a duration, say what it SCALES WITH, not just a flat number. A
+  15 minute huddle is 15 minutes for a small team and much longer for a large one, so write
+  it as "about 15 minutes for a team of 6 to 8, longer as the team grows" rather than a
+  bare "15 minutes".
+- Prefer per-person or per-unit time over totals, for example "about 2 minutes per rep per
+  week", and let "howToSize" carry the multiplication.
+- Do not imply a one-time setup is quick if it depends on other teams. If a step needs IT,
+  vendor, or CRM work, say the calendar time depends on their queue and priorities, not
+  just the hours of effort.
+- Only give a number where you can honestly ground it in the described work. Otherwise
+  describe the effort qualitatively (light, moderate, significant) and let them size it.
+- Never state a duration as if it were fixed regardless of team size, call volume, or the
+  resources available.
+
 Return ONLY valid JSON, no prose, no code fences, in exactly this shape:
 {
   "framing": "one plain sentence on why reinforcement is the step that is skipped and paid for later",
@@ -538,9 +576,13 @@ Return ONLY valid JSON, no prose, no code fences, in exactly this shape:
   "estimateNote": "one sentence reminding the reader these are directional estimates, not quotes, and to plug in their own rates and vendor prices"
 }
 
-Give 4 to 6 moves, a mix of Reinforcement and Incentive, at least two of each. Keep every
-string to one clear sentence. Make investment levels relative to each other so a sponsor
-can triage at a glance. Every motivator must be intrinsic, never fear or compliance.`;
+Give 4 to 6 moves, a mix of Reinforcement and Incentive, at least two of each. Length caps,
+keep to these so every card renders at the same size: move under 22 words, locksIn under 20,
+whatItTakes under 26, howToSize under 26. One sentence each. Make investment levels relative
+to each other so a sponsor can triage at a glance. Every motivator must be intrinsic, never
+fear or compliance. The estimateNote must also remind the reader that timing depends on
+their team size and resource availability.
+${GD_AUDIT}`;
 
   return [
     { role: "system", content: sys },

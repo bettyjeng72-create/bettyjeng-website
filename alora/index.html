@@ -682,16 +682,17 @@ const EXAMPLE_AUGMENT = {
    make-it-stick layer, with intrinsic motivators and estimate-only cost tags. */
 const EXAMPLE_REINFORCE = {
   framing: "Reinforcement is the step most change efforts skip, and then adoption quietly fades after launch. These moves keep the change alive and make people want it, not just tolerate it.",
-  estimateNote: "These investment levels are directional estimates, not quotes. Plug in your own team size, blended rates, and any vendor prices to get real numbers for a funding conversation.",
+  estimateNote: "These investment levels and timings are directional estimates, not quotes. Actual effort depends on your team size, call volume, and how much analyst or admin capacity you have, so plug in your own numbers and rates.",
   moves: [
-    { move: "Two-minute micro-trainings that show how to review and approve an AI summary well, released weekly for the first month.", type: "Reinforcement", motivator: "Mastery", locksIn: "The review-and-submit-in-one-step habit, so reps trust their own judgment on AI output.", cadence: "Weekly", owner: "Sales enablement or change lead", investment: "Low", whatItTakes: "A few hours to record short clips once, plus a couple of minutes of rep time each week to watch.", howToSize: "One-time: recording hours times the creator's rate. Ongoing: 2 minutes times reps times their blended rate per week." },
-    { move: "A friendly streak marker in the CRM showing how many calls in a row a rep let the AI draft, with a small team-visible milestone at ten.", type: "Incentive", motivator: "Progress", locksIn: "Reps choosing the AI draft by default instead of writing from scratch.", cadence: "Ongoing", owner: "Sales ops", investment: "Medium", whatItTakes: "A one-time CRM or dashboard config to show a streak counter, then it runs itself.", howToSize: "Get a one-time build estimate from your CRM admin or vendor; after that, ongoing cost is near zero." },
-    { move: "A weekly manager ritual of one specific, positive note per rep on AI note quality, framed as coaching, not compliance.", type: "Reinforcement", motivator: "Recognition", locksIn: "Closing the trust loop so reps rely on AI notes rather than rewriting out of habit.", cadence: "Weekly", owner: "Sales managers", investment: "Low", whatItTakes: "About 10 to 15 minutes of manager time per week, using data the CRM already tracks, no new tools.", howToSize: "Multiply the weekly minutes by your number of managers by their blended hourly rate." },
-    { move: "An 'AI notes champion' role for two or three respected reps per team who help peers and help shape the notetaker prompts.", type: "Incentive", motivator: "Autonomy", locksIn: "Voluntary reuse and peer-to-peer trust in the AI notes.", cadence: "One-time", owner: "Sales leadership", investment: "Low", whatItTakes: "Mostly recognition and a little of the champions' time; no direct spend unless you add an optional perk.", howToSize: "If you add a perk or stipend, multiply it by the number of champions; otherwise the cost is their time." },
-    { move: "A simple progress dashboard showing time reclaimed and adoption trending up, at both team and personal level.", type: "Reinforcement", motivator: "Progress", locksIn: "Sustained adoption, because reps see their own momentum and want to keep it.", cadence: "Ongoing", owner: "Sales ops or analytics", investment: "Medium", whatItTakes: "A one-time dashboard build on data you already capture, then it updates automatically.", howToSize: "Get a one-time analyst or vendor build estimate; ongoing maintenance is minimal." },
-    { move: "Quarterly recognition for reps who grew most in AI-note quality or helped peers, celebrated in a team setting, never a bottom-ranking leaderboard.", type: "Incentive", motivator: "Belonging", locksIn: "Continued growth and a sense that the team is in this together.", cadence: "Monthly", owner: "Sales leadership", investment: "Low", whatItTakes: "Manager time to select, plus a small optional reward; no tooling required.", howToSize: "Add any reward value times the number of reps recognized per quarter." }
+    { move: "Two-minute micro-trainings on reviewing an AI summary well, released weekly for the first month.", type: "Reinforcement", motivator: "Mastery", locksIn: "The review-and-submit habit, so reps trust their own judgment on AI output.", cadence: "Weekly", owner: "Sales enablement or change lead", investment: "Low", whatItTakes: "A few hours to record the clips once, then about 2 minutes per rep each week to watch.", howToSize: "Recording hours times the creator's rate, plus 2 minutes times your rep count times their blended rate weekly." },
+    { move: "A friendly streak marker showing how many calls in a row a rep let the AI draft stand.", type: "Incentive", motivator: "Progress", locksIn: "Reps choosing the AI draft by default rather than rewriting it.", cadence: "Ongoing", owner: "Sales ops", investment: "Medium", whatItTakes: "A one-time CRM or dashboard config, then it runs itself; calendar time depends on your admin's queue.", howToSize: "Ask your CRM admin or vendor for a one-time build estimate; ongoing cost is near zero." },
+    { move: "A weekly manager note to each rep on what their AI summary captured well.", type: "Reinforcement", motivator: "Recognition", locksIn: "Closing the trust loop so reps rely on AI notes instead of rewriting from habit.", cadence: "Weekly", owner: "Sales managers", investment: "Low", whatItTakes: "Roughly 1 to 2 minutes per rep per week, so it scales with how many reps each manager carries.", howToSize: "Minutes per rep times reps per manager times your manager count times their blended rate." },
+    { move: "An AI notes champion role for a few respected reps who help peers and shape the prompts.", type: "Incentive", motivator: "Autonomy", locksIn: "Voluntary reuse and peer-to-peer trust in the AI notes.", cadence: "One-time", owner: "Sales leadership", investment: "Low", whatItTakes: "Mostly recognition plus some of the champions' time; no direct spend unless you add a perk.", howToSize: "Any perk value times the number of champions, plus their time at their blended rate." },
+    { move: "A progress view showing time reclaimed and adoption trending, at team and personal level.", type: "Reinforcement", motivator: "Progress", locksIn: "Sustained adoption, because reps see their own momentum and want to keep it.", cadence: "Ongoing", owner: "Sales ops or analytics", investment: "Medium", whatItTakes: "A one-time build on data you already capture; timing depends on analyst availability, not just effort.", howToSize: "Get a one-time analyst or vendor build estimate, then add light monthly upkeep." },
+    { move: "Quarterly recognition for the reps who grew most or helped peers, never a bottom-ranked list.", type: "Incentive", motivator: "Belonging", locksIn: "Continued growth and a sense that the team is in this together.", cadence: "Monthly", owner: "Sales leadership", investment: "Low", whatItTakes: "Manager time to select plus an optional small reward; scales with team size.", howToSize: "Reward value times reps recognized per quarter, plus selection time at the manager's rate." }
   ]
 };
+
 const $ = (id) => document.getElementById(id);
 const esc = (s) => String(s == null ? "" : s).replace(/[&<>"]/g, c => ({ "&":"&amp;","<":"&lt;",">":"&gt;","\"":"&quot;" }[c]));
 /* Exactly one terminal period, so model text that already ends in "." doesn't double up. */
@@ -1276,27 +1277,27 @@ function buildBlueprintDeck(pptx, d, dateStr, beyondRoi, augment, reinforce){
       if(hasFraming){
         sr.addText(reinforce.framing,{x:M,y:1.42,w:W-2*M,h:0.4,fontFace:BODY,fontSize:11,italic:true,color:GOLD,valign:"top",fit:"shrink"});
       }
-      const top = hasFraming ? 1.98 : 1.6;
+      const top = hasFraming ? 1.94 : 1.58;
       mv.slice(i,i+2).forEach((m,j)=>{
-        const cy=top+j*2.5, ch=2.35, cw=W-2*M;
+        const cy=top+j*2.52, ch=2.42, cw=W-2*M;
         const isInc=(m.type||"").toLowerCase().indexOf("incentive")>=0;
         const invC=INV[(m.investment||"").replace(/[^A-Za-z]/g,"")]||{bg:CREAM,tx:SOFT};
         sr.addShape(RR,{x:M,y:cy,w:cw,h:ch,fill:{color:CREAM},line:{color:LINE,width:1},rectRadius:0.1});
         // chips on their own line so a long move title gets full width
         sr.addText((m.type||"")+(m.motivator?("   ·   "+m.motivator):"")+(m.cadence?("   ·   "+m.cadence):""),
-          {x:M+0.3,y:cy+0.15,w:cw-0.6,h:0.26,valign:"middle",fontFace:DISP,fontSize:9,bold:true,color:isInc?"7A4FA3":"3E7A5E",charSpacing:.3});
-        // title + body as ONE flowing block, so the gap after the heading is a
-        // consistent paragraph space no matter how many lines the title wraps
-        const row=(lab,val,col)=> val?[{text:lab+"   ",options:{fontFace:DISP,fontSize:9,bold:true,color:col||DEEP,charSpacing:.4}},
-                                       {text:dot(val),options:{fontFace:BODY,fontSize:10.5,color:SOFT,breakLine:true,paraSpaceAfter:3}}]:[];
-        const block=[{text:m.move||"",options:{fontFace:DISP,fontSize:12.5,bold:true,color:INK,breakLine:true,paraSpaceAfter:9}}].concat(
+          {x:M+0.3,y:cy+0.14,w:cw-0.6,h:0.24,valign:"middle",fontFace:DISP,fontSize:8.5,bold:true,color:isInc?"7A4FA3":"3E7A5E",charSpacing:.3});
+        // One flowing block at FIXED sizes so every card reads the same, with content caps
+        // in the prompt keeping it inside the box.
+        const row=(lab,val,col)=> val?[{text:lab+"   ",options:{fontFace:DISP,fontSize:8.5,bold:true,color:col||DEEP,charSpacing:.4}},
+                                       {text:dot(val),options:{fontFace:BODY,fontSize:9.5,color:SOFT,breakLine:true,paraSpaceAfter:2}}]:[];
+        const block=[{text:m.move||"",options:{fontFace:DISP,fontSize:11.5,bold:true,color:INK,breakLine:true,paraSpaceAfter:6}}].concat(
           row("LOCKS IN",m.locksIn),
           row("OWNER",m.owner),
-          [{text:(m.investment?m.investment.toUpperCase()+" INVESTMENT (ESTIMATE)   ":""),options:{fontFace:DISP,fontSize:9,bold:true,color:invC.tx,charSpacing:.4,breakLine:true,paraSpaceBefore:7,paraSpaceAfter:4}}],
+          [{text:(m.investment?m.investment.toUpperCase()+" INVESTMENT (ESTIMATE)   ":""),options:{fontFace:DISP,fontSize:8.5,bold:true,color:invC.tx,charSpacing:.4,breakLine:true,paraSpaceBefore:5,paraSpaceAfter:3}}],
           row("WHAT IT TAKES",m.whatItTakes),
           row("HOW TO SIZE",m.howToSize,GOLD)
         );
-        sr.addText(block,{x:M+0.3,y:cy+0.44,w:cw-0.6,h:ch-0.58,valign:"top",fit:"shrink"});
+        sr.addText(block,{x:M+0.3,y:cy+0.4,w:cw-0.6,h:ch-0.54,valign:"top",fit:"shrink"});
       });
       foot(sr);
     }

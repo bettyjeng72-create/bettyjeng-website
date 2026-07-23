@@ -58,6 +58,58 @@ function clamp(s, max) {
   return String(s == null ? "" : s).slice(0, max).trim();
 }
 
+/* ------------------------------------------------- normalization boundary
+   Every string in every stage passes through here on the way out, so
+   punctuation cleanup lives in ONE place instead of being re-implemented in
+   the page, the PDF, and the slide renderers. That re-implementation is why
+   the double-period bug kept coming back with each new module. */
+
+const LABEL_KEYS = new Set([
+  "initiative", "rootType", "secondaryType", "group", "owner", "when", "effort",
+  "impact", "bucket", "verdict", "shortName", "lens", "signal", "level",
+  "cadence", "motivator", "investment", "type", "category", "trigger", "role", "id"
+]);
+
+function tidy(s) {
+  if (typeof s !== "string") return s;
+  let t = s;
+  t = t.replace(/[\u2014\u2013]\s*/g, ", ");             // em/en dash safety net
+  t = t.replace(/,\s*,/g, ", ");
+  t = t.replace(/\s+/g, " ").trim();
+  t = t.replace(/\s+([,.;:!?])/g, "$1");                 // space before punctuation
+  t = t.replace(/([.!?])\1+/g, "$1");                    // ".." or "!!"
+  t = t.replace(/([.!?]["')\u2019\u201d])\s*\./g, "$1"); // "...why.'." -> "...why.'"
+  t = t.replace(/([,;:])\s*\./g, "$1");                  // stray period after a comma
+  return t;
+}
+
+/* Sentence fields get exactly one terminal stop. Label and chip fields get none,
+   which is what fixes "OWNER  Sales managers." reading differently from its
+   neighbors on the slides. */
+function endStop(s) {
+  const t = tidy(s);
+  if (!t) return t;
+  return /[.!?]["')\u2019\u201d]?$/.test(t) ? t : t + ".";
+}
+
+function tidyDeep(v, key) {
+  if (typeof v === "string") {
+    return LABEL_KEYS.has(key) ? tidy(v).replace(/[.\s]+$/, "") : endStop(v);
+  }
+  if (Array.isArray(v)) return v.map((x) => tidyDeep(x, key));
+  if (v && typeof v === "object") {
+    const o = {};
+    for (const k of Object.keys(v)) o[k] = tidyDeep(v[k], k);
+    return o;
+  }
+  return v;
+}
+
+/* The one call site the rest of the file uses. */
+function parseClean(text) {
+  return tidyDeep(extractJson(text));
+}
+
 /* Pull JSON out of a model response even if it wraps it in prose or code fences,
    has trailing commas, or got cut off before it finished (truncation repair). */
 function extractJson(text) {
@@ -165,8 +217,9 @@ negotiation as useful. Never name-drop frameworks at the user.`;
 const ROLES = `
 Role logic, be precise about how each role actually relates to this workflow:
 - Doers: the people who perform the workflow day to day. They carry the biggest change.
-- Direct leaders: the people who manage, coach, or review the doers daily. They own
-  standards, performance, and coaching.
+- Direct leaders: the people who manage or coach the doers. They own standards and
+  development. How often they touch the doers' actual output is set by the workflow, not
+  by the job title. Read the workflow to find out, and never assume they review everything.
 - Downstream internal: colleagues who receive the output later, for example account
   managers or customer success. They care about quality and handoffs, but they do NOT
   manage or coach the doers.
@@ -198,6 +251,50 @@ do a step the new workflow removed or automated, and never rely on an artifact i
 longer produces. For example, if a tool now starts automatically, do not say "start the
 tool," because that click no longer exists.`;
 
+/* Shared rule: a role's job is ONLY what the workflow gives it. This is the fix for the
+   class of bug where the model reasons from what a job title usually means (managers
+   approve things, managers review everything) instead of from the six steps the user
+   actually wrote. */
+const WORKFLOW_TRUTH = `
+Read the workflow literally before you write about anyone:
+- A role's job is ONLY what the workflow gives it. Do not import what that job title
+  usually does elsewhere. If the workflow says a leader reviews "if there are escalations,
+  questions, or issues," then that role is exception-based, and you may never describe them
+  reviewing, approving, rewriting, signing off on, or reading every item. Exception-based
+  stays exception-based in every section.
+- Sequence and visibility are real constraints. A person can only act on work the sequence
+  has already handed to them. If the doer edits and submits, then nobody else can review,
+  approve, or pre-approve that item before submission. Never invent a checkpoint the
+  sequence does not contain.
+- Never invent a burden so that AI has something to lift. What AI takes off a role's plate
+  must be work that role actually performs in the workflow as the user described it. If a
+  role carries no real drudgery there, say plainly that their day-to-day changes little,
+  and spend the space on what becomes newly possible for them instead.
+- Do not define a role's new work by negating something they never did. Never write "not by
+  rewriting their work" if the workflow never had them rewriting anything.
+- A conditional step is not an efficiency problem. Do not propose relieving a burden that
+  only happens by exception.`;
+
+/* Shared rule: a metric your own recommendation pins at 100% is a dead metric. */
+const MEASURABLE = `
+Metrics must be able to move. If your own recommendation makes a step automatic or
+universal, then counting whether that step happened is a dead metric. It reads 100% on day
+one and tells nobody anything. Never propose one.
+- When a step becomes automatic, measure the HUMAN behavior stacked on top of it: how
+  often people edit, override, correct, flag, or escalate the output, and how good the
+  result is. Never whether the step occurred.
+- Use the word "adoption" only where a real choice remains. If your design removed the
+  choice, the honest measure is trust and quality, not usage.
+- Every metric needs a plausible range. If you cannot describe both a bad result and a good
+  result that could genuinely occur after the change, replace the metric.`;
+
+/* Shared rule for the go-deeper modules: if the Blueprint summary carries a role contract,
+   it is binding. Harmless when it is absent, since the rules above still apply. */
+const CONTRACT_BINDING = `
+If the Blueprint summary below contains a ROLE CONTRACT, treat it as binding. Never give a
+role an action, a burden, or a line of sight the contract does not list. If your idea needs
+one, the idea is wrong, not the contract.`;
+
 /* Shared self-audit for the go-deeper modules. Kept short on purpose. */
 const GD_AUDIT = `
 FINAL AUDIT, run silently on your draft before returning it, and fix what fails:
@@ -208,6 +305,12 @@ FINAL AUDIT, run silently on your draft before returning it, and fix what fails:
 3. Is any role assigned an action it could not perform, such as an external partner
    coaching staff or reading internal records?
 4. Does anything depend on an artifact or comparison the workflow does not actually create?
+5. Does anything give a role a routine, per-item duty when the workflow gives that role only
+   a conditional, exception-based one? Rewrite it to match the workflow.
+6. Does anything require a role to see or act on work before the sequence hands it to them?
+   Move it after the step that actually delivers it.
+7. Does anything claim to lift a burden the workflow never gave that role, or define a
+   role's new work by negating something they never did? Cut it.
 Return only the corrected JSON. Never mention this audit.`;
 
 /* ------------------------------------------------------- stage: CLARIFY */
@@ -237,9 +340,26 @@ Rules:
   cause, ask about the fact, not the imagined symptom.
 - Keep each question to one clear sentence. Warm and curious, never an interrogation.
 - The industry or context should sharpen your questions, never make them vaguer or odder.
+- Use literal language only. No metaphor, no figure of speech, no verb that implies a
+  verdict. Never say something "disappears", "goes nowhere", "falls into a black hole", or
+  "gets lost" when the intake says it is saved, stored, submitted, or captured. Ask the
+  plain thing you actually want to know, for example "does anyone read it afterward".
+- Never contradict a fact the intake already states. Re-read the workflow before you write
+  each question. The person who wrote that workflow should recognize their own process in
+  your wording.
+- One question, one fact. Do not stack an "or does it just ..." tail onto a question. If two
+  things matter, ask the one that would change the diagnosis and drop the other.
+- Prefer who does what, when, and how often, over whether something feels a certain way.
 
 Return ONLY valid JSON, no prose, no code fences, in exactly this shape:
-{"questions":[{"id":"q1","question":"...","why":"one short line on why you're asking"}]}`;
+{"questions":[{"id":"q1","question":"...","why":"one short line on why you're asking"}]}
+
+BEFORE RETURNING, read each question back silently and rewrite any that fails:
+1. Does it contradict or ignore something the intake already states?
+2. Does it use a figure of speech, or a word that implies a judgment about the answer?
+3. Does it ask two things at once?
+4. Could a non-specialist answer it with a plain fact in one or two sentences?
+Return only the corrected JSON. Never mention this check.`;
   return [
     { role: "system", content: sys },
     { role: "user", content: brief }
@@ -262,6 +382,8 @@ function generateMessages(brief, goalMode, qa) {
   const sys = `You are Alora. Turn the intake (and any answers) into an Insight-to-Action Blueprint.
 ${BRAND}
 ${ROLES}
+${WORKFLOW_TRUTH}
+${MEASURABLE}
 
 Think it through internally first: name the real root cause (process, tool, skill, or
 people, often a blend), redraw the workflow lean, and make sure the redrawn workflow
@@ -285,27 +407,6 @@ change with some friction, not automation, so name it honestly rather than dress
 as automated. Do not describe the same step as manual in one section and automated in
 another.
 
-FINAL CONSISTENCY AUDIT, run this on your draft before you return it, and fix anything
-that fails:
-1. Does every assumption survive a re-read of the intake? Delete any that the intake or
-   answers already answer.
-2. Does the after workflow contradict any fix, verdict, or assumption? If a step is
-   automatic in one place, it must be automatic everywhere.
-3. Is any step labeled Automate that still requires a person to click, type, choose,
-   review, or approve? If so, relabel it honestly.
-4. Does any fix, move, or checklist item depend on an artifact the new workflow no longer
-   produces (for example a manual summary that no longer gets written)? If so, either stage
-   it explicitly (a short pilot, or a comparison against historical data) or replace it.
-5. Does any move tell people to do something the new workflow already does for them?
-   If so, cut it.
-6. Would any move require two versions of something the workflow only produces once, or
-   two people where there is only one? If so, rewrite it so it is possible in real life.
-7. Is any group a bundle of roles with different relationships to the workflow (for example
-   a direct manager lumped with downstream colleagues or external partners)? If so, split
-   it and keep only the roles that genuinely share that stake.
-8. Does any group get assigned an action it could not perform, such as an external partner
-   coaching staff or reviewing internal records? If so, fix or remove it.
-Return only the corrected Blueprint. Silent, internal audit; do not mention it in output.
 ${goalMode ? "There is no existing workflow, so propose a sensible starting workflow as the 'before', then the leaner version as the 'after'." : ""}
 
 Fidelity rule for the "before" steps: stay faithful to what the user actually wrote.
@@ -355,6 +456,11 @@ steps the user did not describe. The workflow logic must come from what the user
 wrote, not from what you assume is typical for that industry. A change in industry should
 never change the underlying diagnosis of the same workflow.
 
+The role contract is the fact sheet every later section must obey. Build it straight from
+the workflow you were given, never from what the job titles usually mean. If a step is
+conditional, write that condition into "trigger" in the user's own words. If a role only
+sees the work after somebody else submits it, write that into "sees".
+
 Return ONLY valid JSON, no prose, no code fences, in EXACTLY this shape:
 {
   "initiative": "short label, 3 to 6 words",
@@ -365,6 +471,7 @@ Return ONLY valid JSON, no prose, no code fences, in EXACTLY this shape:
     "after": ["step that includes the AI where it fits", "step"],
     "changes": [{ "change": "what changed", "why": "the payoff" }]
   },
+  "roleContract": [{ "role": "the role name as the user would say it", "category": "Doer|Direct leader|Downstream internal|External", "does": "the steps this role actually performs, from the workflow as written", "trigger": "Every item|Exception only: the stated condition|None", "sees": "what this role can see, and at what point the sequence hands it to them" }],
   "fixes": [{ "fix": "a concrete move", "effort": "Low|Medium|High", "impact": "Low|Medium|High", "bucket": "Quick win|Bigger bet" }],
   "aiFit": [{ "step": "a step in the flow", "verdict": "Automate|Human-AI assist|Keep human", "why": "one line" }],
   "humanAngle": [{ "group": "a group this touches", "worry": "their honest fear", "wiifm": "what's genuinely in it for them", "move": "the change-management move that earns trust" }],
@@ -373,11 +480,44 @@ Return ONLY valid JSON, no prose, no code fences, in EXACTLY this shape:
 
 Aim for: 0 to 2 assumptions, exactly 3 fixes, exactly 3 aiFit rows, exactly 2
 humanAngle groups, 4 checklist items, before and after at most 6 steps each,
-changes at most 3, quick wins first.
+changes at most 3, quick wins first. roleContract covers the 2 to 3 roles the
+workflow actually names, with every field under 15 words.
 Keep every string to ONE short sentence. Be sharp and concrete, never wordy.
 Critical: you have limited space. A complete, concise Blueprint that closes its
 JSON cleanly is far better than a detailed one that gets cut off. Finish every
-section and close the JSON.`;
+section and close the JSON.
+
+FINAL CONSISTENCY AUDIT, run this on your draft before you return it, and fix anything
+that fails:
+1. Does every assumption survive a re-read of the intake? Delete any that the intake or
+   answers already answer.
+2. Does the after workflow contradict any fix, verdict, or assumption? If a step is
+   automatic in one place, it must be automatic everywhere.
+3. Is any step labeled Automate that still requires a person to click, type, choose,
+   review, or approve? If so, relabel it honestly.
+4. Does any fix, move, or checklist item depend on an artifact the new workflow no longer
+   produces (for example a manual summary that no longer gets written)? If so, either stage
+   it explicitly (a short pilot, or a comparison against historical data) or replace it.
+5. Does any move tell people to do something the new workflow already does for them?
+   If so, cut it.
+6. Would any move require two versions of something the workflow only produces once, or
+   two people where there is only one? If so, rewrite it so it is possible in real life.
+7. Is any group a bundle of roles with different relationships to the workflow (for example
+   a direct manager lumped with downstream colleagues or external partners)? If so, split
+   it and keep only the roles that genuinely share that stake.
+8. Does any group get assigned an action it could not perform, such as an external partner
+   coaching staff or reviewing internal records? If so, fix or remove it.
+9. Does any fix, checklist item, or measure count whether a step happened that your own
+   recommendation just made automatic or universal? Replace it with a measure of the human
+   behavior on top of it: edit rate, override rate, quality flags, escalation rate.
+10. Does any section give a role a routine, per-item duty when the workflow gives that role
+   only a conditional, exception-based one? Rewrite it to match the workflow.
+11. Does any move require somebody to see or act on work before the sequence hands it to
+   them? Move it after the step that actually delivers it.
+12. Does anything describe a role being relieved of work the workflow never gave them, or
+   define their new role by negating something they never did? Cut it.
+13. Does every roleContract row match how that role appears in every other section?
+Return only the corrected Blueprint. Silent, internal audit; do not mention it in output.`;
 
   return [
     { role: "system", content: sys },
@@ -390,7 +530,10 @@ function metricsMessages(brief, bpSummary) {
   const sys = `You are Alora, adding a success-measurement layer to a Blueprint you already produced.
 ${BRAND}
 ${ROLES}
+${WORKFLOW_TRUTH}
+${MEASURABLE}
 ${AFTER_STATE}
+${CONTRACT_BINDING}
 
 The user is under pressure to prove ROI, and the danger is that "ROI" shrinks to speed
 alone. Efficiency-only scorekeeping is the exact logic that turns AI adoption into
@@ -460,7 +603,9 @@ function augmentMessages(brief, bpSummary) {
   const sys = `You are Alora, adding an Augmentation Map to a Blueprint you already produced.
 ${BRAND}
 ${ROLES}
+${WORKFLOW_TRUTH}
 ${AFTER_STATE}
+${CONTRACT_BINDING}
 
 The people affected by this change are afraid, often quietly, that AI is coming for their
 jobs. Your job is to replace that fear with a real, walkable path: what changes, what
@@ -509,7 +654,9 @@ function reinforceMessages(brief, bpSummary) {
   const sys = `You are Alora, adding a Reinforcement and Incentivizing layer to a Blueprint you already produced.
 ${BRAND}
 ${ROLES}
+${WORKFLOW_TRUTH}
 ${AFTER_STATE}
+${CONTRACT_BINDING}
 
 Reinforcement is the step most change efforts skip, and then they wonder why adoption
 fades after launch. Your job is the moves that make this change stick and the incentives
@@ -582,6 +729,12 @@ whatItTakes under 26, howToSize under 26. One sentence each. Make investment lev
 to each other so a sponsor can triage at a glance. Every motivator must be intrinsic, never
 fear or compliance. The estimateNote must also remind the reader that timing depends on
 their team size and resource availability.
+
+Self-consistency check, this module only: read your own "locksIn" line back against the
+move it belongs to. If the move contradicts the very workflow step it claims to lock in,
+rewrite the move. An autonomy grant must be a real choice that lives inside the sequence,
+for example how much to edit, or when to submit. Never a choice that would require another
+role to see the work early.
 ${GD_AUDIT}`;
 
   return [
@@ -647,19 +800,19 @@ async function generateJson(messages, maxTokens) {
 
   try {
     let raw = await callModel(messages, maxTokens, false, MODEL, left());
-    let parsed = extractJson(raw);
+    let parsed = parseClean(raw);
     if (parsed) return parsed;
 
     // Bad JSON: one strict retry on the same model, only if time allows.
     if (left() > 3500) {
       raw = await callModel(messages, maxTokens, true, MODEL, left());
-      parsed = extractJson(raw);
+      parsed = parseClean(raw);
       if (parsed) return parsed;
     }
     // Still bad: try the free router once if it is a different model and time allows.
     if (MODEL !== FREE_MODEL && left() > 3500) {
       raw = await callModel(messages, maxTokens, false, FREE_MODEL, left());
-      parsed = extractJson(raw);
+      parsed = parseClean(raw);
       if (parsed) return parsed;
     }
     return null;
@@ -670,7 +823,7 @@ async function generateJson(messages, maxTokens) {
       console.error("alora primary failed, trying free:", err.status || "", err.message || "");
       try {
         const raw = await callModel(messages, maxTokens, false, FREE_MODEL, left());
-        return extractJson(raw);
+        return parseClean(raw);
       } catch (e2) { throw e2; }
     }
     throw err;

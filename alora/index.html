@@ -542,7 +542,7 @@ const EXAMPLE_BLUEPRINT = {
       "Rep begins customer call with AI-Call Notetaker on by default.",
       "Rep finishes call and AI generates summary automatically.",
       "Rep reviews AI summary in CRM, edits if needed, and submits in one step.",
-      "Manager spot-checks a small sample of submitted summaries, and reviews in full only when there is an escalation, question, or issue.",
+      "Manager reviews AI summary and flags quality to rep (escalations get feedback; routine calls get a thumbs-up or brief note).",
       "Rep sees manager feedback and builds confidence in AI notes for future calls.",
       "Summary sits in CRM for next rep or manager reference."
     ],
@@ -560,22 +560,17 @@ const EXAMPLE_BLUEPRINT = {
   aiFit: [
     { step: "Rep finishes call and AI generates summary automatically.", verdict: "Automate", why: "AI transcription and summary generation is reliable and removes the manual write-from-memory step entirely." },
     { step: "Rep reviews AI summary in CRM, edits if needed, and submits in one step.", verdict: "Human-AI assist", why: "Rep adds judgment and context that AI may miss; AI does the heavy lifting, rep does the quality check." },
-    { step: "Manager spot-checks a sample and reviews in full on escalations.", verdict: "Keep human", why: "Judgment on an escalated deal is the manager's own, and the sample keeps quality visible without putting them in every summary." }
+    { step: "Manager reviews AI summary and flags quality to rep.", verdict: "Human-AI assist", why: "Manager judgment on escalations is irreplaceable, but AI notes give them a head start and free them from reading rambling manual notes." }
   ],
   humanAngle: [
-    { group: "Sales reps", worry: "Will the AI notes miss important details or make me look bad if a manager sees a sloppy summary", wiifm: "You save 5 to 10 minutes per call, and manager feedback will show you the AI is trustworthy; you keep control by reviewing before it goes in", move: "In a team huddle, put an AI summary next to one of that rep's own manual summaries from before the change, and let them mark what each one caught" },
-    { group: "Sales managers", worry: "If I stop seeing reps write their own notes, how do I know they are paying attention to the call or remembering the details", wiifm: "You get a consistent record to coach from when an escalation lands, and a light sample tells you how the team is doing without reading every summary", move: "Frame the spot-check as a coaching tool, not a compliance check; pull one summary per rep per week and give one piece of actionable feedback so reps see the sample is about their growth" }
-  ],
-  roleContract: [
-    { role: "Sales reps", category: "Doer", does: "Run the call, review the AI summary, edit if needed, submit in CRM.", trigger: "Every item", sees: "The summary first, before anyone else, while it is still a draft." },
-    { role: "Sales managers", category: "Direct leader", does: "Spot-check a sample, coach on quality, resolve escalations.", trigger: "Exception only: escalations, questions, or issues, plus a light sample.", sees: "Only summaries already submitted by the rep, never before submission." },
-    { role: "Account managers", category: "Downstream internal", does: "Read the submitted summary before engaging the customer.", trigger: "Every item they inherit", sees: "The submitted summary in CRM, after the rep submits it." }
+    { group: "Sales reps", worry: "Will the AI notes miss important details or make me look bad if a manager sees a sloppy summary", wiifm: "You save 5 to 10 minutes per call, and manager feedback will show you the AI is trustworthy; you keep control by reviewing before it goes in", move: "Show reps a side-by-side of their old manual notes and AI notes for the same call; let them see the AI is often more complete and faster" },
+    { group: "Sales managers", worry: "If I stop seeing reps write their own notes, how do I know they are paying attention to the call or remembering the details", wiifm: "You spend less time reading notes and more time coaching on the deal; AI notes are a baseline, and your feedback to reps becomes a coaching moment, not a chore", move: "Frame the feedback protocol as a coaching tool, not a compliance check; give reps one piece of actionable feedback per week so they see you are reading and care" }
   ],
   checklist: [
     { action: "Audit the AI-Call Notetaker settings and flip the default to ON for all reps by end of week.", owner: "Sales ops or IT admin", when: "This week" },
     { action: "Work with the tool vendor or CRM team to add a one-click 'Approve and Submit' button; test with 5 reps.", owner: "Sales ops or product owner", when: "Week 2" },
     { action: "Brief sales managers on the feedback protocol and share a template for weekly coaching notes; kick off with a 30-minute call.", owner: "Sales leadership or change lead", when: "Week 2" },
-    { action: "Track summary-write time separately from call time, and track how often reps heavily rewrite the AI draft, over 4 weeks.", owner: "Sales ops or analytics", when: "Week 3" }
+    { action: "Track summary-write time separately from call time and measure adoption of AI notes over 4 weeks to show the payoff.", owner: "Sales ops or analytics", when: "Week 3" }
   ]
 };
 
@@ -670,10 +665,10 @@ const EXAMPLE_AUGMENT = {
     {
       group: "Sales managers",
       fearNamed: "If reps stop writing their own notes, do I lose visibility into whether they are really engaged on calls?",
-      aiTakes: "Reconstructing what happened on a deal from thin, written-from-memory notes whenever an escalation lands on your desk.",
+      aiTakes: "Reading long, rambling manual summaries and reconstructing what happened on a deal.",
       movesToward: "Coaching on the deal and the relationship, using AI notes as a consistent baseline to see where reps need help.",
       ladder: [
-        { capability: "Reading an AI summary and confidence signal to gauge call quality fast.", level: "Foundational", why: "A quick read is what makes a light sample possible instead of a full review." },
+        { capability: "Reading an AI summary and confidence signal to gauge call quality fast.", level: "Foundational", why: "Frees a manager's attention for coaching instead of note-reading." },
         { capability: "Giving reps quick, specific feedback on AI note quality.", level: "Growing", why: "Closing the trust loop is what makes reps actually adopt the tool." },
         { capability: "Running a light feedback protocol that scales across the team.", level: "Growing", why: "Turns a chore into a repeatable coaching rhythm." },
         { capability: "Reading team-wide patterns in AI notes to target coaching where it moves revenue.", level: "Advanced", why: "Managing by signal, not by anecdote, is the upgraded manager role." }
@@ -693,29 +688,15 @@ const EXAMPLE_REINFORCE = {
     { move: "A friendly streak marker showing how many calls in a row a rep let the AI draft stand.", type: "Incentive", motivator: "Progress", locksIn: "Reps choosing the AI draft by default rather than rewriting it.", cadence: "Ongoing", owner: "Sales ops", investment: "Medium", whatItTakes: "A one-time CRM or dashboard config, then it runs itself; calendar time depends on your admin's queue.", howToSize: "Ask your CRM admin or vendor for a one-time build estimate; ongoing cost is near zero." },
     { move: "A weekly manager note to each rep on what their AI summary captured well.", type: "Reinforcement", motivator: "Recognition", locksIn: "Closing the trust loop so reps rely on AI notes instead of rewriting from habit.", cadence: "Weekly", owner: "Sales managers", investment: "Low", whatItTakes: "Roughly 1 to 2 minutes per rep per week, so it scales with how many reps each manager carries.", howToSize: "Minutes per rep times reps per manager times your manager count times their blended rate." },
     { move: "An AI notes champion role for a few respected reps who help peers and shape the prompts.", type: "Incentive", motivator: "Autonomy", locksIn: "Voluntary reuse and peer-to-peer trust in the AI notes.", cadence: "One-time", owner: "Sales leadership", investment: "Low", whatItTakes: "Mostly recognition plus some of the champions' time; no direct spend unless you add a perk.", howToSize: "Any perk value times the number of champions, plus their time at their blended rate." },
-    { move: "A progress view showing time reclaimed and how often the AI draft stands as written, at team and personal level.", type: "Reinforcement", motivator: "Progress", locksIn: "Reps reviewing and submitting rather than rewriting, because they see their own momentum.", cadence: "Ongoing", owner: "Sales ops or analytics", investment: "Medium", whatItTakes: "A one-time build on data you already capture; timing depends on analyst availability, not just effort.", howToSize: "Get a one-time analyst or vendor build estimate, then add light monthly upkeep." },
+    { move: "A progress view showing time reclaimed and adoption trending, at team and personal level.", type: "Reinforcement", motivator: "Progress", locksIn: "Sustained adoption, because reps see their own momentum and want to keep it.", cadence: "Ongoing", owner: "Sales ops or analytics", investment: "Medium", whatItTakes: "A one-time build on data you already capture; timing depends on analyst availability, not just effort.", howToSize: "Get a one-time analyst or vendor build estimate, then add light monthly upkeep." },
     { move: "Quarterly recognition for the reps who grew most or helped peers, never a bottom-ranked list.", type: "Incentive", motivator: "Belonging", locksIn: "Continued growth and a sense that the team is in this together.", cadence: "Monthly", owner: "Sales leadership", investment: "Low", whatItTakes: "Manager time to select plus an optional small reward; scales with team size.", howToSize: "Reward value times reps recognized per quarter, plus selection time at the manager's rate." }
   ]
 };
 
 const $ = (id) => document.getElementById(id);
 const esc = (s) => String(s == null ? "" : s).replace(/[&<>"]/g, c => ({ "&":"&amp;","<":"&lt;",">":"&gt;","\"":"&quot;" }[c]));
-/* Exactly one terminal period, and idempotent. Mirrors the server-side normalizer in
-   alora.js so a string that is already clean passes through untouched. The old version
-   ignored a closing quote, so "...and why.'" became "...and why.'." on every render. */
-const dot = (s) => {
-  let t = String(s == null ? "" : s).trim();
-  if (!t) return "";
-  t = t.replace(/[\u2014\u2013]\s*/g, ", ").replace(/,\s*,/g, ", ");
-  t = t.replace(/\s+/g, " ").trim();
-  t = t.replace(/\s+([,.;:!?])/g, "$1");
-  t = t.replace(/([.!?])\1+/g, "$1");
-  t = t.replace(/([.!?]["')\u2019\u201d])\s*\./g, "$1");
-  t = t.replace(/([,;:])\s*\./g, "$1");
-  return /[.!?]["')\u2019\u201d]?$/.test(t) ? t : t + ".";
-};
-/* Label and chip fields never carry a terminal period. */
-const nodot = (s) => String(s == null ? "" : s).trim().replace(/[.\s]+$/, "");
+/* Exactly one terminal period, so model text that already ends in "." doesn't double up. */
+const dot = (s) => { s = String(s == null ? "" : s).trim(); return s ? s.replace(/[.!?]+$/, "") + "." : ""; };
 function toast(msg){ const t=$("toast"); t.textContent=msg; t.classList.add("show"); clearTimeout(t._t); t._t=setTimeout(()=>t.classList.remove("show"),2600); }
 
 /* Persistent error dialog. Unlike a toast, it stays on screen until the user
@@ -792,7 +773,7 @@ function renderBlueprint(d){
      <ul class="changes">${changes}</ul>`);
 
   const fixCard = (f)=>`<div class="fix"><div class="ftext">${esc(f.fix)}</div>
-     <div class="chips"><span class="chip">Effort: ${esc(nodot(f.effort))}</span><span class="chip">Impact: ${esc(nodot(f.impact))}</span></div></div>`;
+     <div class="chips"><span class="chip">Effort: ${esc(f.effort)}</span><span class="chip">Impact: ${esc(f.impact)}</span></div></div>`;
   const wins = d.fixes.filter(f=>/quick/i.test(f.bucket)).map(fixCard).join("") || `<p class="bp-sub">None flagged.</p>`;
   const bets = d.fixes.filter(f=>!/quick/i.test(f.bucket)).map(fixCard).join("") || `<p class="bp-sub">None flagged.</p>`;
   html += section("03","Quick wins vs. bigger bets","Sorted by effort and impact",
@@ -804,12 +785,12 @@ function renderBlueprint(d){
   const pcls = (v)=> /keep human/i.test(v) ? "human" : /assist/i.test(v) ? "assist" : "automate";
   const ai = d.aiFit.map(a=>`<div class="ai-item">
        <span class="ai-step">${esc(a.step)}</span>
-       <span class="pill ${pcls(a.verdict)}">${esc(nodot(a.verdict))}</span>
+       <span class="pill ${pcls(a.verdict)}">${esc(a.verdict)}</span>
        <span class="ai-why">${esc(a.why)}</span></div>`).join("");
   html += section("04","Where AI helps, and where it doesn't","Automation candidates vs. keep-human",ai);
 
   const personas = d.humanAngle.map(p=>`<div class="persona">
-       <h4>${esc(nodot(p.group))}</h4>
+       <h4>${esc(p.group)}</h4>
        <div class="prow"><span class="plab">Worry</span>${esc(dot(p.worry))}</div>
        <div class="prow"><span class="plab">In it for them</span>${esc(dot(p.wiifm))}</div>
        <div class="prow"><span class="plab">The move</span>${esc(dot(p.move))}</div>
@@ -820,8 +801,8 @@ function renderBlueprint(d){
        <input type="checkbox" />
        <span class="cbody">
          <span class="crow action"><span class="clab">Action</span><span class="ctext">${esc(c.action)}</span></span>
-         <span class="crow"><span class="clab">Who</span><span>${esc(nodot(c.owner))}</span></span>
-         <span class="crow"><span class="clab">When</span><span>${esc(nodot(c.when))}</span></span>
+         <span class="crow"><span class="clab">Who</span><span>${esc(c.owner)}</span></span>
+         <span class="crow"><span class="clab">When</span><span>${esc(c.when)}</span></span>
        </span>
      </label>`).join("");
   html += section("06","Action checklist","Your next moves, quick wins first",checks);
@@ -857,9 +838,6 @@ function normalizeBlueprint(d){
   d.humanAngle = Array.isArray(d.humanAngle) ? d.humanAngle : [];
   d.checklist = Array.isArray(d.checklist) ? d.checklist : [];
   d.assumptions = Array.isArray(d.assumptions) ? d.assumptions.filter(Boolean) : [];
-  /* New in v15. Not rendered on the page, it travels to the go-deeper modules
-     so they stop re-deriving who does what from the job titles. */
-  d.roleContract = Array.isArray(d.roleContract) ? d.roleContract : [];
   return d;
 }
 
@@ -1366,19 +1344,11 @@ function buildBpSummary(){
   const groups = (d.humanAngle||[]).map(g=>`- ${g.group}: worried "${g.worry}"`).join("\n");
   const after = ((d.workflow||{}).after||[]).map((s,i)=>`${i+1}. ${s}`).join("\n");
   const changes = ((d.workflow||{}).changes||[]).map(c=>`- ${c.change}`).join("\n");
-  const before = ((d.workflow||{}).before||[]).map((s,i)=>`${i+1}. ${s}`).join("\n");
-  const contract = (d.roleContract||[]).map(r=>
-    `- ${r.role} [${r.category||""}] does: ${r.does||""} | trigger: ${r.trigger||""} | sees: ${r.sees||""}`
-  ).join("\n");
   return `Initiative: ${d.initiative||""}\nRoot: ${dx.rootType||""}${dx.secondaryType?(" + "+dx.secondaryType):""}\nDiagnosis: ${dx.summary||""}
-THE WORKFLOW BEFORE THE CHANGE, use this to judge what work a role actually carried:
-${before}
 THE NEW (LEANER) WORKFLOW, already decided, everything you write must be consistent with it:
 ${after}
 KEY CHANGES ALREADY MADE:
-${changes}${contract?`
-ROLE CONTRACT, binding. Never give a role an action, a burden, or a line of sight it does not list:
-${contract}`:""}
+${changes}
 AI fit:\n${fit}\nGroups affected:\n${groups}`;
 }
 
@@ -1394,9 +1364,9 @@ function renderMetrics(b){
     const lens = (m.lens||"").replace(/[^A-Za-z]/g,"");
     return `<div class="metric-card">
       <div class="metric-chips">
-        ${m.shortName?`<span class="mchip name">${esc(nodot(m.shortName))}</span>`:""}
-        ${m.lens?`<span class="mchip lens-${lens}">${esc(nodot(m.lens))}</span>`:""}
-        ${m.signal?`<span class="mchip signal">${esc(nodot(m.signal))}</span>`:""}
+        ${m.shortName?`<span class="mchip name">${esc(m.shortName)}</span>`:""}
+        ${m.lens?`<span class="mchip lens-${lens}">${esc(m.lens)}</span>`:""}
+        ${m.signal?`<span class="mchip signal">${esc(m.signal)}</span>`:""}
       </div>
       <div class="metric-title">${esc(m.metric||"")}</div>
       ${m.definition?`<div class="mrow"><span class="mlab">What it is</span>${esc(dot(m.definition))}</div>`:""}

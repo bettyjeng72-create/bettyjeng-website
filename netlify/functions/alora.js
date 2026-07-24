@@ -189,6 +189,18 @@ Rules:
 - If the user lists roles without saying what each does, infer their relationship from the
   workflow itself, and do not treat an external party as an internal one.`;
 
+/* Shared rule: get the direction of AI's effect right. Used by generate and augment,
+   both of which name people's fears and worries. */
+const AI_FIDELITY = `
+AI fidelity, get the direction of the change right: an AI notetaker records and transcribes
+the whole call, so it gives managers and reps MORE visibility and fidelity than a rep
+writing from memory, not less. Never frame AI as reducing what a person can see or hear.
+Do not write worries or fears like "if AI writes the summary I lose visibility into what
+was said"; that is backwards. Name concerns that are actually true given how the tool works:
+the summary may miss nuance, inferred intent, or the customer's tone that a person would
+catch; reps may rubber-stamp it without editing, so their judgment erodes; or the team may
+lean on the summary instead of listening.`;
+
 /* Shared rule: the leaner workflow is already decided, so every go-deeper module must
    write as if it is live. Prevents advice that undoes the redesign. */
 const AFTER_STATE = `
@@ -208,6 +220,10 @@ FINAL AUDIT, run silently on your draft before returning it, and fix what fails:
 3. Is any role assigned an action it could not perform, such as an external partner
    coaching staff or reading internal records?
 4. Does anything depend on an artifact or comparison the workflow does not actually create?
+5. Does any fear or worry claim the AI reduces what a person can see or hear, when an AI
+   notetaker actually records and transcribes MORE than a human would? If so, replace it
+   with a concern that is genuinely true (missed nuance or intent, rubber-stamping without
+   editing, over-reliance), never a backwards one.
 Return only the corrected JSON. Never mention this audit.`;
 
 /* ------------------------------------------------------- stage: CLARIFY */
@@ -305,6 +321,9 @@ that fails:
    it and keep only the roles that genuinely share that stake.
 8. Does any group get assigned an action it could not perform, such as an external partner
    coaching staff or reviewing internal records? If so, fix or remove it.
+9. Does any worry, fear, or move claim the AI reduces what a person can see or hear when it
+   actually records and transcribes more than a human would? If so, replace it with a
+   concern that is genuinely true given how the tool works.
 Return only the corrected Blueprint. Silent, internal audit; do not mention it in output.
 ${goalMode ? "There is no existing workflow, so propose a sensible starting workflow as the 'before', then the leaner version as the 'after'." : ""}
 
@@ -330,13 +349,16 @@ Role realism, check every move against how the job actually works:
 - Picture the real person doing the real task before you recommend anything. One rep runs
   one call and produces ONE record of it, so they either use the AI summary or write their
   own, never both for the same call. Do not propose comparing two versions of the same
-  event that only one person could have produced.
+  event that only one person could have produced, and a pilot does not fix this: the same
+  rep cannot write a manual summary and also have an AI summary of the SAME call to compare.
+- If a comparison is genuinely useful, ground it in something that can really exist: a rep's
+  manual summaries from BEFORE the change against AI summaries AFTER it (different calls,
+  measured in aggregate), or one rep's AI summary next to a DIFFERENT rep's manual summary.
+  Never one person versus themselves on one call.
 - The same applies generally: never suggest a comparison, demo, or exercise that would
   require two people, two systems, or two outputs where the workflow only ever creates one.
-  If a comparison is genuinely useful, ground it in something real, for example a rep's
-  earlier manual summaries from before the change, a deliberate side-by-side during a short
-  pilot, or one rep's AI summary next to a different rep's manual one.
 - Respect the rhythm of the role. Do not add steps a busy person plausibly would not do.
+${AI_FIDELITY}
 
 Availability rule, do not invent data or artifacts that will not exist:
 - Only recommend comparing, measuring, or reviewing things that the new workflow actually
@@ -460,6 +482,7 @@ function augmentMessages(brief, bpSummary) {
   const sys = `You are Alora, adding an Augmentation Map to a Blueprint you already produced.
 ${BRAND}
 ${ROLES}
+${AI_FIDELITY}
 ${AFTER_STATE}
 
 The people affected by this change are afraid, often quietly, that AI is coming for their

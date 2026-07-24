@@ -564,7 +564,7 @@ const EXAMPLE_BLUEPRINT = {
   ],
   humanAngle: [
     { group: "Sales reps", worry: "Will the AI notes miss important details or make me look bad if a manager sees a sloppy summary", wiifm: "You save 5 to 10 minutes per call, and manager feedback will show you the AI is trustworthy; you keep control by reviewing before it goes in", move: "Show reps a side-by-side of their old manual notes and AI notes for the same call; let them see the AI is often more complete and faster" },
-    { group: "Sales managers", worry: "If I stop seeing reps write their own notes, how do I know they are paying attention to the call or remembering the details", wiifm: "You spend less time reading notes and more time coaching on the deal; AI notes are a baseline, and your feedback to reps becomes a coaching moment, not a chore", move: "Frame the feedback protocol as a coaching tool, not a compliance check; give reps one piece of actionable feedback per week so they see you are reading and care" }
+    { group: "Sales managers", worry: "If AI writes the summaries, I worry the nuance and inferred intent a rep would catch gets lost, and that reps rubber-stamp the AI without really engaging", wiifm: "You spend less time reading notes and more time coaching on the deal; AI notes are a consistent baseline, and your feedback to reps becomes a coaching moment, not a chore", move: "Frame the feedback protocol as a coaching tool, not a compliance check; give reps one piece of actionable feedback per week so they see you are reading and care" }
   ],
   checklist: [
     { action: "Audit the AI-Call Notetaker settings and flip the default to ON for all reps by end of week.", owner: "Sales ops or IT admin", when: "This week" },
@@ -664,7 +664,7 @@ const EXAMPLE_AUGMENT = {
     },
     {
       group: "Sales managers",
-      fearNamed: "If reps stop writing their own notes, do I lose visibility into whether they are really engaged on calls?",
+      fearNamed: "If AI writes the summaries, will the nuance and inferred intent get lost, and will reps just rubber-stamp the AI instead of really engaging on the call?",
       aiTakes: "Reading long, rambling manual summaries and reconstructing what happened on a deal.",
       movesToward: "Coaching on the deal and the relationship, using AI notes as a consistent baseline to see where reps need help.",
       ladder: [

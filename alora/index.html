@@ -399,6 +399,7 @@
                 <option>Telecommunications</option>
                 <option>Energy / Utilities</option>
                 <option>Media / Entertainment</option>
+                <option>Real Estate / Commercial Real Estate</option>
                 <option>Transportation / Logistics</option>
                 <option>Nonprofit</option>
                 <option>Other</option>
@@ -508,26 +509,26 @@
 /* ---------- Example scenario (intake + sample Blueprint output) ---------- */
 const EXAMPLE_INTAKE = {
   pain: "Our sales team got an AI call-notetaker three months ago, but reps still write their own summaries afterward and the AI notes mostly sit unused.",
-  flow: "1. Rep begins customer call\n2. Rep optionally clicks Start AI-Call Notetaker button\n3. Rep finishes call\n4. Rep writes summary from memory into CRM\n5. Manager reviews summary if there are escalations, questions, or issues\n6. Summary sits in CRM for next rep or manager reference",
-  who: "Sales reps (do the work), sales managers (coach and review them daily), account managers and customer success managers (receive the handoff downstream), partners and customers (external, affected by follow-up quality).",
+  flow: "1. Rep begins customer call\n2. Optional: Rep clicks the Start AI-Call Notetaker button.\n3. Rep finishes call.\n4. Rep writes summary from memory into CRM.\n5. Rep clicks the Submit button in CRM.\n6. Edge Case: Manager reviews summary if there are any escalations, questions, or issues.\n7. Summary sits in CRM for next rep or manager reference.",
+  who: "Sales reps (do the work), Sales managers (coach sales rep performance and directly manage sales reps), Account managers and customer success managers (receive the handoff to continuously improve relationships with external customers and partners), External customers and partners (affected, influence indirectly through customer satisfaction and buying products and services).",
   constraints: "",
   ctxTeam: "Sales Representatives",
-  ctxRole: "Engage, sell, and follow up with end-customers and partners",
+  ctxRole: "Engage, sell, and follow-up with customers and partners",
   ctxDeploy: "Enterprise",
   ctxUsers: "500",
-  ctxIndustry: "Technology / Software"
+  ctxIndustry: "Professional Services"
 };
 
 const EXAMPLE_BLUEPRINT = {
-  initiative: "Activate AI call notes, close the loop",
+  initiative: "Make AI summaries the default, measure the win",
   assumptions: [
-    "The START button friction is the primary blocker; reps forget because it requires a deliberate click before each call rather than being on by default.",
-    "Reps do not trust the AI notes quality yet because they have never seen manager feedback affirming that AI summaries meet the bar."
+    "The AI summary that auto-populates is accurate enough to use as-is or with light editing, since no quality baseline was captured before rollout.",
+    "Reps skip the AI notetaker because it feels optional and adds no visible friction or reward compared to their familiar manual habit."
   ],
   diagnosis: {
     rootType: "Process",
-    secondaryType: "Tool",
-    summary: "The AI tool is bolted on, not woven in. Reps must remember two manual steps (START button, then SUBMIT button) and have no feedback loop showing them the AI notes are good enough, so they default to the familiar habit of writing their own. Trust and habit, not capability, are the real blockers."
+    secondaryType: "People",
+    summary: "The AI tool was bolted on as optional, so reps kept their old habit of writing summaries from memory. Without a required workflow change, a manager nudge, or a visible payoff, adoption stalled. The fix is to flip the default: AI summary becomes the starting point, reps edit rather than write, and managers reinforce the new standard."
   },
   workflow: {
     before: [
@@ -535,168 +536,175 @@ const EXAMPLE_BLUEPRINT = {
       "Rep optionally clicks Start AI-Call Notetaker button.",
       "Rep finishes call.",
       "Rep writes summary from memory into CRM.",
-      "Manager reviews summary if there are escalations, questions, or issues.",
-      "Summary sits in CRM for next rep or manager reference."
+      "Rep clicks Submit button in CRM.",
+      "Manager reviews summary if escalation, question, or issue exists."
     ],
     after: [
-      "Rep begins customer call with AI-Call Notetaker on by default.",
-      "Rep finishes call and AI generates summary automatically.",
-      "Rep reviews AI summary in CRM, edits if needed, and submits in one step.",
-      "Manager reviews AI summary and flags quality to rep (escalations get feedback; routine calls get a thumbs-up or brief note).",
-      "Rep sees manager feedback and builds confidence in AI notes for future calls.",
+      "Rep begins customer call and AI-Call Notetaker starts automatically.",
+      "Rep finishes call.",
+      "AI summary auto-populates into CRM summary field.",
+      "Rep reviews and edits AI summary as needed, then clicks Submit.",
+      "Manager reviews summary if escalation, question, or issue exists.",
       "Summary sits in CRM for next rep or manager reference."
     ],
     changes: [
-      { change: "Make AI-Call Notetaker on by default instead of opt-in", why: "Removes the friction of remembering to click START; reps no longer have to choose" },
-      { change: "Merge the review and submit step so reps edit and confirm in one motion", why: "Cuts the manual overhead and makes the AI notes feel like a natural part of the call close, not an extra task" },
-      { change: "Managers give reps explicit feedback on AI note quality, even for routine calls", why: "Closes the trust loop; reps see that AI notes are good enough and stop rewriting out of habit" }
+      { change: "AI notetaker becomes automatic, not optional", why: "Removes the friction of remembering to click Start and makes the AI summary the default path, not an afterthought" },
+      { change: "Rep edits the AI summary instead of writing from scratch", why: "Cuts time spent on summary writing and shifts reps to a faster, higher-fidelity starting point" },
+      { change: "Managers reinforce the new standard in 1-on-1 coaching and performance reviews", why: "Signals that this is now the expected workflow, not a nice-to-have, and closes the adoption gap" }
     ]
   },
   fixes: [
-    { fix: "Change AI-Call Notetaker default to ON for all reps; require opt-out only if a rep has a specific reason.", effort: "Low", impact: "High", bucket: "Quick win" },
-    { fix: "Add a one-click 'Approve and Submit' button in the CRM so reps can confirm AI notes without rewriting.", effort: "Low", impact: "High", bucket: "Quick win" },
-    { fix: "Brief sales managers on a feedback protocol: for escalations give specific feedback; for routine calls send a weekly digest of 'AI notes approved' to reinforce the pattern.", effort: "Medium", impact: "High", bucket: "Bigger bet" }
+    { fix: "Enable AI-Call Notetaker to start automatically on all calls; remove the manual Start button.", effort: "Low", impact: "High", bucket: "Quick win" },
+    { fix: "Run a two-week pilot with 20 reps: capture turnaround time and quality of AI summaries against their prior manual summaries from the same period last quarter.", effort: "Medium", impact: "High", bucket: "Quick win" },
+    { fix: "Brief sales managers on the new workflow and equip them with a one-page coaching card: what to look for in a rep's edited summary, when to flag incomplete edits, and how to reinforce the standard in weekly 1-on-1s.", effort: "Medium", impact: "Medium", bucket: "Bigger bet" }
   ],
   aiFit: [
-    { step: "Rep finishes call and AI generates summary automatically.", verdict: "Automate", why: "AI transcription and summary generation is reliable and removes the manual write-from-memory step entirely." },
-    { step: "Rep reviews AI summary in CRM, edits if needed, and submits in one step.", verdict: "Human-AI assist", why: "Rep adds judgment and context that AI may miss; AI does the heavy lifting, rep does the quality check." },
-    { step: "Manager reviews AI summary and flags quality to rep.", verdict: "Human-AI assist", why: "Manager judgment on escalations is irreplaceable, but AI notes give them a head start and free them from reading rambling manual notes." }
+    { step: "AI-Call Notetaker starts automatically when rep begins call.", verdict: "Automate", why: "No human decision needed; the tool records and transcribes the call on its own." },
+    { step: "AI summary auto-populates into CRM summary field after call ends.", verdict: "Automate", why: "The system moves the summary into the CRM without any rep action required." },
+    { step: "Rep reviews and edits AI summary, then submits.", verdict: "Human-AI assist", why: "Rep adds judgment, context, and any missing details before the summary goes live." }
   ],
   humanAngle: [
-    { group: "Sales reps", worry: "Will the AI notes miss important details or make me look bad if a manager sees a sloppy summary", wiifm: "You save 5 to 10 minutes per call, and manager feedback will show you the AI is trustworthy; you keep control by reviewing before it goes in", move: "Show reps a side-by-side of their old manual notes and AI notes for the same call; let them see the AI is often more complete and faster" },
-    { group: "Sales managers", worry: "If I stop seeing reps write their own notes, how do I know they are paying attention to the call or remembering the details", wiifm: "You spend less time reading notes and more time coaching on the deal; AI notes are a baseline, and your feedback to reps becomes a coaching moment, not a chore", move: "Frame the feedback protocol as a coaching tool, not a compliance check; give reps one piece of actionable feedback per week so they see you are reading and care" }
+    { group: "Sales reps", worry: "This feels like one more thing to do, or like the AI is checking their work.", wiifm: "You spend less time on admin and more time selling; the summary is already 80% done, you just polish it.", move: "Show the pilot data: reps who use the AI summary finish their CRM work 30% faster and can get back to customers sooner." },
+    { group: "Sales managers", worry: "If I don't actively push this, reps will ignore it like they did before, and I'll look like I'm not driving adoption.", wiifm: "You get cleaner, faster summaries to review, fewer escalations slip through because the AI catches details reps miss, and you have a clear coaching standard to reinforce.", move: "Equip managers with a simple coaching card and a weekly check-in question: 'How much did you edit the AI summary this week?' This makes it visible and gives you a natural way to reinforce the new norm." }
   ],
   checklist: [
-    { action: "Audit the AI-Call Notetaker settings and flip the default to ON for all reps by end of week.", owner: "Sales ops or IT admin", when: "This week" },
-    { action: "Work with the tool vendor or CRM team to add a one-click 'Approve and Submit' button; test with 5 reps.", owner: "Sales ops or product owner", when: "Week 2" },
-    { action: "Brief sales managers on the feedback protocol and share a template for weekly coaching notes; kick off with a 30-minute call.", owner: "Sales leadership or change lead", when: "Week 2" },
-    { action: "Track summary-write time separately from call time and measure adoption of AI notes over 4 weeks to show the payoff.", owner: "Sales ops or analytics", when: "Week 3" }
+    { action: "Confirm with the AI tool vendor that auto-start is possible and set a go-live date.", owner: "Sales operations or IT lead", when: "This week" },
+    { action: "Select 20 reps for the two-week pilot; brief them on the new workflow and ask them to note any friction.", owner: "Sales manager", when: "Week 2" },
+    { action: "Create a one-page coaching card for managers: what to look for in an edited summary, red flags, and a sample 1-on-1 question.", owner: "Sales enablement or manager lead", when: "Week 2" },
+    { action: "After the pilot, compare turnaround time and quality against last quarter's manual summaries and share results with the full team.", owner: "Sales operations", when: "Week 4" }
   ]
 };
 
-/* Canned clarify round, so the offline example showcases the agent loop
-   (the real differentiator) with no API call. Answers are pre-filled to
-   model a completed conversation. */
 const EXAMPLE_QUESTIONS = [
   {
-    question: "When a rep clicks Start AI-Call Notetaker, does the AI summary automatically land in the CRM, or does the rep have to manually copy it over or approve it first?",
-    why: "If it is a manual step, friction alone explains the drop-off. If it is automatic, the issue is trust or habit, not effort.",
-    answer: "It's a bolt-on solution, so the AI-Call Notetaker notes don't auto-populate the CRM until AFTER someone clicks the SUBMIT button, and ONLY IF the rep remembers to click the START AI-CALL NOTETAKER button first. Two steps have to happen before the AI notes appear in the CRM."
+    question: "When a rep clicks Start AI-Call Notetaker, does the AI summary automatically populate into the CRM summary field, or does the rep have to manually copy it over or re-enter it?",
+    why: "If it lands automatically, friction is not the blocker and the issue is habit or trust. If it is manual, the friction itself explains the drop-off.",
+    answer: "Automatically populates into the CRM."
   },
   {
-    question: "Has anyone told the reps that using the AI notes instead of writing their own would save them time, or has it just been presented as an option?",
-    why: "Adoption behaves differently when a tool is framed as a time-saver versus an optional extra.",
-    answer: "Yes, reps have been told the AI call notes will save them time. But because you have to remember to click START AI-CALL NOTETAKER, a lot of them forget to use it."
+    question: "Was using the AI notetaker part of a rep's required daily work, tied to their performance review, or presented as optional?",
+    why: "A tool framed as optional competes with an established habit and usually loses; a required or measured step behaves very differently.",
+    answer: "It was presented as optional."
   },
   {
-    question: "When managers review summaries, do they ever give reps feedback on whether the AI notes would have been good enough, or does that loop just not exist?",
-    why: "If leadership never affirms the AI output, reps never learn to trust it, and the loop stays open.",
-    answer: "The AI call notes are still 'optional,' so managers are NOT giving reps feedback on whether the AI notes would have been good enough. The notes loop exists for customer escalations, but it covers both manual and AI notes."
+    question: "When the AI notes do get used, has anyone measured whether they're faster, more complete, or more accurate than the rep's own summaries, or was there no baseline captured before rollout?",
+    why: "Without a baseline, the payoff stays invisible, so reps have no proof the new way is worth the change.",
+    answer: "No, there was no baseline captured before the rollout. The manual summary turnaround times were rolled into the customer call metric and never broken out. Quality has not been compared yet because adoption is too low."
   },
   {
-    question: "Was there a baseline measurement of how long reps spent writing summaries before the AI tool arrived, and has anyone tracked whether that time has actually gone down?",
-    why: "Without a baseline, ROI cannot be proven, and success collapses into a feeling instead of a number.",
-    answer: "The metric for the summary is mixed in with the Customer Call Time metric and not easily separated right now."
+    question: "Have managers been trained or coached to specifically ask reps to use the AI notes, or to flag when a rep skips it?",
+    why: "If leadership never reinforces the tool, reps read that silence as permission to stick with the old way.",
+    answer: "No, the AI-Call Notetaker was a bolt-on solution and was optional with no consequence if skipped."
   }
 ];
 
-/* Canned success metrics for the offline example, so the sample shows the
-   Beyond-ROI "go deeper" layer without a live call. */
 const EXAMPLE_METRICS = {
-  framing: "Success means reps trust and use AI notes enough to reclaim selling time, while quality and accountability stay visible to managers and customers.",
-  estimateNote: "These are directional estimates, not quotes. Plug in your own rep count, working weeks, and blended rates to size the value for a funding conversation.",
+  framing: "Success means reps spend less time on admin, catch more nuance in customer calls, and managers coach on what matters, not whether notes exist.",
+  estimateNote: "These are directional estimates, not quotes. Plug in your own call volume, rep count, and blended rates to size the value for your team.",
   metrics: [
-    { shortName: "AI Notes Adopted", lens: "Adoption", signal: "Leading",
-      metric: "Percentage of calls where the AI summary is submitted to the CRM without a manual rewrite.",
-      definition: "The share of calls with an AI note that the rep submits directly or edits lightly rather than discarding and writing from scratch.",
-      why: "This is the leading signal that reps actually trust the AI output; without it, the tool stays dead weight and selling time stays locked in admin.",
-      value: "Reclaims roughly 2 to 3 hours per rep per week that currently goes to writing summaries, and that time moves to selling.",
-      howToSize: "Multiply the hours reclaimed per rep per week by your rep count, by your working weeks, by your blended hourly rate.",
-      good: "Above 60 percent within 60 days; trending toward 75 percent by month four as trust builds and habit shifts." },
-    { shortName: "Voluntary Reuse", lens: "Human", signal: "Leading",
-      metric: "Percentage of reps who voluntarily use AI notes in deal prep or handoff to account managers.",
-      definition: "The share of reps who reference an AI summary when prepping a follow-up or sharing context with an account manager, measured by survey or CRM activity.",
-      why: "Voluntary reuse is the truest sign reps see AI notes as a capability multiplier, not a compliance burden.",
-      value: "Builds institutional memory, speeds new-hire ramp, and reduces deals lost to miscommunication.",
-      howToSize: "Compare ramp time for new hires before and after, and multiply the days saved by their fully loaded daily cost.",
-      good: "Above 40 percent of reps actively reusing notes within 90 days; trending toward 60 percent by six months." },
-    { shortName: "Summary Speed", lens: "Efficiency", signal: "Lagging",
-      metric: "Average time from call end to CRM summary completion per rep.",
-      definition: "The median minutes between call disconnect and summary posted to the CRM, measured per rep and in aggregate.",
-      why: "Faster summaries mean reps move to the next deal sooner and managers see context sooner.",
-      value: "Cuts roughly 8 to 12 minutes of admin per call, which converts directly into selling capacity.",
-      howToSize: "Multiply minutes saved per call by calls per rep per week, by your rep count, by your blended hourly rate.",
-      good: "Median time under 5 minutes per rep; no rep averaging longer than 15 minutes." },
-    { shortName: "AI Summary Quality", lens: "Quality", signal: "Lagging",
-      metric: "Manager-flagged accuracy or completeness issues per 100 AI summaries reviewed.",
-      definition: "The count of summaries where a manager notes missing deal details, wrong next steps, or misheard customer intent, per 100 reviewed.",
-      why: "If AI notes are inaccurate, reps keep writing their own and customers lose context.",
-      value: "Fewer errors slipping downstream, less rework, and lower risk of missed upsell or churn signals.",
-      howToSize: "Estimate the rework hours per flagged issue, then multiply by issues avoided and your blended hourly rate.",
-      good: "Fewer than 5 issues per 100 summaries; trend stable or improving over time." },
-    { shortName: "Rep Retention", lens: "Human", signal: "Lagging",
-      metric: "Voluntary turnover and tool-satisfaction scores across the sales team.",
-      definition: "The voluntary turnover rate for reps plus their self-reported satisfaction with the tool and the time it gives back.",
-      why: "If reps feel the AI gives them time back and cuts drudgery, they stay longer and perform better.",
-      value: "Protects retention and preserves institutional knowledge, avoiding the cost of replacing and re-ramping reps.",
-      howToSize: "Multiply the reps retained by your own replacement-and-ramp cost per rep.",
-      good: "Voluntary turnover stable or declining; tool-satisfaction scores above 7 out of 10." }
+    { shortName: "Admin Time Reclaimed", lens: "Efficiency", signal: "Leading",
+      metric: "Time spent on call documentation per rep per week.",
+      definition: "Minutes per rep per week spent writing or editing call summaries in the CRM, measured before and after the workflow change.",
+      why: "Reps feared more work; proving time saved builds trust and frees capacity for selling and relationship work.",
+      value: "8 to 12 minutes per rep per call, compounding across a typical call volume.",
+      howToSize: "Multiply minutes saved per call by average calls per rep per week, by your rep count, by working weeks per year.",
+      good: "Reps report editing takes 2 to 4 minutes per call; writing from scratch took 8 to 12 minutes." },
+    { shortName: "Summary Quality", lens: "Quality", signal: "Lagging",
+      metric: "Accuracy and completeness of call summaries in the CRM.",
+      definition: "A spot-check of whether summaries capture the key customer asks, objections, and next steps, and match what actually happened on the call.",
+      why: "AI summaries can miss context or misread tone; reps editing catch the gaps and keep handoffs to account managers reliable.",
+      value: "Fewer rework loops, fewer customer misunderstandings, and faster account manager onboarding to the relationship.",
+      howToSize: "Sample 10 to 15 calls per week and track how many summaries needed an account manager follow-up question or correction.",
+      good: "80% or more of summaries need zero follow-up; account managers confirm they have what they need to continue the relationship." },
+    { shortName: "Adoption Trust", lens: "Adoption", signal: "Leading",
+      metric: "Rep confidence in the AI summary as a starting point.",
+      definition: "A survey or pulse on whether reps believe the AI summary is accurate enough to edit, or still feel they need to rewrite it.",
+      why: "Adoption stalled because reps did not trust the tool; measuring confidence shows whether the workflow change is actually shifting behavior.",
+      value: "Reps who trust the AI spend less time second-guessing and more time selling, and voluntary adoption rises.",
+      howToSize: "Ask reps monthly, on a scale of 1 to 5, how often the AI summary captures the main points of their call, and track the trend.",
+      good: "70% or more of reps rate the AI summary a 4 or 5, and they edit rather than rewrite." },
+    { shortName: "Coaching Quality Shift", lens: "Human", signal: "Leading",
+      metric: "Manager coaching conversations focused on customer insight, not documentation.",
+      definition: "In 1-on-1 reviews, how often managers coach on call strategy, objection handling, or relationship moves versus reminding reps to write summaries.",
+      why: "Managers can now coach on selling skill instead of process compliance, so reps build capability and feel trusted, not policed.",
+      value: "Reps report higher engagement, and managers spend coaching time on what drives revenue instead of admin hygiene.",
+      howToSize: "Track manager notes from 1-on-1s and count coaching topics tied to selling skill versus documentation reminders.",
+      good: "80% or more of coaching conversations focus on customer strategy, objection handling, or relationship building." },
+    { shortName: "Handoff Clarity", lens: "Business", signal: "Lagging",
+      metric: "Account manager handoff quality and speed to next action.",
+      definition: "Whether account managers confirm they have clear next steps and customer context from the summary, or need to ask reps for clarification.",
+      why: "Reliable, complete summaries reduce friction in the customer journey, so account managers act faster and customer experience improves.",
+      value: "Fewer clarification loops, faster follow-up, stronger customer relationships, and lower churn risk.",
+      howToSize: "Track how many handoffs require an account manager follow-up question, measured before and after the workflow change.",
+      good: "90% or more of handoffs are actionable without follow-up; account managers confirm they can move forward immediately." }
   ]
 };
 
-/* Canned Augmentation Map for the offline example, so the sample shows the
-   fear-to-path layer without a live call. */
 const EXAMPLE_AUGMENT = {
-  framing: "Augmentation is a path, not a promise. Here is what changes for each group and how they grow into the new version of their role.",
+  framing: "AI summaries become your starting point, not your replacement, freeing you to spend call time on selling instead of typing afterward.",
   groups: [
     {
       group: "Sales reps",
-      fearNamed: "If the AI writes my call notes, what is left that only I can do, and am I next?",
-      aiTakes: "The after-call transcription and first-draft summary, the tab-switching and the write-from-memory grind.",
-      movesToward: "More live selling and follow-up, and becoming the person who reads the customer rather than the person who types up the call.",
+      fearNamed: "This feels like one more thing to do, or like the AI is checking my work and I'll be blamed if it gets something wrong.",
+      aiTakes: "Writing summaries from memory after every call, which pulls focus away from follow-up and relationship building.",
+      movesToward: "You spend call time selling and listening, not mentally drafting notes. You move from scribe to editor, which takes 2 to 3 minutes instead of 10 to 15, and that time goes to prep for the next call, relationship notes, or deal strategy.",
       ladder: [
-        { capability: "Reviewing and correcting an AI summary quickly and confidently.", level: "Foundational", why: "The new core skill is judging AI output, not producing it from scratch." },
-        { capability: "Prompting the notetaker for the deal details that matter most.", level: "Growing", why: "Reps who shape the AI get summaries that actually fit their pipeline." },
-        { capability: "Using AI notes in deal prep and handoffs to move faster.", level: "Growing", why: "Turns a record into a selling advantage, not just a compliance step." },
-        { capability: "Spotting patterns across calls to coach themselves and lift close rates.", level: "Advanced", why: "The higher-value work is insight, and AI hands reps the raw material for it." }
+        { capability: "Read the AI summary quickly and spot what it got right versus what it missed or misframed.", level: "Foundational", why: "You own the call; the AI is your draft, not the final word." },
+        { capability: "Edit the summary in the CRM field directly, adding context the AI could not hear, like tone, hesitation, or next steps you committed to.", level: "Foundational", why: "Your edits take 2 to 3 minutes and make the summary actually useful to the next person." },
+        { capability: "Spot patterns in your own edits across calls to see what the AI consistently misses, so you can brief your manager on what is and is not working.", level: "Growing", why: "You become the expert on how to tune the tool for your team's style and deals." },
+        { capability: "Use the saved time to prep better questions for the next call, or to flag deal risks earlier to your manager.", level: "Advanced", why: "The real win is not faster admin, it is better selling and earlier visibility into problems." }
       ],
-      firstStep: "Learn to review and approve an AI summary in under two minutes, so the tool saves time instead of adding a step."
+      firstStep: "In your next call, let the AI run. Afterward, spend 3 minutes reading what it wrote and editing one or two things that felt off. That is the whole job. Do not rewrite it from scratch."
     },
     {
       group: "Sales managers",
-      fearNamed: "If reps stop writing their own notes, do I lose visibility into whether they are really engaged on calls?",
-      aiTakes: "Reading long, rambling manual summaries and reconstructing what happened on a deal.",
-      movesToward: "Coaching on the deal and the relationship, using AI notes as a consistent baseline to see where reps need help.",
+      fearNamed: "If I do not actively push this, reps will ignore it like they did before, and I will look like I am not driving adoption.",
+      aiTakes: "Manually reviewing summaries reps wrote from memory, which often lacked the detail or context you needed to coach on.",
+      movesToward: "You shift from reviewing raw summaries to coaching reps on how they edit and use the AI output. You spot patterns in what reps add or change, which tells you where they are strong and where they need help, and you get richer summaries faster so you can coach earlier in the deal cycle.",
       ladder: [
-        { capability: "Reading an AI summary and confidence signal to gauge call quality fast.", level: "Foundational", why: "Frees a manager's attention for coaching instead of note-reading." },
-        { capability: "Giving reps quick, specific feedback on AI note quality.", level: "Growing", why: "Closing the trust loop is what makes reps actually adopt the tool." },
-        { capability: "Running a light feedback protocol that scales across the team.", level: "Growing", why: "Turns a chore into a repeatable coaching rhythm." },
-        { capability: "Reading team-wide patterns in AI notes to target coaching where it moves revenue.", level: "Advanced", why: "Managing by signal, not by anecdote, is the upgraded manager role." }
+        { capability: "In 1-on-1s, ask reps to show you one edited summary and explain what the AI got right and what they had to fix.", level: "Foundational", why: "This normalizes the new workflow and shows reps you are watching for quality, not just speed." },
+        { capability: "Notice what reps consistently edit or add across summaries, and coach them on what the AI is missing or what they are not saying clearly on calls.", level: "Growing", why: "You move from grading summaries to coaching call skills and communication, which is higher-value coaching." },
+        { capability: "In performance reviews, measure adoption by whether reps submit edited AI summaries on time, not by whether they wrote them from scratch.", level: "Growing", why: "You reinforce the new standard and make it clear that editing is the job, not writing." },
+        { capability: "Collect feedback from reps on what the AI gets wrong most often, and escalate patterns to the tool owner so the team's edits improve the AI over time.", level: "Advanced", why: "You become the bridge between the tool and the team, and reps see their feedback matters." }
       ],
-      firstStep: "Pick one routine call a week per rep and send a one-line 'AI notes looked good,' so reps see you are reading and that it is safe to rely on the tool."
+      firstStep: "In your next 1-on-1 with each rep, ask them to pull up one call summary the AI wrote and walk you through what they edited and why. Do not grade it, just listen. That conversation tells you who is adopting and who needs a nudge."
+    },
+    {
+      group: "Account managers and customer success managers",
+      fearNamed: "We will get worse handoff notes if reps are rushing through edits instead of writing thoughtful summaries.",
+      aiTakes: "Waiting for reps to finish writing summaries before you can see what happened on a call, which delays your follow-up or relationship work.",
+      movesToward: "You get summaries faster and more consistently, because reps edit instead of writing from scratch. You also get richer context, because the AI captures details reps might skip from memory, so your job shifts from chasing down notes to reading them sooner and acting earlier in the relationship.",
+      ladder: [
+        { capability: "Read the AI summary and the rep's edits together to understand what the rep heard and what they thought was important enough to highlight.", level: "Foundational", why: "The edits are as telling as the summary itself; they show you what the rep prioritized." },
+        { capability: "If a summary is unclear or missing context you need, ask the rep directly instead of assuming the AI failed.", level: "Growing", why: "You get better information faster, and reps learn what downstream partners actually need." },
+        { capability: "Flag patterns in summaries missing customer health signals or next-step clarity, and share that with the sales manager so reps can improve their edits.", level: "Advanced", why: "You close the loop between your needs and the rep's work, which improves handoffs over time." }
+      ],
+      firstStep: "For the next three calls you receive summaries for, note one thing the AI got right and one thing the rep's edit added. That tells you whether the handoff is actually getting better."
     }
   ]
 };
 
-/* Canned Reinforcement plan for the offline example, so the sample shows the
-   make-it-stick layer, with intrinsic motivators and estimate-only cost tags. */
 const EXAMPLE_REINFORCE = {
-  framing: "Reinforcement is the step most change efforts skip, and then adoption quietly fades after launch. These moves keep the change alive and make people want it, not just tolerate it.",
-  estimateNote: "These investment levels and timings are directional estimates, not quotes. Actual effort depends on your team size, call volume, and how much analyst or admin capacity you have, so plug in your own numbers and rates.",
+  framing: "Adoption stalls when people see change as compliance, not payoff. Without visible wins and rituals that make the new way easier than the old one, reps revert to habit and managers exhaust themselves pushing.",
+  estimateNote: "These investment levels and timings are directional estimates, not quotes. Actual effort depends on your team size, call volume, and available CRM or BI capacity, so plug in your own numbers and rates.",
   moves: [
-    { move: "Two-minute micro-trainings on reviewing an AI summary well, released weekly for the first month.", type: "Reinforcement", motivator: "Mastery", locksIn: "The review-and-submit habit, so reps trust their own judgment on AI output.", cadence: "Weekly", owner: "Sales enablement or change lead", investment: "Low", whatItTakes: "A few hours to record the clips once, then about 2 minutes per rep each week to watch.", howToSize: "Recording hours times the creator's rate, plus 2 minutes times your rep count times their blended rate weekly." },
-    { move: "A friendly streak marker showing how many calls in a row a rep let the AI draft stand.", type: "Incentive", motivator: "Progress", locksIn: "Reps choosing the AI draft by default rather than rewriting it.", cadence: "Ongoing", owner: "Sales ops", investment: "Medium", whatItTakes: "A one-time CRM or dashboard config, then it runs itself; calendar time depends on your admin's queue.", howToSize: "Ask your CRM admin or vendor for a one-time build estimate; ongoing cost is near zero." },
-    { move: "A weekly manager note to each rep on what their AI summary captured well.", type: "Reinforcement", motivator: "Recognition", locksIn: "Closing the trust loop so reps rely on AI notes instead of rewriting from habit.", cadence: "Weekly", owner: "Sales managers", investment: "Low", whatItTakes: "Roughly 1 to 2 minutes per rep per week, so it scales with how many reps each manager carries.", howToSize: "Minutes per rep times reps per manager times your manager count times their blended rate." },
-    { move: "An AI notes champion role for a few respected reps who help peers and shape the prompts.", type: "Incentive", motivator: "Autonomy", locksIn: "Voluntary reuse and peer-to-peer trust in the AI notes.", cadence: "One-time", owner: "Sales leadership", investment: "Low", whatItTakes: "Mostly recognition plus some of the champions' time; no direct spend unless you add a perk.", howToSize: "Any perk value times the number of champions, plus their time at their blended rate." },
-    { move: "A progress view showing time reclaimed and adoption trending, at team and personal level.", type: "Reinforcement", motivator: "Progress", locksIn: "Sustained adoption, because reps see their own momentum and want to keep it.", cadence: "Ongoing", owner: "Sales ops or analytics", investment: "Medium", whatItTakes: "A one-time build on data you already capture; timing depends on analyst availability, not just effort.", howToSize: "Get a one-time analyst or vendor build estimate, then add light monthly upkeep." },
-    { move: "Quarterly recognition for the reps who grew most or helped peers, never a bottom-ranked list.", type: "Incentive", motivator: "Belonging", locksIn: "Continued growth and a sense that the team is in this together.", cadence: "Monthly", owner: "Sales leadership", investment: "Low", whatItTakes: "Manager time to select plus an optional small reward; scales with team size.", howToSize: "Reward value times reps recognized per quarter, plus selection time at the manager's rate." }
+    { move: "Weekly rep huddle where each rep shares one edit they made to an AI summary and why it mattered to the deal.", type: "Reinforcement", motivator: "Mastery", locksIn: "Rep reviews and edits the AI summary instead of writing from scratch.", cadence: "Weekly", owner: "Sales manager", investment: "Low", whatItTakes: "Manager facilitates 15 to 20 minutes per week for a team of 8 to 12, scaling with team size, with no prep beyond opening the floor.", howToSize: "Multiply your team size by 2 to 3 minutes per person per week for the huddle slot." },
+    { move: "Monthly dashboard showing each rep their edit rate, time saved per call, and CRM handoff quality score against their baseline.", type: "Incentive", motivator: "Progress", locksIn: "Rep adopts the AI summary as default and edits it consistently.", cadence: "Monthly", owner: "Sales manager", investment: "Medium", whatItTakes: "A one-time CRM query or dashboard config to pull edit rate and time-to-submit, then 30 to 45 minutes monthly for the manager to review and share.", howToSize: "Estimate one-time setup as 4 to 8 hours of CRM or BI work depending on your data stack; monthly upkeep is manager time only." },
+    { move: "Early-adopter peer mentors: pair 3 to 5 reps who edit confidently with peers for 1-on-1 shadowing or async Slack tips.", type: "Incentive", motivator: "Belonging", locksIn: "Rep reviews and edits the AI summary, and the manager reinforces the standard in coaching.", cadence: "Ongoing", owner: "Sales manager", investment: "Low", whatItTakes: "Manager identifies mentors and sets up pairings; mentors spend 10 to 15 minutes per week answering questions or sharing a quick edit tip.", howToSize: "Multiply 3 to 5 mentors by 10 to 15 minutes weekly, and recognize mentors in team comms or reviews as a non-monetary thank you." },
+    { move: "Micro-training: a 3 to 4 minute video of a real rep editing an AI summary to catch a missed deal detail, posted in Slack and linked in onboarding.", type: "Reinforcement", motivator: "Mastery", locksIn: "Rep reviews and edits the AI summary instead of writing from scratch.", cadence: "One-time", owner: "Sales manager or enablement", investment: "Low", whatItTakes: "Record one call debrief or screen share showing an edit that changed the summary, with minimal editing, then reuse it for all new hires.", howToSize: "Estimate 2 to 3 hours of recording and light editing, and refresh quarterly if the workflow changes." },
+    { move: "Manager 1-on-1 coaching: in each check-in, ask 'What did you edit in this week's summaries and why?' and note patterns in the performance review.", type: "Reinforcement", motivator: "Autonomy", locksIn: "Manager reinforces the new standard in 1-on-1 coaching and performance reviews.", cadence: "Weekly", owner: "Sales manager", investment: "Low", whatItTakes: "Manager adds one question to the existing 1-on-1 agenda, so no new meeting time is needed, just a shift in focus that scales with team size.", howToSize: "Estimate 2 to 3 minutes per rep per week, already embedded in existing 1-on-1 time." },
+    { move: "Quarterly recognition for the rep whose edits most improved handoff quality or deal clarity, called out in team all-hands or a manager message.", type: "Incentive", motivator: "Recognition", locksIn: "Rep adopts the AI summary as default and edits it consistently.", cadence: "Monthly", owner: "Sales manager", investment: "Low", whatItTakes: "Manager reviews the monthly dashboard, picks one standout edit pattern, and calls it out in team comms, about 10 to 15 minutes per month.", howToSize: "Multiply 10 to 15 minutes by 12 months; no cost beyond manager time." }
   ]
 };
 
 const $ = (id) => document.getElementById(id);
 const esc = (s) => String(s == null ? "" : s).replace(/[&<>"]/g, c => ({ "&":"&amp;","<":"&lt;",">":"&gt;","\"":"&quot;" }[c]));
 /* Exactly one terminal period, so model text that already ends in "." doesn't double up. */
-const dot = (s) => { s = String(s == null ? "" : s).trim(); return s ? s.replace(/[.!?]+$/, "") + "." : ""; };
+const dot = (s) => { s = String(s == null ? "" : s).trim(); if (!s) return ""; const m = s.match(/(["')\]]+)$/); const tail = m ? m[1] : ""; const core = tail ? s.slice(0, -tail.length) : s; return core.replace(/[.!?]+$/, "") + "." + tail; };
+/* Capitalize the first letter. Used where model fields must read as full sentences. */
+const cap = (s) => { s = String(s == null ? "" : s).trim(); return s ? s.charAt(0).toUpperCase() + s.slice(1) : ""; };
+/* Full-sentence tidy: capitalized start, single terminal period. */
+const sent = (s) => dot(cap(s));
 function toast(msg){ const t=$("toast"); t.textContent=msg; t.classList.add("show"); clearTimeout(t._t); t._t=setTimeout(()=>t.classList.remove("show"),2600); }
 
 /* Persistent error dialog. Unlike a toast, it stays on screen until the user
@@ -1289,8 +1297,8 @@ function buildBlueprintDeck(pptx, d, dateStr, beyondRoi, augment, reinforce){
         // One flowing block at FIXED sizes so every card reads the same, with content caps
         // in the prompt keeping it inside the box.
         const row=(lab,val,col)=> val?[{text:lab+"   ",options:{fontFace:DISP,fontSize:8.5,bold:true,color:col||DEEP,charSpacing:.4}},
-                                       {text:dot(val),options:{fontFace:BODY,fontSize:9.5,color:SOFT,breakLine:true,paraSpaceAfter:2}}]:[];
-        const block=[{text:m.move||"",options:{fontFace:DISP,fontSize:11.5,bold:true,color:INK,breakLine:true,paraSpaceAfter:6}}].concat(
+                                       {text:sent(val),options:{fontFace:BODY,fontSize:9.5,color:SOFT,breakLine:true,paraSpaceAfter:2}}]:[];
+        const block=[{text:cap(m.move||""),options:{fontFace:DISP,fontSize:11.5,bold:true,color:INK,breakLine:true,paraSpaceAfter:6}}].concat(
           row("LOCKS IN",m.locksIn),
           row("OWNER",m.owner),
           [{text:(m.investment?m.investment.toUpperCase()+" INVESTMENT (ESTIMATE)   ":""),options:{fontFace:DISP,fontSize:8.5,bold:true,color:invC.tx,charSpacing:.4,breakLine:true,paraSpaceBefore:5,paraSpaceAfter:3}}],
@@ -1473,13 +1481,13 @@ function renderReinforce(r){
         ${m.motivator?`<span class="rf-mot">${esc(m.motivator)}</span>`:""}
         ${m.cadence?`<span class="rf-cad">${esc(m.cadence)}</span>`:""}
       </div>
-      <div class="rf-move">${esc(m.move||"")}</div>
-      ${m.locksIn?`<div class="mrow"><span class="mlab">Locks in</span>${esc(dot(m.locksIn))}</div>`:""}
-      ${m.owner?`<div class="mrow"><span class="mlab">Owner</span>${esc(m.owner)}</div>`:""}
+      <div class="rf-move">${esc(cap(m.move||""))}</div>
+      ${m.locksIn?`<div class="mrow"><span class="mlab">Locks in</span>${esc(sent(m.locksIn))}</div>`:""}
+      ${m.owner?`<div class="mrow"><span class="mlab">Owner</span>${esc(cap(m.owner))}</div>`:""}
       <div class="rf-cost">
         <div class="rf-cost-head">${m.investment?`<span class="rf-inv inv-${inv}">${esc(m.investment)} investment</span>`:""}<span class="rf-cost-lab">estimate</span></div>
-        ${m.whatItTakes?`<div class="mrow"><span class="mlab">What it takes</span>${esc(dot(m.whatItTakes))}</div>`:""}
-        ${m.howToSize?`<div class="mrow val"><span class="mlab">How to size it</span>${esc(dot(m.howToSize))}</div>`:""}
+        ${m.whatItTakes?`<div class="mrow"><span class="mlab">What it takes</span>${esc(sent(m.whatItTakes))}</div>`:""}
+        ${m.howToSize?`<div class="mrow val"><span class="mlab">How to size it</span>${esc(sent(m.howToSize))}</div>`:""}
       </div>
     </div>`;
   }).join("");

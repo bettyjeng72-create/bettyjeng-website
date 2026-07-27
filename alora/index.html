@@ -24,6 +24,8 @@
 
   /* header */
   .app-header{padding:46px 0 24px;text-align:center}
+  .home-link{display:inline-block;font-family:var(--disp);font-weight:600;font-size:13px;letter-spacing:.02em;color:var(--ink-faint);text-decoration:none;margin:0 0 18px;transition:color .15s}
+  .home-link:hover{color:var(--accent)}
   .wordmark{font-family:var(--disp);font-weight:800;font-size:clamp(34px,6vw,52px);letter-spacing:-.02em;margin:0;color:var(--ink)}
   .wordmark .dot{color:var(--accent)}
   .tagline{font-size:clamp(15px,2.3vw,17px);color:var(--ink-soft);max-width:620px;margin:10px auto 0}
@@ -305,6 +307,7 @@
 <body>
   <header class="app-header">
     <div class="wrap">
+      <a class="home-link" href="/">&larr; bettyjeng.com</a>
       <p class="eyebrow-top">A Human Mirror tool</p>
       <h1 class="wordmark">Alora<span class="dot">.</span></h1>
       <p class="tagline">Describe a workflow that isn't working. Alora hands back a Blueprint: what's really wrong, what to change, where AI fits and where it doesn't, and what to do next.</p>

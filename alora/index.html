@@ -24,8 +24,8 @@
 
   /* header */
   .app-header{padding:46px 0 24px;text-align:center}
-  .home-link{display:inline-block;font-family:var(--disp);font-weight:600;font-size:13px;letter-spacing:.02em;color:var(--ink-faint);text-decoration:none;margin:0 0 18px;transition:color .15s}
-  .home-link:hover{color:var(--accent)}
+  .eyebrow-top a{color:inherit;text-decoration:none;transition:opacity .15s}
+  .eyebrow-top a:hover{text-decoration:underline;text-underline-offset:3px}
   .wordmark{font-family:var(--disp);font-weight:800;font-size:clamp(34px,6vw,52px);letter-spacing:-.02em;margin:0;color:var(--ink)}
   .wordmark .dot{color:var(--accent)}
   .tagline{font-size:clamp(15px,2.3vw,17px);color:var(--ink-soft);max-width:620px;margin:10px auto 0}
@@ -260,6 +260,8 @@
 
   footer{text-align:center;padding:34px 20px 50px;color:var(--ink-faint);font-size:13px}
   footer .brand{font-family:var(--disp);font-weight:700;color:var(--accent)}
+  footer a{color:inherit;text-decoration:none;border-bottom:1px solid var(--line)}
+  footer a:hover{color:var(--accent)}
   footer .disclaimer{max-width:580px;margin:0 auto 12px;font-size:12.5px;color:var(--ink-faint)}
   .toast{position:fixed;left:50%;bottom:26px;transform:translateX(-50%) translateY(20px);background:var(--ink);color:#fff;font-size:13.5px;padding:11px 18px;border-radius:10px;opacity:0;pointer-events:none;transition:opacity .2s,transform .2s;z-index:50;font-family:var(--body)}
   .toast.show{opacity:1;transform:translateX(-50%) translateY(0)}
@@ -307,8 +309,7 @@
 <body>
   <header class="app-header">
     <div class="wrap">
-      <a class="home-link" href="/">&larr; bettyjeng.com</a>
-      <p class="eyebrow-top">A Human Mirror tool</p>
+      <p class="eyebrow-top"><a href="https://bettyjeng.com/index">A Human Mirror tool</a></p>
       <h1 class="wordmark">Alora<span class="dot">.</span></h1>
       <p class="tagline">Describe a workflow that isn't working. Alora hands back a Blueprint: what's really wrong, what to change, where AI fits and where it doesn't, and what to do next.</p>
     </div>
@@ -502,7 +503,7 @@
 
   <footer>
     <p class="disclaimer">A starting point for the conversation, not a substitute for it. Validate with the people the change touches, then plan the reinforcement that makes it stick.</p>
-    <span class="brand">Alora</span> &nbsp;·&nbsp; by Betty Jeng &nbsp;·&nbsp; bettyjeng.com
+    <span class="brand">Alora</span> &nbsp;·&nbsp; by Betty Jeng &nbsp;·&nbsp; <a href="https://bettyjeng.com/index">bettyjeng.com</a>
   </footer>
 
   <div class="toast" id="toast"></div>
